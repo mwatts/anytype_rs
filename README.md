@@ -1,3 +1,7 @@
+# Anytype.rs
+
+**THIS IS CURRENTLY ALL VIBE CODED AND SHOULD NOT BE TRUSTED.** It is not comprehensive and I wouldn't run it on any spaces you care about. It will be improved over time, but for now, it is just a starting point. Created with Claud Sonnet 4 (Preview) in GitHub Copilot.
+
 # Anytype API Client for Rust
 
 A comprehensive Rust library and CLI tool for interacting with your local Anytype application via its API.
