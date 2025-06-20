@@ -1,7 +1,7 @@
 //! Member management commands
 
 use anyhow::{Context, Result};
-use anytype_core::AnytypeClient;
+use api::AnytypeClient;
 use clap::{Args, Subcommand};
 use tracing::debug;
 

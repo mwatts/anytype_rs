@@ -1,6 +1,6 @@
-//! Integration tests for the anytype-core library
+//! Integration tests for the api library
 
-use anytype_core::{AnytypeClient, ClientConfig};
+use api::{AnytypeClient, ClientConfig};
 
 #[test]
 fn test_default_client_uses_localhost() {
@@ -39,7 +39,7 @@ async fn test_unauthenticated_request_fails() {
     assert!(result.is_err());
 
     // The error should be an authentication error
-    if let Err(anytype_core::AnytypeError::Auth { message }) = result {
+    if let Err(api::AnytypeError::Auth { message }) = result {
         assert!(message.contains("API key not set"));
     } else {
         panic!("Expected auth error, got: {:?}", result);
@@ -55,7 +55,7 @@ async fn test_unauthenticated_members_request_fails() {
     assert!(result.is_err());
 
     // The error should be an authentication error
-    if let Err(anytype_core::AnytypeError::Auth { message }) = result {
+    if let Err(api::AnytypeError::Auth { message }) = result {
         assert!(message.contains("API key not set"));
     } else {
         panic!("Expected auth error, got: {:?}", result);
@@ -71,7 +71,7 @@ async fn test_unauthenticated_members_pagination_request_fails() {
     assert!(result.is_err());
 
     // The error should be an authentication error
-    if let Err(anytype_core::AnytypeError::Auth { message }) = result {
+    if let Err(api::AnytypeError::Auth { message }) = result {
         assert!(message.contains("API key not set"));
     } else {
         panic!("Expected auth error, got: {:?}", result);

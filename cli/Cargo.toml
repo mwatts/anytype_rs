@@ -1,5 +1,5 @@
 [package]
-name = "anytype-cli"
+name = "cli"
 version = "0.1.0"
 edition = "2021"
 description = "Command-line interface for the Anytype API"
@@ -10,7 +10,7 @@ name = "anytype"
 path = "src/main.rs"
 
 [dependencies]
-anytype-core = { path = "../anytype-core" }
+api = { path = "../api" }
 tokio = { workspace = true }
 clap = { workspace = true }
 anyhow = { workspace = true }

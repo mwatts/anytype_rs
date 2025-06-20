@@ -14,7 +14,7 @@
 //! ## Quick Start
 //!
 //! ```rust,no_run
-//! use anytype_core::{AnytypeClient, Result};
+//! use core::{AnytypeClient, Result};
 //!
 //! #[tokio::main]
 //! async fn main() -> Result<()> {

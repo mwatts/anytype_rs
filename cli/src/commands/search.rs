@@ -1,5 +1,5 @@
 use anyhow::{Context, Result};
-use anytype_core::{AnytypeClient, SearchRequest};
+use api::{AnytypeClient, SearchRequest};
 use clap::Args;
 
 #[derive(Debug, Args)]

@@ -87,12 +87,12 @@ fn init_logging(debug: bool, verbose: bool) -> Result<()> {
     // Only show logs from our crates unless debug is enabled
     let env_filter = if debug {
         EnvFilter::from_default_env()
-            .add_directive(format!("anytype_core={}", level).parse()?)
-            .add_directive(format!("anytype_cli={}", level).parse()?)
+            .add_directive(format!("api={}", level).parse()?)
+            .add_directive(format!("cli={}", level).parse()?)
     } else {
         EnvFilter::from_default_env()
-            .add_directive(format!("anytype_core={}", level).parse()?)
-            .add_directive(format!("anytype_cli={}", level).parse()?)
+            .add_directive(format!("api={}", level).parse()?)
+            .add_directive(format!("cli={}", level).parse()?)
             .add_directive("hyper=warn".parse()?)
             .add_directive("reqwest=warn".parse()?)
     };

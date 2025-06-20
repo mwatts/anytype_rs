@@ -1,7 +1,7 @@
 [workspace]
 members = [
-    "anytype-core",
-    "anytype-cli",
+    "api",
+    "cli",
 ]
 resolver = "2"
 
