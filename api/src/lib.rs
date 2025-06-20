@@ -44,7 +44,7 @@ pub use types::*;
 pub use client::auth::{
     CreateApiKeyRequest, CreateApiKeyResponse, CreateChallengeRequest, CreateChallengeResponse,
 };
-pub use client::members::{ListMembersResponse, Member, MemberRole, MemberStatus};
+pub use client::members::{GetMemberResponse, ListMembersResponse, Member, MemberRole, MemberStatus};
 pub use client::objects::{CreateObjectRequest, CreateObjectResponse, ListObjectsResponse, Object};
 pub use client::search::{SearchObject, SearchRequest, SearchResponse};
 pub use client::spaces::{ListSpacesResponse, Space};

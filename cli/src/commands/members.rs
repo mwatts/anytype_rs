@@ -18,10 +18,20 @@ pub enum MembersCommand {
         /// Space ID to list members from
         #[arg(short, long)]
         space_id: String,
-
+        
         /// Enable pagination (returns full response with pagination info)
         #[arg(short, long)]
         pagination: bool,
+    },
+    /// Get a specific member by ID
+    Get {
+        /// Space ID
+        #[arg(short, long)]
+        space_id: String,
+        
+        /// Member ID
+        #[arg(short, long)]
+        member_id: String,
     },
 }
 
@@ -52,6 +62,16 @@ pub async fn handle_members_command(args: MembersArgs) -> Result<()> {
                     .context("Failed to list members")?;
                 println!("{}", serde_json::to_string_pretty(&members)?);
             }
+        }
+        MembersCommand::Get {
+            space_id,
+            member_id,
+        } => {
+            let member = client
+                .get_member(&space_id, &member_id)
+                .await
+                .context("Failed to get member")?;
+            println!("{}", serde_json::to_string_pretty(&member)?);
         }
     }
 

@@ -52,6 +52,12 @@ pub enum MemberStatus {
     Canceled,
 }
 
+/// Response for getting a single member
+#[derive(Debug, Deserialize, Serialize)]
+pub struct GetMemberResponse {
+    pub member: Member,
+}
+
 /// Response for listing members
 #[derive(Debug, Deserialize, Serialize)]
 pub struct ListMembersResponse {
@@ -60,6 +66,14 @@ pub struct ListMembersResponse {
 }
 
 impl AnytypeClient {
+    /// Get a specific member by ID in a space
+    pub async fn get_member(&self, space_id: &str, member_id: &str) -> Result<Member> {
+        let response: GetMemberResponse = self
+            .get(&format!("/v1/spaces/{}/members/{}", space_id, member_id))
+            .await?;
+        Ok(response.member)
+    }
+
     /// List members in a space
     pub async fn list_members(&self, space_id: &str) -> Result<Vec<Member>> {
         let response: ListMembersResponse = self
@@ -77,7 +91,6 @@ impl AnytypeClient {
     }
 
     // TODO: Add additional member management methods like:
-    // - get_member
     // - invite_member
     // - remove_member
     // - update_member_role

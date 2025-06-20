@@ -77,3 +77,19 @@ async fn test_unauthenticated_members_pagination_request_fails() {
         panic!("Expected auth error, got: {:?}", result);
     }
 }
+
+#[tokio::test]
+async fn test_unauthenticated_get_member_request_fails() {
+    let client = AnytypeClient::new().expect("Failed to create client");
+
+    // This should fail because no API key is set
+    let result = client.get_member("test-space-id", "test-member-id").await;
+    assert!(result.is_err());
+
+    // The error should be an authentication error
+    if let Err(api::AnytypeError::Auth { message }) = result {
+        assert!(message.contains("API key not set"));
+    } else {
+        panic!("Expected auth error, got: {:?}", result);
+    }
+}
