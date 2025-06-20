@@ -1,0 +1,20 @@
+[package]
+name = "anytype-cli"
+version = "0.1.0"
+edition = "2021"
+description = "Command-line interface for the Anytype API"
+license = "MIT"
+
+[[bin]]
+name = "anytype"
+path = "src/main.rs"
+
+[dependencies]
+anytype-core = { path = "../anytype-core" }
+tokio = { workspace = true }
+clap = { workspace = true }
+anyhow = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true, features = ["env-filter"] }
+serde_json = { workspace = true }
+dirs = "5.0"

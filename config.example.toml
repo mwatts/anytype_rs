@@ -1,0 +1,22 @@
+# Example configuration file for anytype-core library usage
+# This is just a reference - the library can be configured programmatically
+
+# Default API base URL (local Anytype app)
+base_url = "http://localhost:31009"
+
+# Request timeout in seconds
+timeout_seconds = 30
+
+# App name for authentication
+app_name = "anytype-rust-cli"
+
+# Example library usage:
+#
+# use anytype_core::{AnytypeClient, ClientConfig};
+#
+# let config = ClientConfig {
+#     base_url: "http://localhost:31009".to_string(),
+#     timeout_seconds: 30,
+#     app_name: "my-rust-app".to_string(),
+# };
+# let client = AnytypeClient::with_config(config)?;
