@@ -2,9 +2,28 @@
 //! 
 //! Handles space management operations.
 
-use crate::{error::Result, types::*};
-
+use crate::{error::Result, types::Pagination};
+use serde::{Deserialize, Serialize};
 use super::AnytypeClient;
+
+/// Space information
+#[derive(Debug, Deserialize, Serialize)]
+pub struct Space {
+    pub id: String,
+    pub name: String,
+    pub object: Option<String>, // "space"
+    pub description: Option<String>,
+    pub icon: Option<serde_json::Value>,
+    pub gateway_url: Option<String>,
+    pub network_id: Option<String>,
+}
+
+/// Response for listing spaces
+#[derive(Debug, Deserialize)]
+pub struct ListSpacesResponse {
+    pub data: Vec<Space>,
+    pub pagination: Pagination,
+}
 
 impl AnytypeClient {
     /// List spaces available to the authenticated user

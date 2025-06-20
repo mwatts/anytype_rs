@@ -2,10 +2,36 @@
 //! 
 //! Handles authentication challenges and API key creation.
 
-use crate::{error::Result, types::*};
+use crate::error::Result;
+use serde::{Deserialize, Serialize};
 use tracing::{debug, info};
-
 use super::AnytypeClient;
+
+/// Request to create an authentication challenge
+#[derive(Debug, Serialize)]
+pub struct CreateChallengeRequest {
+    pub app_name: String,
+}
+
+/// Response containing challenge information
+#[derive(Debug, Deserialize)]
+pub struct CreateChallengeResponse {
+    pub challenge_id: String,
+    // Add other fields as discovered from API
+}
+
+/// Request to create an API key using challenge response
+#[derive(Debug, Serialize)]
+pub struct CreateApiKeyRequest {
+    pub challenge_id: String,
+    pub code: String, // 4-digit code
+}
+
+/// Response containing the API key
+#[derive(Debug, Deserialize)]
+pub struct CreateApiKeyResponse {
+    pub api_key: String,
+}
 
 impl AnytypeClient {
     /// Create an authentication challenge

@@ -39,3 +39,10 @@ pub mod types;
 pub use client::{AnytypeClient, ClientConfig};
 pub use error::{AnytypeError, Result};
 pub use types::*;
+
+// Re-export types from client modules for convenience
+pub use client::auth::{CreateChallengeRequest, CreateChallengeResponse, CreateApiKeyRequest, CreateApiKeyResponse};
+pub use client::spaces::{Space, ListSpacesResponse};
+pub use client::objects::{Object, ListObjectsResponse, CreateObjectRequest, CreateObjectResponse};
+pub use client::search::{SearchRequest, SearchResponse, SearchObject};
+pub use client::members::{Member, MemberRole, MemberStatus, ListMembersResponse};

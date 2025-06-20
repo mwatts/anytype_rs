@@ -2,10 +2,46 @@
 //! 
 //! Handles object management operations.
 
-use crate::{error::Result, types::*};
+use crate::{error::Result, types::Pagination};
+use serde::{Deserialize, Serialize};
 use tracing::{debug, info};
-
 use super::AnytypeClient;
+
+/// Object information
+#[derive(Debug, Deserialize, Serialize)]
+pub struct Object {
+    pub id: String,
+    pub name: Option<String>,
+    pub space_id: Option<String>,
+    pub object: Option<String>, // object type
+    pub properties: serde_json::Value,
+    // Add more fields as needed
+}
+
+/// Response for listing objects
+#[derive(Debug, Deserialize)]
+pub struct ListObjectsResponse {
+    pub data: Vec<Object>,
+    pub pagination: Pagination,
+}
+
+/// Request to create a new object
+#[derive(Debug, Serialize)]
+pub struct CreateObjectRequest {
+    pub type_key: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub properties: Option<serde_json::Value>,
+}
+
+/// Response when creating an object
+#[derive(Debug, Deserialize)]
+pub struct CreateObjectResponse {
+    pub object: Object,
+    pub properties: Option<serde_json::Value>,
+    pub markdown: Option<String>,
+}
 
 impl AnytypeClient {
     /// List objects in a space

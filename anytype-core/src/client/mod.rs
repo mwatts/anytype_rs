@@ -2,22 +2,22 @@
 //! 
 //! This module is organized to match the official API reference structure.
 
-use crate::{error::Result, types::*};
+use crate::{error::Result, types::ApiErrorResponse};
 use reqwest::{Client, RequestBuilder};
 use serde::de::DeserializeOwned;
 use tracing::{debug, error};
 
 // Include all module implementations
-mod auth;
-mod search;
-mod spaces;
-mod objects;
-mod properties;
-mod lists;
-mod members;
-mod tags;
-mod type_management;
-mod templates;
+pub mod auth;
+pub mod search;
+pub mod spaces;
+pub mod objects;
+pub mod properties;
+pub mod lists;
+pub mod members;
+pub mod tags;
+pub mod type_management;
+pub mod templates;
 
 const DEFAULT_BASE_URL: &str = "http://localhost:31009";
 
