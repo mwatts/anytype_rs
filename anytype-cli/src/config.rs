@@ -6,7 +6,7 @@ pub fn config_dir() -> Result<PathBuf> {
     let config_dir = dirs::config_dir()
         .ok_or_else(|| anyhow::anyhow!("Could not determine config directory"))?
         .join("anytype-cli");
-    
+
     std::fs::create_dir_all(&config_dir)?;
     Ok(config_dir)
 }
@@ -26,7 +26,7 @@ pub fn save_api_key(api_key: &str) -> Result<()> {
 /// Load API key from file
 pub fn load_api_key() -> Result<Option<String>> {
     let key_file = api_key_file()?;
-    
+
     if key_file.exists() {
         let api_key = std::fs::read_to_string(key_file)?.trim().to_string();
         if api_key.is_empty() {

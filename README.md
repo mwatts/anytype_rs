@@ -122,6 +122,31 @@ async fn main() -> Result<()> {
 }
 ```
 
+## Library Architecture
+
+The `anytype-core` library is organized into modules that mirror the official Anytype API structure:
+
+```
+anytype-core/src/client/
+├── mod.rs          # Main client and shared functionality
+├── auth.rs         # Authentication (challenges, API keys)
+├── spaces.rs       # Space management
+├── objects.rs      # Object CRUD operations
+├── search.rs       # Search functionality
+├── properties.rs   # Property management (TODO)
+├── lists.rs        # List operations (TODO)
+├── members.rs      # Member management (TODO)  
+├── tags.rs         # Tag operations (TODO)
+├── types.rs        # Type management (TODO)
+└── templates.rs    # Template operations (TODO)
+```
+
+This modular structure makes it easy to:
+- Navigate and maintain the codebase
+- Add new API endpoints in logical groups
+- Find functionality quickly
+- Keep related operations together
+
 ## API Coverage
 
 ### Authentication
@@ -135,15 +160,18 @@ async fn main() -> Result<()> {
 ### Objects
 - ✅ List objects (`/v1/spaces/{space_id}/objects`)
 - ✅ Get object details (`/v1/spaces/{space_id}/objects/{object_id}`)
+- ✅ Create objects (`/v1/spaces/{space_id}/objects`)
 
 ### Search
 - ✅ Global search (`/v1/search`)
 
 ### Planned Features
-- [ ] Object creation and updates
 - [ ] Property management
-- [ ] Template operations
+- [ ] List operations
 - [ ] Member management
+- [ ] Tag operations
+- [ ] Type management
+- [ ] Template operations
 - [ ] File uploads
 
 ## Local Development

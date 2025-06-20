@@ -17,7 +17,7 @@ fn test_custom_config() {
         timeout_seconds: 60,
         app_name: "test-app".to_string(),
     };
-    
+
     let client = AnytypeClient::with_config(config).expect("Failed to create client with config");
     assert!(client.api_key().is_none());
 }
@@ -33,11 +33,11 @@ fn test_default_config_values() {
 #[tokio::test]
 async fn test_unauthenticated_request_fails() {
     let client = AnytypeClient::new().expect("Failed to create client");
-    
+
     // This should fail because no API key is set
     let result = client.list_spaces().await;
     assert!(result.is_err());
-    
+
     // The error should be an authentication error
     if let Err(anytype_core::AnytypeError::Auth { message }) = result {
         assert!(message.contains("API key not set"));
