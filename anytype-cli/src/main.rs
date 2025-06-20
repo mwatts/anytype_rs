@@ -30,6 +30,9 @@ pub enum Commands {
     /// Authentication commands
     Auth(commands::auth::AuthArgs),
 
+    /// Member management commands
+    Members(commands::members::MembersArgs),
+
     /// Space management commands
     Spaces(commands::spaces::SpacesArgs),
 
@@ -47,6 +50,7 @@ async fn main() -> Result<()> {
     // Handle commands
     let result = match cli.command {
         Commands::Auth(args) => commands::auth::handle_auth_command(args).await,
+        Commands::Members(args) => commands::members::handle_members_command(args).await,
         Commands::Spaces(args) => commands::spaces::handle_spaces_command(args).await,
         Commands::Search(args) => commands::search::handle_search_command(args).await,
     };

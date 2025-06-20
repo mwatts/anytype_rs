@@ -16,7 +16,7 @@ mod properties;
 mod lists;
 mod members;
 mod tags;
-mod types;
+mod type_management;
 mod templates;
 
 const DEFAULT_BASE_URL: &str = "http://localhost:31009";

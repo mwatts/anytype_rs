@@ -47,7 +47,7 @@ pub struct Space {
 }
 
 /// Pagination information
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Pagination {
     pub total: u32,
     pub offset: u32,
@@ -112,4 +112,57 @@ pub struct CreateObjectResponse {
     pub object: Object,
     pub properties: Option<serde_json::Value>,
     pub markdown: Option<String>,
+}
+
+/// Member information
+#[derive(Debug, Deserialize, Serialize)]
+pub struct Member {
+    /// The profile object id of the member
+    pub id: String,
+    /// The name of the member
+    pub name: Option<String>,
+    /// The global name of the member in the network (e.g., john.any)
+    pub global_name: Option<String>,
+    /// The identity of the member in the network
+    pub identity: Option<String>,
+    /// The data model of the object (should be "member")
+    pub object: Option<String>,
+    /// The role of the member
+    pub role: MemberRole,
+    /// The status of the member
+    pub status: MemberStatus,
+    /// Icon information
+    pub icon: Option<serde_json::Value>,
+}
+
+/// Member role enum
+/// Possible values: [viewer, editor, owner, no_permission]
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum MemberRole {
+    Viewer,
+    Editor,  
+    Owner,
+    #[serde(rename = "no_permission")]
+    NoPermission,
+}
+
+/// Member status enum  
+/// Possible values: [joining, active, removed, declined, removing, canceled]
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum MemberStatus {
+    Joining,
+    Active,
+    Removed,
+    Declined,
+    Removing,
+    Canceled,
+}
+
+/// Response for listing members
+#[derive(Debug, Deserialize, Serialize)]
+pub struct ListMembersResponse {
+    pub data: Vec<Member>,
+    pub pagination: Pagination,
 }
