@@ -1,21 +1,21 @@
 //! # Anytype Core
-//! 
+//!
 //! A Rust library for interacting with your local Anytype application API.
-//! 
+//!
 //! ## Features
-//! 
+//!
 //! - Authentication via challenge-response mechanism with local Anytype app
 //! - JWT Bearer token support
 //! - Full CRUD operations for spaces and objects
 //! - Search functionality
 //! - Async/await support with tokio
 //! - Comprehensive error handling
-//! 
+//!
 //! ## Quick Start
-//! 
+//!
 //! ```rust,no_run
 //! use anytype_core::{AnytypeClient, Result};
-//! 
+//!
 //! #[tokio::main]
 //! async fn main() -> Result<()> {
 //!     // Connect to local Anytype app (http://localhost:31009)
@@ -41,8 +41,10 @@ pub use error::{AnytypeError, Result};
 pub use types::*;
 
 // Re-export types from client modules for convenience
-pub use client::auth::{CreateChallengeRequest, CreateChallengeResponse, CreateApiKeyRequest, CreateApiKeyResponse};
-pub use client::spaces::{Space, ListSpacesResponse};
-pub use client::objects::{Object, ListObjectsResponse, CreateObjectRequest, CreateObjectResponse};
-pub use client::search::{SearchRequest, SearchResponse, SearchObject};
-pub use client::members::{Member, MemberRole, MemberStatus, ListMembersResponse};
+pub use client::auth::{
+    CreateApiKeyRequest, CreateApiKeyResponse, CreateChallengeRequest, CreateChallengeResponse,
+};
+pub use client::members::{ListMembersResponse, Member, MemberRole, MemberStatus};
+pub use client::objects::{CreateObjectRequest, CreateObjectResponse, ListObjectsResponse, Object};
+pub use client::search::{SearchObject, SearchRequest, SearchResponse};
+pub use client::spaces::{ListSpacesResponse, Space};

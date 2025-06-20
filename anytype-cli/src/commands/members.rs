@@ -18,7 +18,7 @@ pub enum MembersCommand {
         /// Space ID to list members from
         #[arg(short, long)]
         space_id: String,
-        
+
         /// Enable pagination (returns full response with pagination info)
         #[arg(short, long)]
         pagination: bool,
@@ -35,13 +35,20 @@ pub async fn handle_members_command(args: MembersArgs) -> Result<()> {
     client.set_api_key(api_key);
 
     match args.command {
-        MembersCommand::List { space_id, pagination } => {
+        MembersCommand::List {
+            space_id,
+            pagination,
+        } => {
             if pagination {
-                let response = client.list_members_with_pagination(&space_id).await
+                let response = client
+                    .list_members_with_pagination(&space_id)
+                    .await
                     .context("Failed to list members with pagination")?;
                 println!("{}", serde_json::to_string_pretty(&response)?);
             } else {
-                let members = client.list_members(&space_id).await
+                let members = client
+                    .list_members(&space_id)
+                    .await
                     .context("Failed to list members")?;
                 println!("{}", serde_json::to_string_pretty(&members)?);
             }

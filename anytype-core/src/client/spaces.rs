@@ -1,10 +1,10 @@
 //! Spaces module
-//! 
+//!
 //! Handles space management operations.
 
+use super::AnytypeClient;
 use crate::{error::Result, types::Pagination};
 use serde::{Deserialize, Serialize};
-use super::AnytypeClient;
 
 /// Space information
 #[derive(Debug, Deserialize, Serialize)]
@@ -28,20 +28,17 @@ pub struct ListSpacesResponse {
 impl AnytypeClient {
     /// List spaces available to the authenticated user
     pub async fn list_spaces(&self) -> Result<Vec<Space>> {
-        let url = format!("{}/v1/spaces", self.config.base_url);
-        let response: ListSpacesResponse = self.authenticated_get(&url).await?;
+        let response: ListSpacesResponse = self.get("/v1/spaces").await?;
         Ok(response.data)
     }
 
     /// Get a specific space by ID
     pub async fn get_space(&self, space_id: &str) -> Result<Space> {
-        let url = format!("{}/v1/spaces/{}", self.config.base_url, space_id);
-        self.authenticated_get(&url).await
+        self.get(&format!("/v1/spaces/{}", space_id)).await
     }
 
     /// List spaces with pagination information
     pub async fn list_spaces_with_pagination(&self) -> Result<ListSpacesResponse> {
-        let url = format!("{}/v1/spaces", self.config.base_url);
-        self.authenticated_get(&url).await
+        self.get("/v1/spaces").await
     }
 }

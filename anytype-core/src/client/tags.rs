@@ -1,5 +1,5 @@
 //! Tags module
-//! 
+//!
 //! Handles tag management operations.
 //! TODO: Implement tag-related API methods
 

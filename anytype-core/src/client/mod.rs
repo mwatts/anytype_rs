@@ -1,23 +1,23 @@
 //! Anytype API client modules
-//! 
+//!
 //! This module is organized to match the official API reference structure.
 
 use crate::{error::Result, types::ApiErrorResponse};
 use reqwest::{Client, RequestBuilder};
-use serde::de::DeserializeOwned;
+use serde::{de::DeserializeOwned, Serialize};
 use tracing::{debug, error};
 
 // Include all module implementations
 pub mod auth;
-pub mod search;
-pub mod spaces;
-pub mod objects;
-pub mod properties;
 pub mod lists;
 pub mod members;
+pub mod objects;
+pub mod properties;
+pub mod search;
+pub mod spaces;
 pub mod tags;
-pub mod type_management;
 pub mod templates;
+pub mod type_management;
 
 const DEFAULT_BASE_URL: &str = "http://localhost:31009";
 
@@ -76,9 +76,83 @@ impl AnytypeClient {
         self.api_key.as_deref()
     }
 
-    /// Create an authenticated request builder
-    pub(crate) fn authenticated_request_builder(&self, method: &str, url: &str) -> Result<RequestBuilder> {
-        let api_key = self.api_key.as_ref()
+    /// Make an authenticated GET request
+    pub(crate) async fn get<T: DeserializeOwned>(&self, path: &str) -> Result<T> {
+        let url = format!("{}{}", self.config.base_url, path);
+        debug!("GET {}", url);
+
+        let response = self.authenticated_request("GET", &url)?.send().await?;
+
+        self.handle_response(response).await
+    }
+
+    /// Make an authenticated POST request with JSON body
+    pub(crate) async fn post<T: DeserializeOwned, B: Serialize>(
+        &self,
+        path: &str,
+        body: &B,
+    ) -> Result<T> {
+        let url = format!("{}{}", self.config.base_url, path);
+        debug!("POST {}", url);
+
+        let response = self
+            .authenticated_request("POST", &url)?
+            .json(body)
+            .send()
+            .await?;
+
+        self.handle_response(response).await
+    }
+
+    /// Make an authenticated PUT request with JSON body
+    #[allow(dead_code)] // Future use
+    pub(crate) async fn put<T: DeserializeOwned, B: Serialize>(
+        &self,
+        path: &str,
+        body: &B,
+    ) -> Result<T> {
+        let url = format!("{}{}", self.config.base_url, path);
+        debug!("PUT {}", url);
+
+        let response = self
+            .authenticated_request("PUT", &url)?
+            .json(body)
+            .send()
+            .await?;
+
+        self.handle_response(response).await
+    }
+
+    /// Make an authenticated DELETE request
+    #[allow(dead_code)] // Future use
+    pub(crate) async fn delete<T: DeserializeOwned>(&self, path: &str) -> Result<T> {
+        let url = format!("{}{}", self.config.base_url, path);
+        debug!("DELETE {}", url);
+
+        let response = self.authenticated_request("DELETE", &url)?.send().await?;
+
+        self.handle_response(response).await
+    }
+
+    /// Make an unauthenticated POST request (for auth endpoints)
+    pub(crate) async fn post_unauthenticated<T: DeserializeOwned, B: Serialize>(
+        &self,
+        path: &str,
+        body: &B,
+    ) -> Result<T> {
+        let url = format!("{}{}", self.config.base_url, path);
+        debug!("POST {} (unauthenticated)", url);
+
+        let response = self.http_client.post(&url).json(body).send().await?;
+
+        self.handle_response(response).await
+    }
+
+    /// Create an authenticated request builder (internal helper)
+    fn authenticated_request(&self, method: &str, url: &str) -> Result<RequestBuilder> {
+        let api_key = self
+            .api_key
+            .as_ref()
             .ok_or_else(|| crate::error::AnytypeError::Auth {
                 message: "API key not set. Call set_api_key() first.".to_string(),
             })?;
@@ -88,37 +162,30 @@ impl AnytypeClient {
             "POST" => self.http_client.post(url),
             "PUT" => self.http_client.put(url),
             "DELETE" => self.http_client.delete(url),
-            _ => return Err(crate::error::AnytypeError::Api {
-                message: format!("Unsupported HTTP method: {}", method),
-            }),
+            _ => {
+                return Err(crate::error::AnytypeError::Api {
+                    message: format!("Unsupported HTTP method: {}", method),
+                })
+            }
         };
 
         Ok(builder.bearer_auth(api_key))
     }
 
-    /// Helper method for authenticated GET requests
-    pub(crate) async fn authenticated_get<T: DeserializeOwned>(&self, url: &str) -> Result<T> {
-        debug!("GET {}", url);
-        
-        let response = self
-            .authenticated_request_builder("GET", url)?
-            .send()
-            .await?;
-
-        self.handle_response(response).await
-    }
-
     /// Handle HTTP response and deserialize JSON
-    pub(crate) async fn handle_response<T: DeserializeOwned>(&self, response: reqwest::Response) -> Result<T> {
+    pub(crate) async fn handle_response<T: DeserializeOwned>(
+        &self,
+        response: reqwest::Response,
+    ) -> Result<T> {
         let status = response.status();
         let url = response.url().clone();
-        
+
         debug!("Response status: {} for {}", status, url);
 
         if status.is_success() {
             let text = response.text().await?;
             debug!("Response body: {}", text);
-            
+
             match serde_json::from_str(&text) {
                 Ok(data) => Ok(data),
                 Err(e) => {
@@ -133,13 +200,14 @@ impl AnytypeClient {
         } else {
             let error_text = response.text().await.unwrap_or_default();
             error!("API error {}: {}", status, error_text);
-            
+
             // Try to parse as API error response
             if let Ok(api_error) = serde_json::from_str::<ApiErrorResponse>(&error_text) {
-                let message = api_error.message
+                let message = api_error
+                    .message
                     .or(api_error.error)
                     .unwrap_or_else(|| format!("HTTP {}", status));
-                
+
                 if status == 401 || status == 403 {
                     Err(crate::error::AnytypeError::Auth { message })
                 } else {

@@ -1,5 +1,5 @@
 //! Type management module
-//! 
+//!
 //! Handles type management operations such as creating, updating, and deleting object types.
 //! TODO: Implement type-related API methods
 

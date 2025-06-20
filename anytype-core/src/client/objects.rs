@@ -1,11 +1,11 @@
 //! Objects module
-//! 
+//!
 //! Handles object management operations.
 
+use super::AnytypeClient;
 use crate::{error::Result, types::Pagination};
 use serde::{Deserialize, Serialize};
 use tracing::{debug, info};
-use super::AnytypeClient;
 
 /// Object information
 #[derive(Debug, Deserialize, Serialize)]
@@ -46,37 +46,37 @@ pub struct CreateObjectResponse {
 impl AnytypeClient {
     /// List objects in a space
     pub async fn list_objects(&self, space_id: &str) -> Result<Vec<Object>> {
-        let url = format!("{}/v1/spaces/{}/objects", self.config.base_url, space_id);
-        let response: ListObjectsResponse = self.authenticated_get(&url).await?;
+        let response: ListObjectsResponse = self
+            .get(&format!("/v1/spaces/{}/objects", space_id))
+            .await?;
         Ok(response.data)
     }
 
     /// Get a specific object by ID
     pub async fn get_object(&self, space_id: &str, object_id: &str) -> Result<Object> {
-        let url = format!("{}/v1/spaces/{}/objects/{}", self.config.base_url, space_id, object_id);
-        self.authenticated_get(&url).await
+        self.get(&format!("/v1/spaces/{}/objects/{}", space_id, object_id))
+            .await
     }
 
     /// Create a new object in a space
-    pub async fn create_object(&self, space_id: &str, request: CreateObjectRequest) -> Result<CreateObjectResponse> {
-        let url = format!("{}/v1/spaces/{}/objects", self.config.base_url, space_id);
-        
+    pub async fn create_object(
+        &self,
+        space_id: &str,
+        request: CreateObjectRequest,
+    ) -> Result<CreateObjectResponse> {
         info!("Creating object in space: {}", space_id);
-        debug!("POST {} with request: {:?}", url, request);
+        debug!("Request: {:?}", request);
         debug!("Request JSON: {}", serde_json::to_string_pretty(&request)?);
 
-        let response = self
-            .authenticated_request_builder("POST", &url)?
-            .json(&request)
-            .send()
-            .await?;
-
-        self.handle_response(response).await
+        self.post(&format!("/v1/spaces/{}/objects", space_id), &request)
+            .await
     }
 
     /// List objects in a space with pagination information
-    pub async fn list_objects_with_pagination(&self, space_id: &str) -> Result<ListObjectsResponse> {
-        let url = format!("{}/v1/spaces/{}/objects", self.config.base_url, space_id);
-        self.authenticated_get(&url).await
+    pub async fn list_objects_with_pagination(
+        &self,
+        space_id: &str,
+    ) -> Result<ListObjectsResponse> {
+        self.get(&format!("/v1/spaces/{}/objects", space_id)).await
     }
 }

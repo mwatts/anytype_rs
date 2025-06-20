@@ -1,5 +1,5 @@
 //! Templates module
-//! 
+//!
 //! Handles template management operations.
 //! TODO: Implement template-related API methods
 

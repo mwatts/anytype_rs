@@ -1,5 +1,5 @@
 //! Lists module
-//! 
+//!
 //! Handles list management operations.
 //! TODO: Implement list-related API methods
 
