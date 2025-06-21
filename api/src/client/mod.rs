@@ -4,7 +4,7 @@
 
 use crate::{error::Result, types::ApiErrorResponse};
 use reqwest::{Client, RequestBuilder};
-use serde::{de::DeserializeOwned, Serialize};
+use serde::{Serialize, de::DeserializeOwned};
 use tracing::{debug, error};
 
 // Include all module implementations
@@ -165,7 +165,7 @@ impl AnytypeClient {
             _ => {
                 return Err(crate::error::AnytypeError::Api {
                     message: format!("Unsupported HTTP method: {}", method),
-                })
+                });
             }
         };
 
@@ -193,7 +193,12 @@ impl AnytypeClient {
                     error!("Expected type: {}", std::any::type_name::<T>());
                     error!("Raw response was: {}", text);
                     Err(crate::error::AnytypeError::InvalidResponse {
-                        message: format!("Failed to parse JSON response: {}. Expected type: {}. Raw response: {}", e, std::any::type_name::<T>(), text),
+                        message: format!(
+                            "Failed to parse JSON response: {}. Expected type: {}. Raw response: {}",
+                            e,
+                            std::any::type_name::<T>(),
+                            text
+                        ),
                     })
                 }
             }

@@ -18,7 +18,7 @@ pub enum MembersCommand {
         /// Space ID to list members from
         #[arg(short, long)]
         space_id: String,
-        
+
         /// Enable pagination (returns full response with pagination info)
         #[arg(short, long)]
         pagination: bool,
@@ -28,7 +28,7 @@ pub enum MembersCommand {
         /// Space ID
         #[arg(short, long)]
         space_id: String,
-        
+
         /// Member ID
         #[arg(short, long)]
         member_id: String,
