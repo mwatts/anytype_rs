@@ -3,7 +3,7 @@
 //! This module is organized to match the official API reference structure.
 
 use crate::{error::Result, types::ApiErrorResponse};
-use reqwest::{Client, RequestBuilder};
+use reqwest::{Client, Method, RequestBuilder};
 use serde::{Serialize, de::DeserializeOwned};
 use tracing::{debug, error};
 
@@ -34,7 +34,7 @@ impl Default for ClientConfig {
         Self {
             base_url: DEFAULT_BASE_URL.to_string(),
             timeout_seconds: 30,
-            app_name: "anytype-rust-cli".to_string(),
+            app_name: "anytype_rs".to_string(),
         }
     }
 }
@@ -81,7 +81,10 @@ impl AnytypeClient {
         let url = format!("{}{}", self.config.base_url, path);
         debug!("GET {}", url);
 
-        let response = self.authenticated_request("GET", &url)?.send().await?;
+        let response = self
+            .authenticated_request(Method::GET, &url)?
+            .send()
+            .await?;
 
         self.handle_response(response).await
     }
@@ -96,7 +99,7 @@ impl AnytypeClient {
         debug!("POST {}", url);
 
         let response = self
-            .authenticated_request("POST", &url)?
+            .authenticated_request(Method::POST, &url)?
             .json(body)
             .send()
             .await?;
@@ -115,7 +118,7 @@ impl AnytypeClient {
         debug!("PUT {}", url);
 
         let response = self
-            .authenticated_request("PUT", &url)?
+            .authenticated_request(Method::PUT, &url)?
             .json(body)
             .send()
             .await?;
@@ -129,7 +132,10 @@ impl AnytypeClient {
         let url = format!("{}{}", self.config.base_url, path);
         debug!("DELETE {}", url);
 
-        let response = self.authenticated_request("DELETE", &url)?.send().await?;
+        let response = self
+            .authenticated_request(Method::DELETE, &url)?
+            .send()
+            .await?;
 
         self.handle_response(response).await
     }
@@ -149,7 +155,7 @@ impl AnytypeClient {
     }
 
     /// Create an authenticated request builder (internal helper)
-    fn authenticated_request(&self, method: &str, url: &str) -> Result<RequestBuilder> {
+    fn authenticated_request(&self, method: Method, url: &str) -> Result<RequestBuilder> {
         let api_key = self
             .api_key
             .as_ref()
@@ -157,11 +163,11 @@ impl AnytypeClient {
                 message: "API key not set. Call set_api_key() first.".to_string(),
             })?;
 
-        let builder = match method.to_uppercase().as_str() {
-            "GET" => self.http_client.get(url),
-            "POST" => self.http_client.post(url),
-            "PUT" => self.http_client.put(url),
-            "DELETE" => self.http_client.delete(url),
+        let builder = match method {
+            Method::GET => self.http_client.get(url),
+            Method::POST => self.http_client.post(url),
+            Method::PUT => self.http_client.put(url),
+            Method::DELETE => self.http_client.delete(url),
             _ => {
                 return Err(crate::error::AnytypeError::Api {
                     message: format!("Unsupported HTTP method: {}", method),
@@ -208,10 +214,7 @@ impl AnytypeClient {
 
             // Try to parse as API error response
             if let Ok(api_error) = serde_json::from_str::<ApiErrorResponse>(&error_text) {
-                let message = api_error
-                    .message
-                    .or(api_error.error)
-                    .unwrap_or_else(|| format!("HTTP {}", status));
+                let message = api_error.message;
 
                 if status == 401 || status == 403 {
                     Err(crate::error::AnytypeError::Auth { message })
@@ -224,11 +227,5 @@ impl AnytypeClient {
                 })
             }
         }
-    }
-}
-
-impl Default for AnytypeClient {
-    fn default() -> Self {
-        Self::new().expect("Failed to create default AnytypeClient")
     }
 }

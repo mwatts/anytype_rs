@@ -27,7 +27,7 @@ fn test_default_config_values() {
     let config = ClientConfig::default();
     assert_eq!(config.base_url, "http://localhost:31009");
     assert_eq!(config.timeout_seconds, 30);
-    assert_eq!(config.app_name, "anytype-rust-cli");
+    assert_eq!(config.app_name, "anytype_rs");
 }
 
 #[tokio::test]
