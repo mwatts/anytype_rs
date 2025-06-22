@@ -189,42 +189,39 @@ impl AnytypeClient {
         debug!("Response status: {} for {}", status, url);
 
         if status.is_success() {
-            let text = response.text().await?;
-            debug!("Response body: {}", text);
+            let response = response.json::<T>().await;
 
-            match serde_json::from_str(&text) {
+            match response {
                 Ok(data) => Ok(data),
                 Err(e) => {
                     error!("Failed to deserialize response: {}", e);
                     error!("Expected type: {}", std::any::type_name::<T>());
-                    error!("Raw response was: {}", text);
                     Err(crate::error::AnytypeError::InvalidResponse {
                         message: format!(
-                            "Failed to parse JSON response: {}. Expected type: {}. Raw response: {}",
+                            "Failed to parse JSON response: {}. Expected type: {}",
                             e,
-                            std::any::type_name::<T>(),
-                            text
+                            std::any::type_name::<T>()
                         ),
                     })
                 }
             }
         } else {
-            let error_text = response.text().await.unwrap_or_default();
-            error!("API error {}: {}", status, error_text);
+            let response = response.json::<ApiErrorResponse>().await;
+            error!("API error {}", status);
 
-            // Try to parse as API error response
-            if let Ok(api_error) = serde_json::from_str::<ApiErrorResponse>(&error_text) {
-                let message = api_error.message;
+            match response {
+                Ok(error) => {
+                    let message = error.message;
 
-                if status == 401 || status == 403 {
-                    Err(crate::error::AnytypeError::Auth { message })
-                } else {
-                    Err(crate::error::AnytypeError::Api { message })
+                    if status == 401 || status == 403 {
+                        Err(crate::error::AnytypeError::Auth { message })
+                    } else {
+                        Err(crate::error::AnytypeError::Api { message })
+                    }
                 }
-            } else {
-                Err(crate::error::AnytypeError::Api {
-                    message: format!("HTTP {} - {}", status, error_text),
-                })
+                Err(e) => Err(crate::error::AnytypeError::Api {
+                    message: format!("HTTP {} - {}", status, e.to_string()),
+                }),
             }
         }
     }
