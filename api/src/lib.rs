@@ -48,8 +48,10 @@ pub use client::members::{
     GetMemberResponse, ListMembersResponse, Member, MemberRole, MemberStatus,
 };
 pub use client::objects::{CreateObjectRequest, CreateObjectResponse, ListObjectsResponse, Object};
+pub use client::properties::{ListPropertiesResponse, Property};
 pub use client::search::{SearchObject, SearchRequest, SearchResponse};
 pub use client::spaces::{ListSpacesResponse, Space};
+pub use client::tags::{ListTagsResponse, Tag};
 pub use client::templates::{
     GetTemplateResponse, Icon, ListTemplatesResponse, ObjectType, Template,
 };

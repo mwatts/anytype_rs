@@ -80,11 +80,23 @@ The CLI binary will be available at `target/release/anytype`.
    ./target/release/anytype templates get <space_id> <type_id> <template_id>
    ```
 
-5. **Get help**:
+6. **List tags for a property**:
+   ```bash
+   ./target/release/anytype tags list <space_id> <property_id>
+   ```
+
+7. **List properties in a space**:
+   ```bash
+   ./target/release/anytype properties list <space_id>
+   ```
+
+8. **Get help**:
    ```bash
    ./target/release/anytype --help
    ./target/release/anytype auth --help
    ./target/release/anytype spaces --help
+   ./target/release/anytype properties --help
+   ./target/release/anytype tags --help
    ./target/release/anytype templates --help
    ```
 
@@ -186,6 +198,12 @@ This modular structure makes it easy to:
 
 ### Types
 - ✅ List types (`/v1/spaces/{space_id}/types`)
+
+### Properties
+- ✅ List properties (`/v1/spaces/{space_id}/properties`)
+
+### Tags
+- ✅ List tags for a property (`/v1/spaces/{space_id}/properties/{property_id}/tags`)
 
 ### Planned Features
 - [ ] Property management

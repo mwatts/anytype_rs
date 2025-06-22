@@ -33,11 +33,17 @@ pub enum Commands {
     /// Member management commands
     Members(commands::members::MembersArgs),
 
+    /// Property management commands
+    Properties(commands::properties::PropertiesArgs),
+
     /// Space management commands
     Spaces(commands::spaces::SpacesArgs),
 
     /// Search for objects
     Search(commands::search::SearchArgs),
+
+    /// Tag management commands
+    Tags(commands::tags::TagsArgs),
 
     /// Template management commands
     Templates(commands::templates::TemplatesArgs),
@@ -57,8 +63,10 @@ async fn main() -> Result<()> {
     let result = match cli.command {
         Commands::Auth(args) => commands::auth::handle_auth_command(args).await,
         Commands::Members(args) => commands::members::handle_members_command(args).await,
+        Commands::Properties(args) => commands::properties::handle_properties_command(args).await,
         Commands::Spaces(args) => commands::spaces::handle_spaces_command(args).await,
         Commands::Search(args) => commands::search::handle_search_command(args).await,
+        Commands::Tags(args) => commands::tags::handle_tags_command(args).await,
         Commands::Templates(args) => commands::templates::handle_templates_command(args).await,
         Commands::Types(args) => commands::types::handle_types_command(args).await,
     };

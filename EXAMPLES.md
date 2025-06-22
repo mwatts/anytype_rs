@@ -154,6 +154,56 @@ async fn get_template_details() -> Result<()> {
 }
 ```
 
+## Working with Properties
+
+```rust
+use anytype_core::{AnytypeClient, Result};
+
+async fn list_space_properties() -> Result<()> {
+    let mut client = AnytypeClient::new()?;
+    client.set_api_key("your-jwt-token".to_string());
+    
+    // List properties in a space
+    let properties = client.list_properties("space_id").await?;
+    
+    println!("Found {} properties", properties.len());
+    for property in properties {
+        println!("- {} ({})", property.name, property.key);
+        println!("  ID: {}", property.id);
+        println!("  Format: {}", property.format);
+        println!("  Object: {}", property.object);
+    }
+    
+    Ok(())
+}
+```
+
+## Working with Tags
+
+```rust
+use anytype_core::{AnytypeClient, Result};
+
+async fn list_property_tags() -> Result<()> {
+    let mut client = AnytypeClient::new()?;
+    client.set_api_key("your-jwt-token".to_string());
+    
+    // List tags for a specific property
+    let tags = client.list_tags("space_id", "property_id").await?;
+    
+    println!("Found {} tags", tags.len());
+    for tag in tags {
+        println!("- {} ({})", tag.name, tag.key);
+        println!("  ID: {}", tag.id);
+        if let Some(color) = tag.color {
+            println!("  Color: {}", color);
+        }
+        println!("  Object: {}", tag.object);
+    }
+    
+    Ok(())
+}
+```
+
 ## Error Handling
 
 ```rust
