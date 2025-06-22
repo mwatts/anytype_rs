@@ -17,7 +17,7 @@ pub mod search;
 pub mod spaces;
 pub mod tags;
 pub mod templates;
-pub mod r#type;
+pub mod types;
 
 const DEFAULT_BASE_URL: &str = "http://localhost:31009";
 
