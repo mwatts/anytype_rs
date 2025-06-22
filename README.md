@@ -70,11 +70,22 @@ The CLI binary will be available at `target/release/anytype`.
    ./target/release/anytype search "my query"
    ```
 
-4. **Get help**:
+4. **List templates for a type**:
+   ```bash
+   ./target/release/anytype templates list <space_id> <type_id>
+   ```
+
+5. **Get template details**:
+   ```bash
+   ./target/release/anytype templates get <space_id> <type_id> <template_id>
+   ```
+
+5. **Get help**:
    ```bash
    ./target/release/anytype --help
    ./target/release/anytype auth --help
    ./target/release/anytype spaces --help
+   ./target/release/anytype templates --help
    ```
 
 ### Library Usage
@@ -165,13 +176,22 @@ This modular structure makes it easy to:
 ### Search
 - ✅ Global search (`/v1/search`)
 
+### Members
+- ✅ List members (`/v1/spaces/{space_id}/members`)
+- ✅ Get member details (`/v1/spaces/{space_id}/members/{member_id}`)
+
+### Templates
+- ✅ List templates for a type (`/v1/spaces/{space_id}/types/{type_id}/templates`)
+- ✅ Get template details (`/v1/spaces/{space_id}/types/{type_id}/templates/{template_id}`)
+
+### Types
+- ✅ List types (`/v1/spaces/{space_id}/types`)
+
 ### Planned Features
 - [ ] Property management
-- [ ] List operations
-- [ ] Member management
+- [ ] List operations  
 - [ ] Tag operations
-- [ ] Type management
-- [ ] Template operations
+- [ ] File uploads
 - [ ] File uploads
 
 ## Local Development

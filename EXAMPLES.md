@@ -111,6 +111,49 @@ async fn search_objects() -> Result<()> {
 }
 ```
 
+## Working with Templates
+
+```rust
+use anytype_core::{AnytypeClient, Result};
+
+async fn get_template_details() -> Result<()> {
+    let mut client = AnytypeClient::new()?;
+    client.set_api_key("your-jwt-token".to_string());
+    
+    // List templates for a specific type
+    let templates = client.list_templates("space_id", "type_id").await?;
+    
+    println!("Found {} templates", templates.len());
+    for template in templates {
+        println!("- {} ({})", template.name.as_deref().unwrap_or("Unnamed"), template.id);
+        if let Some(snippet) = template.snippet {
+            println!("  Snippet: {}", snippet);
+        }
+    }
+    
+    // Get template details
+    let template = client.get_template("space_id", "type_id", "template_id").await?;
+    
+    println!("Template: {}", template.name.as_deref().unwrap_or("Unnamed"));
+    println!("ID: {}", template.id);
+    println!("Space: {}", template.space_id);
+    
+    if let Some(snippet) = template.snippet {
+        println!("Snippet: {}", snippet);
+    }
+    
+    if let Some(markdown) = template.markdown {
+        println!("Markdown content: {}", markdown);
+    }
+    
+    if let Some(object_type) = template.object_type {
+        println!("Type: {} ({})", object_type.name, object_type.key);
+    }
+    
+    Ok(())
+}
+```
+
 ## Error Handling
 
 ```rust

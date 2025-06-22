@@ -38,6 +38,12 @@ pub enum Commands {
 
     /// Search for objects
     Search(commands::search::SearchArgs),
+
+    /// Template management commands
+    Templates(commands::templates::TemplatesArgs),
+
+    /// Type management commands
+    Types(commands::types::TypesArgs),
 }
 
 #[tokio::main]
@@ -53,6 +59,8 @@ async fn main() -> Result<()> {
         Commands::Members(args) => commands::members::handle_members_command(args).await,
         Commands::Spaces(args) => commands::spaces::handle_spaces_command(args).await,
         Commands::Search(args) => commands::search::handle_search_command(args).await,
+        Commands::Templates(args) => commands::templates::handle_templates_command(args).await,
+        Commands::Types(args) => commands::types::handle_types_command(args).await,
     };
 
     if let Err(ref error) = result {
