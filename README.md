@@ -1,14 +1,14 @@
-# Anytype.rs
+# Anytype.rs - Rust API Client and CLI for Interacting with Anytype
+
+A Rust library and CLI tool for interacting with your local Anytype application via its API.
 
 **THIS IS CURRENTLY ALL VIBE CODED AND SHOULD NOT BE TRUSTED.** It is not comprehensive and I wouldn't run it on any spaces you care about. It will be improved over time, but for now, it is just a starting point. Created with Claud Sonnet 4 (Preview) in GitHub Copilot.
 
-# Anytype API Client and CLI for Rust
-
-A comprehensive Rust library and CLI tool for interacting with your local Anytype application via its API.
-
 ## Overview
 
-This project provides a Rust interface to interact with Anytype's local API server, which runs on `http://localhost:31009`. It's a single crate that provides both a library for programmatic access and a command-line interface for direct usage.
+This project provides a Rust interface to interact with Anytype's local API server, which runs in your Anytype app at `http://localhost:31009`. It's a single crate that provides both a library for programmatic access and a command-line interface for direct usage.
+
+You can download the crate from [crates.io](https://crates.io/crates/anytype_rs).
 
 ## Project Structure
 
@@ -16,37 +16,25 @@ This is a single crate with two main modules:
 
 - **`src/api/`**: Core library for interacting with the Anytype API
 - **`src/cli/`**: Command-line interface that uses the API module
-- **Binary**: The CLI is exported as the `anytype` binary
+
+There is also a `tests` directory for integration tests that cover both the library and CLI functionality, but they're all vibe coded right now and probably useless.
 
 ## Features
 
 ### Library (`anytype_rs`)
 - JWT Bearer token authentication with challenge-response flow
 - Async/await support with tokio
-- Full CRUD operations for spaces and objects
-- Search functionality
-- Template, type, property, and tag management
-- Comprehensive error handling
-- Type-safe API interactions
+- TODO: List features
 
 ### CLI Tool (`anytype`)
 - Interactive authentication flow
-- List and manage spaces
-- Search across objects
-- Template and type management
-- Property and tag operations
-- Comprehensive help system
-- Interactive authentication flow
-- Space management commands
-- Object search capabilities
-- Configuration management
-- Detailed error reporting
+- TODO: List features
 
 ## Installation
 
 ### Prerequisites
-- Rust 1.70 or later
-- Anytype application running locally (default port: 31009)
+- Rust 1.87.0 or later (may work on earlier versions, but not tested)
+- Anytype application running locally
 
 ### Build from Source
 
@@ -68,125 +56,21 @@ This will install the `anytype` binary to your Cargo bin directory.
 
 ## Usage
 
-### CLI Quick Start
+### Command-Line Interface
 
-1. **Authenticate**:
-   ```bash
-   anytype auth login
-   ```
-   This will start the authentication flow with your local Anytype app. You'll receive a 4-digit code via email or your Anytype app.
+The CLI provides a way to interact with the available Anytype API endpoints directly from the terminal.
 
-2. **List your spaces**:
-   ```bash
-   anytype spaces list
-   ```
-
-3. **Search for objects**:
-   ```bash
-   anytype search "my query"
-   ```
-
-4. **List templates for a type**:
-   ```bash
-   anytype templates list <space_id> <type_id>
-   ```
-
-5. **Get template details**:
-   ```bash
-   anytype templates get <space_id> <type_id> <template_id>
-   ```
-
-6. **List tags for a property**:
-   ```bash
-   anytype tags list <space_id> <property_id>
-   ```
-
-7. **List properties in a space**:
-   ```bash
-   anytype properties list <space_id>
-   ```
-
-8. **Get help**:
-   ```bash
-   anytype --help
-   anytype auth --help
-   anytype spaces --help
-   anytype properties --help
-   anytype tags --help
-   anytype templates --help
-   ```
+Use the `--help` flag to see the available commands and how to use them.
 
 ### Library Usage
 
-Add this to your `Cargo.toml`:
-
-```toml
-[dependencies]
-anytype_rs = "0.1.0"
-tokio = { version = "1.0", features = ["full"] }
-```
-
-Basic usage:
-
-```rust
-use anytype_rs::{AnytypeClient, Result};
-
-#[tokio::main]
-async fn main() -> Result<()> {
-    let mut client = AnytypeClient::new()?;
-    
-    // Authenticate
-    let challenge = client.create_challenge().await?;
-    println!("Challenge ID: {}", challenge.challenge_id);
-    
-    // After receiving the 4-digit code
-    let api_key_response = client.create_api_key(challenge.challenge_id, "1234".to_string()).await?;
-    client.set_api_key(api_key_response.api_key);
-    
-    // List spaces
-    let spaces = client.list_spaces().await?;
-    println!("Found {} spaces", spaces.len());
-    
-    // Search objects
-    let search_request = anytype_core::SearchRequest {
-        query: Some("important".to_string()),
-        limit: Some(10),
-        offset: Some(0),
-        space_id: None,
-    };
-    let results = client.search(search_request).await?;
-    println!("Found {} objects", results.objects.len());
-    
-    Ok(())
-}
-```
-
-## Library Architecture
-
-The `anytype-core` library is organized into modules that mirror the official Anytype API structure:
-
-```
-anytype-core/src/client/
-├── mod.rs          # Main client and shared functionality
-├── auth.rs         # Authentication (challenges, API keys)
-├── spaces.rs       # Space management
-├── objects.rs      # Object CRUD operations
-├── search.rs       # Search functionality
-├── properties.rs   # Property management (TODO)
-├── lists.rs        # List operations (TODO)
-├── members.rs      # Member management (TODO)  
-├── tags.rs         # Tag operations (TODO)
-├── types.rs        # Type management (TODO)
-└── templates.rs    # Template operations (TODO)
-```
-
-This modular structure makes it easy to:
-- Navigate and maintain the codebase
-- Add new API endpoints in logical groups
-- Find functionality quickly
-- Keep related operations together
+Install the library from Crates.io by adding `anytype_rs` to your `Cargo.toml`.
 
 ## API Coverage
+
+TODO: Make a table and list the Anytype versions and all the endpoints that are covered.
+
+The supported features below was generated by an AI and is probably not accurate.
 
 ### Authentication
 - ✅ Create challenge (`/v1/auth/challenges`)
@@ -238,14 +122,11 @@ This client is designed to work with your local Anytype application. Make sure:
 
 ### Checking Your Local Setup
 
-You can verify your local Anytype API is accessible:
+You can verify your local Anytype API is accessible by running the authentication status command:
 
 ```bash
-# Check if the API server is running
-curl http://localhost:31009/v1/auth/challenges
-
 # Or use the CLI to check status
-anytype --debug auth status
+anytype auth status
 ```
 
 ## Configuration
@@ -274,68 +155,3 @@ anytype --debug auth status
 # For library development
 RUST_LOG=debug cargo run
 ```
-
-### Project Structure
-
-```
-anytype_rs/
-├── Cargo.toml          # Workspace configuration
-├── anytype-core/       # Core library
-│   ├── src/
-│   │   ├── lib.rs      # Public API
-│   │   ├── client.rs   # HTTP client implementation
-│   │   ├── types.rs    # API types and models
-│   │   └── error.rs    # Error types
-│   └── Cargo.toml
-├── anytype-cli/        # CLI application
-│   ├── src/
-│   │   ├── main.rs     # CLI entry point
-│   │   ├── config.rs   # Configuration management
-│   │   └── commands/   # Command implementations
-│   └── Cargo.toml
-└── README.md
-```
-
-## Dependencies
-
-### Core Dependencies
-- `tokio`: Async runtime
-- `reqwest`: HTTP client
-- `serde`: Serialization
-- `anyhow`: Error handling
-- `tracing`: Logging
-
-### CLI Dependencies
-- `clap`: Command-line parsing
-- `dirs`: Cross-platform directories
-
-## Error Handling
-
-The library provides comprehensive error handling with the `AnytypeError` enum:
-
-- `Http`: Network and HTTP errors
-- `Auth`: Authentication failures
-- `Api`: API-specific errors
-- `Serialization`: JSON parsing errors
-- `InvalidResponse`: Unexpected response format
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-- [Anytype](https://anytype.io/) for providing the local API interface
-- The Rust community for excellent crates and tools
-
----
-
-**Note**: This project connects to your local Anytype application running on `http://localhost:31009`. Make sure your Anytype desktop app is running before using this tool.
