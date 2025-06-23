@@ -1,11 +1,11 @@
 # API Examples
 
-This document provides examples of how to use the anytype-core library to interact with your local Anytype application.
+This document provides examples of how to use the anytype_rs library to interact with your local Anytype application.
 
 ## Basic Client Setup
 
 ```rust
-use anytype_core::{AnytypeClient, ClientConfig, Result};
+use anytype_rs::{AnytypeClient, ClientConfig, Result};
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -27,7 +27,7 @@ async fn main() -> Result<()> {
 ## Authentication Flow
 
 ```rust
-use anytype_core::{AnytypeClient, Result};
+use anytype_rs::{AnytypeClient, Result};
 
 async fn authenticate() -> Result<String> {
     let client = AnytypeClient::new()?;
@@ -50,7 +50,7 @@ async fn authenticate() -> Result<String> {
 ## Working with Spaces
 
 ```rust
-use anytype_core::{AnytypeClient, Result};
+use anytype_rs::{AnytypeClient, Result};
 
 async fn work_with_spaces() -> Result<()> {
     let mut client = AnytypeClient::new()?;
@@ -79,7 +79,7 @@ async fn work_with_spaces() -> Result<()> {
 ## Searching Objects
 
 ```rust
-use anytype_core::{AnytypeClient, SearchRequest, Result};
+use anytype_rs::{AnytypeClient, SearchRequest, Result};
 
 async fn search_objects() -> Result<()> {
     let mut client = AnytypeClient::new()?;
@@ -114,7 +114,7 @@ async fn search_objects() -> Result<()> {
 ## Working with Templates
 
 ```rust
-use anytype_core::{AnytypeClient, Result};
+use anytype_rs::{AnytypeClient, Result};
 
 async fn get_template_details() -> Result<()> {
     let mut client = AnytypeClient::new()?;
@@ -157,7 +157,7 @@ async fn get_template_details() -> Result<()> {
 ## Working with Properties
 
 ```rust
-use anytype_core::{AnytypeClient, Result};
+use anytype_rs::{AnytypeClient, Result};
 
 async fn list_space_properties() -> Result<()> {
     let mut client = AnytypeClient::new()?;
@@ -181,7 +181,7 @@ async fn list_space_properties() -> Result<()> {
 ## Working with Tags
 
 ```rust
-use anytype_core::{AnytypeClient, Result};
+use anytype_rs::{AnytypeClient, Result};
 
 async fn list_property_tags() -> Result<()> {
     let mut client = AnytypeClient::new()?;
@@ -207,7 +207,7 @@ async fn list_property_tags() -> Result<()> {
 ## Error Handling
 
 ```rust
-use anytype_core::{AnytypeClient, AnytypeError, Result};
+use anytype_rs::{AnytypeClient, AnytypeError, Result};
 
 async fn handle_errors() -> Result<()> {
     let client = AnytypeClient::new()?;
@@ -240,7 +240,7 @@ async fn handle_errors() -> Result<()> {
 ## Configuration
 
 ```rust
-use anytype_core::{AnytypeClient, ClientConfig};
+use anytype_rs::{AnytypeClient, ClientConfig};
 
 // Default configuration (connects to local Anytype app)
 let client = AnytypeClient::new()?;
@@ -260,7 +260,7 @@ let client = AnytypeClient::with_config(config)?;
 Here's a complete example that demonstrates the full workflow with your local Anytype app:
 
 ```rust
-use anytype_core::{AnytypeClient, SearchRequest, Result};
+use anytype_rs::{AnytypeClient, SearchRequest, Result};
 use std::io::{self, Write};
 
 #[tokio::main]

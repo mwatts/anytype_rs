@@ -1,4 +1,4 @@
-//! # Anytype Core
+//! # Anytype API Client
 //!
 //! A Rust library for interacting with your local Anytype application API.
 //!
@@ -8,29 +8,9 @@
 //! - JWT Bearer token support
 //! - Full CRUD operations for spaces and objects
 //! - Search functionality
+//! - Template, type, property, and tag management
 //! - Async/await support with tokio
 //! - Comprehensive error handling
-//!
-//! ## Quick Start
-//!
-//! ```rust,no_run
-//! use api::{AnytypeClient, Result};
-//!
-//! #[tokio::main]
-//! async fn main() -> Result<()> {
-//!     // Connect to local Anytype app (http://localhost:31009)
-//!     let mut client = AnytypeClient::new()?;
-//!     
-//!     // Authenticate (you'll need to implement the challenge flow)
-//!     client.set_api_key("your-jwt-token".to_string());
-//!     
-//!     // List spaces from your local Anytype
-//!     let spaces = client.list_spaces().await?;
-//!     println!("Found {} spaces", spaces.len());
-//!     
-//!     Ok(())
-//! }
-//! ```
 
 pub mod client;
 pub mod error;

@@ -1,5 +1,5 @@
 use anyhow::{Context, Result};
-use api::AnytypeClient;
+use anytype_rs::api::AnytypeClient;
 use clap::{Args, Subcommand};
 
 #[derive(Debug, Args)]

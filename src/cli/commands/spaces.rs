@@ -1,5 +1,5 @@
 use anyhow::{Context, Result};
-use api::{AnytypeClient, CreateObjectRequest};
+use anytype_rs::api::{AnytypeClient, CreateObjectRequest};
 use clap::{Args, Subcommand};
 
 #[derive(Debug, Args)]

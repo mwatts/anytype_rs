@@ -1,6 +1,6 @@
 //! Integration tests for the api library
 
-use api::{AnytypeClient, ClientConfig};
+use anytype_rs::api::{AnytypeClient, ClientConfig};
 
 #[test]
 fn test_default_client_uses_localhost() {
@@ -39,7 +39,7 @@ async fn test_unauthenticated_request_fails() {
     assert!(result.is_err());
 
     // The error should be an authentication error
-    if let Err(api::AnytypeError::Auth { message }) = result {
+    if let Err(anytype_rs::api::AnytypeError::Auth { message }) = result {
         assert!(message.contains("API key not set"));
     } else {
         panic!("Expected auth error, got: {:?}", result);
@@ -55,7 +55,7 @@ async fn test_unauthenticated_members_request_fails() {
     assert!(result.is_err());
 
     // The error should be an authentication error
-    if let Err(api::AnytypeError::Auth { message }) = result {
+    if let Err(anytype_rs::api::AnytypeError::Auth { message }) = result {
         assert!(message.contains("API key not set"));
     } else {
         panic!("Expected auth error, got: {:?}", result);
@@ -71,7 +71,7 @@ async fn test_unauthenticated_members_pagination_request_fails() {
     assert!(result.is_err());
 
     // The error should be an authentication error
-    if let Err(api::AnytypeError::Auth { message }) = result {
+    if let Err(anytype_rs::api::AnytypeError::Auth { message }) = result {
         assert!(message.contains("API key not set"));
     } else {
         panic!("Expected auth error, got: {:?}", result);
@@ -87,7 +87,7 @@ async fn test_unauthenticated_get_member_request_fails() {
     assert!(result.is_err());
 
     // The error should be an authentication error
-    if let Err(api::AnytypeError::Auth { message }) = result {
+    if let Err(anytype_rs::api::AnytypeError::Auth { message }) = result {
         assert!(message.contains("API key not set"));
     } else {
         panic!("Expected auth error, got: {:?}", result);
@@ -105,7 +105,7 @@ async fn test_unauthenticated_get_template_request_fails() {
     assert!(result.is_err());
 
     // The error should be an authentication error
-    if let Err(api::AnytypeError::Auth { message }) = result {
+    if let Err(anytype_rs::api::AnytypeError::Auth { message }) = result {
         assert!(message.contains("API key not set"));
     } else {
         panic!("Expected auth error, got: {:?}", result);
@@ -121,7 +121,7 @@ async fn test_unauthenticated_list_tags_request_fails() {
     assert!(result.is_err());
 
     // The error should be an authentication error
-    if let Err(api::AnytypeError::Auth { message }) = result {
+    if let Err(anytype_rs::api::AnytypeError::Auth { message }) = result {
         assert!(message.contains("API key not set"));
     } else {
         panic!("Expected authentication error, got: {:?}", result);
@@ -137,7 +137,7 @@ async fn test_unauthenticated_list_properties_request_fails() {
     assert!(result.is_err());
 
     // The error should be an authentication error
-    if let Err(api::AnytypeError::Auth { message }) = result {
+    if let Err(anytype_rs::api::AnytypeError::Auth { message }) = result {
         assert!(message.contains("API key not set"));
     } else {
         panic!("Expected authentication error, got: {:?}", result);

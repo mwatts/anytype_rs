@@ -2,32 +2,40 @@
 
 **THIS IS CURRENTLY ALL VIBE CODED AND SHOULD NOT BE TRUSTED.** It is not comprehensive and I wouldn't run it on any spaces you care about. It will be improved over time, but for now, it is just a starting point. Created with Claud Sonnet 4 (Preview) in GitHub Copilot.
 
-# Anytype API Client for Rust
+# Anytype API Client and CLI for Rust
 
 A comprehensive Rust library and CLI tool for interacting with your local Anytype application via its API.
 
 ## Overview
 
-This project provides a Rust interface to interact with Anytype's local API server, which runs on `http://localhost:31009`. It consists of two crates that work together to provide both programmatic access and command-line tools for managing your Anytype data.
+This project provides a Rust interface to interact with Anytype's local API server, which runs on `http://localhost:31009`. It's a single crate that provides both a library for programmatic access and a command-line interface for direct usage.
 
 ## Project Structure
 
-This project consists of two crates:
+This is a single crate with two main modules:
 
-- **`anytype-core`**: Core library for interacting with the Anytype API
-- **`anytype-cli`**: Command-line interface that uses the core library
+- **`src/api/`**: Core library for interacting with the Anytype API
+- **`src/cli/`**: Command-line interface that uses the API module
+- **Binary**: The CLI is exported as the `anytype` binary
 
 ## Features
 
-### Core Library (`anytype-core`)
+### Library (`anytype_rs`)
 - JWT Bearer token authentication with challenge-response flow
 - Async/await support with tokio
 - Full CRUD operations for spaces and objects
 - Search functionality
+- Template, type, property, and tag management
 - Comprehensive error handling
 - Type-safe API interactions
 
-### CLI Tool (`anytype-cli`)
+### CLI Tool (`anytype`)
+- Interactive authentication flow
+- List and manage spaces
+- Search across objects
+- Template and type management
+- Property and tag operations
+- Comprehensive help system
 - Interactive authentication flow
 - Space management commands
 - Object search capabilities
@@ -50,54 +58,62 @@ cargo build --release
 
 The CLI binary will be available at `target/release/anytype`.
 
+### Install from Cargo
+
+```bash
+cargo install anytype_rs
+```
+
+This will install the `anytype` binary to your Cargo bin directory.
+
 ## Usage
 
 ### CLI Quick Start
 
 1. **Authenticate**:
    ```bash
-   ./target/release/anytype auth login
+   anytype auth login
    ```
    This will start the authentication flow with your local Anytype app. You'll receive a 4-digit code via email or your Anytype app.
 
 2. **List your spaces**:
    ```bash
-   ./target/release/anytype spaces list
+   anytype spaces list
    ```
 
 3. **Search for objects**:
    ```bash
-   ./target/release/anytype search "my query"
+   anytype search "my query"
    ```
 
 4. **List templates for a type**:
    ```bash
-   ./target/release/anytype templates list <space_id> <type_id>
+   anytype templates list <space_id> <type_id>
    ```
 
 5. **Get template details**:
    ```bash
-   ./target/release/anytype templates get <space_id> <type_id> <template_id>
+   anytype templates get <space_id> <type_id> <template_id>
    ```
 
 6. **List tags for a property**:
    ```bash
-   ./target/release/anytype tags list <space_id> <property_id>
+   anytype tags list <space_id> <property_id>
    ```
 
 7. **List properties in a space**:
    ```bash
-   ./target/release/anytype properties list <space_id>
+   anytype properties list <space_id>
    ```
 
 8. **Get help**:
    ```bash
-   ./target/release/anytype --help
-   ./target/release/anytype auth --help
-   ./target/release/anytype spaces --help
-   ./target/release/anytype properties --help
-   ./target/release/anytype tags --help
-   ./target/release/anytype templates --help
+   anytype --help
+   anytype auth --help
+   anytype spaces --help
+   anytype properties --help
+   anytype tags --help
+   anytype templates --help
    ```
 
 ### Library Usage
@@ -106,14 +122,14 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-anytype-core = { path = "./anytype-core" }
+anytype_rs = "0.1.0"
 tokio = { version = "1.0", features = ["full"] }
 ```
 
 Basic usage:
 
 ```rust
-use anytype_core::{AnytypeClient, Result};
+use anytype_rs::{AnytypeClient, Result};
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -229,7 +245,7 @@ You can verify your local Anytype API is accessible:
 curl http://localhost:31009/v1/auth/challenges
 
 # Or use the CLI to check status
-./target/release/anytype --debug auth status
+anytype --debug auth status
 ```
 
 ## Configuration
@@ -253,7 +269,7 @@ cargo test
 
 ```bash
 # For the CLI
-./target/release/anytype --debug auth status
+anytype --debug auth status
 
 # For library development
 RUST_LOG=debug cargo run
