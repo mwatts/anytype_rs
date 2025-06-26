@@ -107,18 +107,17 @@ impl AnytypeClient {
         self.handle_response(response).await
     }
 
-    /// Make an authenticated PUT request with JSON body
-    #[allow(dead_code)] // Future use
-    pub(crate) async fn put<T: DeserializeOwned, B: Serialize>(
+    /// Make an authenticated PATCH request with JSON body
+    pub(crate) async fn patch<T: DeserializeOwned, B: Serialize>(
         &self,
         path: &str,
         body: &B,
     ) -> Result<T> {
         let url = format!("{}{}", self.config.base_url, path);
-        debug!("PUT {}", url);
+        debug!("PATCH {}", url);
 
         let response = self
-            .authenticated_request(Method::PUT, &url)?
+            .authenticated_request(Method::PATCH, &url)?
             .json(body)
             .send()
             .await?;
@@ -166,7 +165,7 @@ impl AnytypeClient {
         let builder = match method {
             Method::GET => self.http_client.get(url),
             Method::POST => self.http_client.post(url),
-            Method::PUT => self.http_client.put(url),
+            Method::PATCH => self.http_client.patch(url),
             Method::DELETE => self.http_client.delete(url),
             _ => {
                 return Err(crate::error::AnytypeError::Api {
@@ -220,7 +219,7 @@ impl AnytypeClient {
                     }
                 }
                 Err(e) => Err(crate::error::AnytypeError::Api {
-                    message: format!("HTTP {} - {}", status, e.to_string()),
+                    message: format!("HTTP {} - {}", status, e),
                 }),
             }
         }

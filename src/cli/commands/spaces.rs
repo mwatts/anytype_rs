@@ -1,5 +1,5 @@
 use anyhow::{Context, Result};
-use anytype_rs::api::{AnytypeClient, CreateObjectRequest, CreateSpaceRequest};
+use anytype_rs::api::{AnytypeClient, CreateObjectRequest, CreateSpaceRequest, UpdateSpaceRequest};
 use clap::{Args, Subcommand};
 
 #[derive(Debug, Args)]
@@ -23,6 +23,17 @@ pub enum SpacesCommand {
         #[arg(short, long)]
         name: String,
         /// Description of the space
+        #[arg(long)]
+        description: Option<String>,
+    },
+    /// Update an existing space
+    Update {
+        /// Space ID to update
+        space_id: String,
+        /// New name for the space
+        #[arg(short, long)]
+        name: Option<String>,
+        /// New description for the space
         #[arg(long)]
         description: Option<String>,
     },
@@ -60,6 +71,11 @@ pub async fn handle_spaces_command(args: SpacesArgs) -> Result<()> {
         SpacesCommand::Create { name, description } => {
             create_space(&client, &name, description).await
         }
+        SpacesCommand::Update {
+            space_id,
+            name,
+            description,
+        } => update_space(&client, &space_id, name, description).await,
         SpacesCommand::Objects { space_id, limit } => list_objects(&client, &space_id, limit).await,
         SpacesCommand::CreateObject {
             space_id,
@@ -217,6 +233,44 @@ async fn create_object(
     );
     if let Some(object_type) = &response.object.object {
         println!("   🏷️  Type: {}", object_type);
+    }
+
+    Ok(())
+}
+
+async fn update_space(
+    client: &AnytypeClient,
+    space_id: &str,
+    name: Option<String>,
+    description: Option<String>,
+) -> Result<()> {
+    // Check if at least one field is provided for update
+    if name.is_none() && description.is_none() {
+        return Err(anyhow::anyhow!(
+            "At least one field (name or description) must be provided to update"
+        ));
+    }
+
+    println!("🔄 Updating space '{}'...", space_id);
+
+    let request = UpdateSpaceRequest { name, description };
+
+    let response = client
+        .update_space(space_id, request)
+        .await
+        .context("Failed to update space")?;
+
+    println!("✅ Space updated successfully!");
+    println!("   🆔 Space ID: {}", response.space.id);
+    println!("   📛 Name: {}", response.space.name);
+    if let Some(desc) = &response.space.description {
+        println!("   📝 Description: {}", desc);
+    }
+    if let Some(gateway) = &response.space.gateway_url {
+        println!("   🌐 Gateway URL: {}", gateway);
+    }
+    if let Some(network_id) = &response.space.network_id {
+        println!("   🌍 Network ID: {}", network_id);
     }
 
     Ok(())
