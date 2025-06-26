@@ -35,7 +35,7 @@ The following lists the currently implemented endpoints for the 2025-05-20 API v
 
 ### Spaces
 - ✅ List spaces
-- ❌ Create space
+- ✅ Create space
 - ✅ Get space
 - ❌ Update space
 

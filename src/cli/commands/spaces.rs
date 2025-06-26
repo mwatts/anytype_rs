@@ -1,5 +1,5 @@
 use anyhow::{Context, Result};
-use anytype_rs::api::{AnytypeClient, CreateObjectRequest};
+use anytype_rs::api::{AnytypeClient, CreateObjectRequest, CreateSpaceRequest};
 use clap::{Args, Subcommand};
 
 #[derive(Debug, Args)]
@@ -17,6 +17,15 @@ pub enum SpacesCommand {
         /// Space ID
         space_id: String,
     },
+    /// Create a new space
+    Create {
+        /// Name of the space
+        #[arg(short, long)]
+        name: String,
+        /// Description of the space
+        #[arg(long)]
+        description: Option<String>,
+    },
     /// List objects in a space
     Objects {
         /// Space ID
@@ -26,7 +35,7 @@ pub enum SpacesCommand {
         limit: u32,
     },
     /// Create a new object in a space
-    Create {
+    CreateObject {
         /// Space ID
         space_id: String,
         /// Name of the object
@@ -48,8 +57,11 @@ pub async fn handle_spaces_command(args: SpacesArgs) -> Result<()> {
     match args.command {
         SpacesCommand::List => list_spaces(&client).await,
         SpacesCommand::Get { space_id } => get_space(&client, &space_id).await,
+        SpacesCommand::Create { name, description } => {
+            create_space(&client, &name, description).await
+        }
         SpacesCommand::Objects { space_id, limit } => list_objects(&client, &space_id, limit).await,
-        SpacesCommand::Create {
+        SpacesCommand::CreateObject {
             space_id,
             name,
             type_key,
@@ -89,6 +101,39 @@ async fn get_space(client: &AnytypeClient, space_id: &str) -> Result<()> {
     println!("✅ Space details:");
     println!("  🆔 ID: {}", space.id);
     println!("  📛 Name: {}", space.name);
+
+    Ok(())
+}
+
+async fn create_space(
+    client: &AnytypeClient,
+    name: &str,
+    description: Option<String>,
+) -> Result<()> {
+    println!("🏗️  Creating space '{}'...", name);
+
+    let request = CreateSpaceRequest {
+        name: name.to_string(),
+        description,
+    };
+
+    let response = client
+        .create_space(request)
+        .await
+        .context("Failed to create space")?;
+
+    println!("✅ Space created successfully!");
+    println!("   🆔 Space ID: {}", response.space.id);
+    println!("   📛 Name: {}", response.space.name);
+    if let Some(desc) = &response.space.description {
+        println!("   📝 Description: {}", desc);
+    }
+    if let Some(gateway) = &response.space.gateway_url {
+        println!("   🌐 Gateway URL: {}", gateway);
+    }
+    if let Some(network_id) = &response.space.network_id {
+        println!("   🌍 Network ID: {}", network_id);
+    }
 
     Ok(())
 }
