@@ -1,5 +1,5 @@
 use anyhow::{Context, Result};
-use anytype_rs::api::{AnytypeClient, CreateObjectRequest, CreateSpaceRequest, UpdateSpaceRequest};
+use anytype_rs::api::{AnytypeClient, CreateObjectRequest, CreateSpaceRequest, UpdateSpaceRequest, UpdateObjectRequest};
 use clap::{Args, Subcommand};
 
 #[derive(Debug, Args)]
@@ -63,6 +63,19 @@ pub enum SpacesCommand {
         /// Object ID to delete
         object_id: String,
     },
+    /// Update an existing object in a space
+    UpdateObject {
+        /// Space ID
+        space_id: String,
+        /// Object ID to update
+        object_id: String,
+        /// New name for the object
+        #[arg(short, long)]
+        name: Option<String>,
+        /// New markdown content for the object
+        #[arg(short, long)]
+        markdown: Option<String>,
+    },
 }
 
 pub async fn handle_spaces_command(args: SpacesArgs) -> Result<()> {
@@ -93,6 +106,12 @@ pub async fn handle_spaces_command(args: SpacesArgs) -> Result<()> {
             space_id,
             object_id,
         } => delete_object(&client, &space_id, &object_id).await,
+        SpacesCommand::UpdateObject {
+            space_id,
+            object_id,
+            name,
+            markdown,
+        } => update_object(&client, &space_id, &object_id, name, markdown).await,
     }
 }
 
@@ -313,6 +332,53 @@ async fn delete_object(
         println!("   🏷️  Type: {}", object_type);
     }
     println!("   📦 Archived: The object has been marked as archived");
+
+    Ok(())
+}
+
+async fn update_object(
+    client: &AnytypeClient,
+    space_id: &str,
+    object_id: &str,
+    name: Option<String>,
+    markdown: Option<String>,
+) -> Result<()> {
+    // Check if at least one field is provided for update
+    if name.is_none() && markdown.is_none() {
+        return Err(anyhow::anyhow!(
+            "At least one field (name or markdown) must be provided to update"
+        ));
+    }
+
+    println!("🔄 Updating object '{}' in space '{}'...", object_id, space_id);
+
+    let request = UpdateObjectRequest {
+        name,
+        markdown,
+        properties: None, // For now, we don't support updating properties via CLI
+    };
+
+    let response = client
+        .update_object(space_id, object_id, request)
+        .await
+        .context("Failed to update object")?;
+
+    println!("✅ Object updated successfully!");
+    println!("   📄 Object ID: {}", response.object.id);
+    println!(
+        "   🏠 Space ID: {}",
+        response.object.space_id.as_deref().unwrap_or("Unknown")
+    );
+    println!(
+        "   📝 Name: {}",
+        response.object.name.as_deref().unwrap_or("Unnamed")
+    );
+    if let Some(object_type) = &response.object.object {
+        println!("   🏷️  Type: {}", object_type);
+    }
+    if let Some(markdown) = &response.markdown {
+        println!("   📄 Markdown: {} characters", markdown.len());
+    }
 
     Ok(())
 }

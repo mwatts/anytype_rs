@@ -49,6 +49,25 @@ pub struct DeleteObjectResponse {
     pub object: Object,
 }
 
+/// Request to update an existing object
+#[derive(Debug, Serialize)]
+pub struct UpdateObjectRequest {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub markdown: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub properties: Option<serde_json::Value>,
+}
+
+/// Response when updating an object
+#[derive(Debug, Deserialize)]
+pub struct UpdateObjectResponse {
+    pub object: Object,
+    pub properties: Option<serde_json::Value>,
+    pub markdown: Option<String>,
+}
+
 impl AnytypeClient {
     /// List objects in a space
     pub async fn list_objects(&self, space_id: &str) -> Result<Vec<Object>> {
@@ -83,6 +102,21 @@ impl AnytypeClient {
         info!("Deleting object {} in space: {}", object_id, space_id);
 
         self.delete(&format!("/v1/spaces/{}/objects/{}", space_id, object_id))
+            .await
+    }
+
+    /// Update an existing object in a space
+    pub async fn update_object(
+        &self,
+        space_id: &str,
+        object_id: &str,
+        request: UpdateObjectRequest,
+    ) -> Result<UpdateObjectResponse> {
+        info!("Updating object {} in space: {}", object_id, space_id);
+        debug!("Request: {:?}", request);
+        debug!("Request JSON: {}", serde_json::to_string_pretty(&request)?);
+
+        self.patch(&format!("/v1/spaces/{}/objects/{}", space_id, object_id), &request)
             .await
     }
 

@@ -25,6 +25,10 @@ This project provides bindings to the Anytype API and a CLI tool to interact wit
 
 The following lists the currently implemented endpoints for the 2025-05-20 API version.
 
+The ✅ means it's been vibe coded. I still need to go through and verify each of the ✅ endpoints, but the basics are there. They might be missing some functionality but the basics worked.
+
+❌ means it has not been implemented yet in any fashion.
+
 ### Authentication
 - ✅ Create API key
 - ✅ Create challenge
@@ -54,7 +58,7 @@ The following lists the currently implemented endpoints for the 2025-05-20 API v
 - ✅ Create object
 - ✅ Delete object
 - ✅ Get object
-- ❌ Update object
+- ✅ Update object
 
 ### Properties
 - ✅ List properties
