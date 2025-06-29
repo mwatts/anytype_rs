@@ -1,6 +1,6 @@
 [package]
 name = "anytype_rs"
-version = "0.0.1"
+version = "0.0.2"
 authors=["Lane Sawyer <github@lanesawyer.dev>"]
 description = "A Rust client library and CLI for the Anytype API"
 repository = "https://github.com/lanesawyer/anytype_rs"
