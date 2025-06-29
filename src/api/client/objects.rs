@@ -43,6 +43,12 @@ pub struct CreateObjectResponse {
     pub markdown: Option<String>,
 }
 
+/// Response when deleting an object
+#[derive(Debug, Deserialize)]
+pub struct DeleteObjectResponse {
+    pub object: Object,
+}
+
 impl AnytypeClient {
     /// List objects in a space
     pub async fn list_objects(&self, space_id: &str) -> Result<Vec<Object>> {
@@ -69,6 +75,14 @@ impl AnytypeClient {
         debug!("Request JSON: {}", serde_json::to_string_pretty(&request)?);
 
         self.post(&format!("/v1/spaces/{}/objects", space_id), &request)
+            .await
+    }
+
+    /// Delete an object in a space (marks it as archived)
+    pub async fn delete_object(&self, space_id: &str, object_id: &str) -> Result<DeleteObjectResponse> {
+        info!("Deleting object {} in space: {}", object_id, space_id);
+
+        self.delete(&format!("/v1/spaces/{}/objects/{}", space_id, object_id))
             .await
     }
 

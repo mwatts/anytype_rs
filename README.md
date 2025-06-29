@@ -52,7 +52,7 @@ The following lists the currently implemented endpoints for the 2025-05-20 API v
 ### Objects
 - ✅ List objects
 - ✅ Create object
-- ❌ Delete object
+- ✅ Delete object
 - ✅ Get object
 - ❌ Update object
 

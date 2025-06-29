@@ -56,6 +56,13 @@ pub enum SpacesCommand {
         #[arg(short = 't', long, default_value = "page")]
         type_key: String,
     },
+    /// Delete an object in a space (archives it)
+    DeleteObject {
+        /// Space ID
+        space_id: String,
+        /// Object ID to delete
+        object_id: String,
+    },
 }
 
 pub async fn handle_spaces_command(args: SpacesArgs) -> Result<()> {
@@ -82,6 +89,10 @@ pub async fn handle_spaces_command(args: SpacesArgs) -> Result<()> {
             name,
             type_key,
         } => create_object(&client, &space_id, &name, &type_key).await,
+        SpacesCommand::DeleteObject {
+            space_id,
+            object_id,
+        } => delete_object(&client, &space_id, &object_id).await,
     }
 }
 
@@ -272,6 +283,36 @@ async fn update_space(
     if let Some(network_id) = &response.space.network_id {
         println!("   🌍 Network ID: {}", network_id);
     }
+
+    Ok(())
+}
+
+async fn delete_object(
+    client: &AnytypeClient,
+    space_id: &str,
+    object_id: &str,
+) -> Result<()> {
+    println!("🗑️  Deleting object '{}' in space '{}'...", object_id, space_id);
+
+    let response = client
+        .delete_object(space_id, object_id)
+        .await
+        .context("Failed to delete object")?;
+
+    println!("✅ Object deleted successfully (archived)!");
+    println!("   📄 Object ID: {}", response.object.id);
+    println!(
+        "   🏠 Space ID: {}",
+        response.object.space_id.as_deref().unwrap_or("Unknown")
+    );
+    println!(
+        "   📝 Name: {}",
+        response.object.name.as_deref().unwrap_or("Unnamed")
+    );
+    if let Some(object_type) = &response.object.object {
+        println!("   🏷️  Type: {}", object_type);
+    }
+    println!("   📦 Archived: The object has been marked as archived");
 
     Ok(())
 }
