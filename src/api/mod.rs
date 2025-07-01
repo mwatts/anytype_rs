@@ -45,4 +45,5 @@ pub use client::templates::{
 pub use client::types::{
     CreateTypeIcon, CreateTypeProperty, CreateTypeRequest, CreateTypeResponse, GetTypeResponse,
     IconFormat, Layout, ListTypesResponse, PropertyFormat, Type, TypeIcon, TypeProperty,
+    UpdateTypeRequest, UpdateTypeResponse,
 };

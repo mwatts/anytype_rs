@@ -1,7 +1,7 @@
 use anyhow::{Context, Result};
 use anytype_rs::api::{
     AnytypeClient, CreateTypeIcon, CreateTypeProperty, CreateTypeRequest, IconFormat, Layout,
-    PropertyFormat,
+    PropertyFormat, UpdateTypeRequest,
 };
 use clap::{Args, Subcommand};
 
@@ -62,6 +62,31 @@ pub enum TypesCommand {
         #[arg(long, value_delimiter = ',')]
         properties: Vec<String>,
     },
+    /// Update an existing type in a space
+    Update {
+        /// Space ID where the type exists
+        space_id: String,
+        /// Type ID to update
+        type_id: String,
+        /// Type key (unique identifier)
+        #[arg(short, long)]
+        key: String,
+        /// Type name
+        #[arg(short, long)]
+        name: String,
+        /// Plural name for the type
+        #[arg(short, long)]
+        plural_name: String,
+        /// Layout for the type
+        #[arg(short, long, default_value = "basic")]
+        layout: String,
+        /// Icon emoji (optional)
+        #[arg(long)]
+        icon_emoji: Option<String>,
+        /// Property definitions in format "key:name:format" (can be repeated)
+        #[arg(long, value_delimiter = ',')]
+        properties: Vec<String>,
+    },
 }
 
 pub async fn handle_types_command(args: TypesArgs) -> Result<()> {
@@ -93,6 +118,27 @@ pub async fn handle_types_command(args: TypesArgs) -> Result<()> {
                 properties,
             };
             create_type(&client, create_params).await
+        }
+        TypesCommand::Update {
+            space_id,
+            type_id,
+            key,
+            name,
+            plural_name,
+            layout,
+            icon_emoji,
+            properties,
+        } => {
+            let update_params = CreateTypeParams {
+                space_id,
+                key,
+                name,
+                plural_name,
+                layout,
+                icon_emoji,
+                properties,
+            };
+            update_type(&client, &type_id, update_params).await
         }
     }
 }
@@ -332,6 +378,122 @@ async fn get_type(client: &AnytypeClient, space_id: &str, type_id: &str) -> Resu
         }
     } else {
         println!("  🔑 Properties: None");
+    }
+
+    Ok(())
+}
+
+async fn update_type(client: &AnytypeClient, type_id: &str, params: CreateTypeParams) -> Result<()> {
+    println!(
+        "🔄 Updating type '{}' in space '{}'...",
+        type_id, params.space_id
+    );
+
+    // Parse layout
+    let layout_enum = match params.layout.to_lowercase().as_str() {
+        "basic" => Layout::Basic,
+        "profile" => Layout::Profile,
+        "action" => Layout::Action,
+        "note" => Layout::Note,
+        "bookmark" => Layout::Bookmark,
+        "set" => Layout::Set,
+        "collection" => Layout::Collection,
+        "participant" => Layout::Participant,
+        _ => {
+            println!(
+                "❌ Invalid layout: {}. Valid options: basic, profile, action, note, bookmark, set, collection, participant",
+                params.layout
+            );
+            return Ok(());
+        }
+    };
+
+    // Parse icon
+    let icon = params.icon_emoji.map(|emoji| CreateTypeIcon {
+        emoji: Some(emoji),
+        format: IconFormat::Emoji,
+    });
+
+    // Parse properties
+    let mut parsed_properties = Vec::new();
+    for prop_str in &params.properties {
+        let parts: Vec<&str> = prop_str.split(':').collect();
+        if parts.len() != 3 {
+            println!(
+                "❌ Invalid property format: '{prop_str}'. Expected format: 'key:name:format'"
+            );
+            return Ok(());
+        }
+
+        let property_format = match parts[2].to_lowercase().as_str() {
+            "text" => PropertyFormat::Text,
+            "number" => PropertyFormat::Number,
+            "select" => PropertyFormat::Select,
+            "multi_select" | "multiselect" => PropertyFormat::MultiSelect,
+            "date" => PropertyFormat::Date,
+            "files" => PropertyFormat::Files,
+            "checkbox" => PropertyFormat::Checkbox,
+            "url" => PropertyFormat::Url,
+            "email" => PropertyFormat::Email,
+            "phone" => PropertyFormat::Phone,
+            "objects" => PropertyFormat::Objects,
+            _ => {
+                println!(
+                    "❌ Invalid property format: '{}'. Valid options: text, number, select, multi_select, date, files, checkbox, url, email, phone, objects",
+                    parts[2]
+                );
+                return Ok(());
+            }
+        };
+
+        parsed_properties.push(CreateTypeProperty {
+            key: parts[0].to_string(),
+            name: parts[1].to_string(),
+            format: property_format,
+        });
+    }
+
+    let request = UpdateTypeRequest {
+        key: params.key,
+        name: params.name.clone(),
+        plural_name: params.plural_name,
+        layout: layout_enum,
+        icon,
+        properties: parsed_properties,
+    };
+
+    let response = client
+        .update_type(&params.space_id, type_id, request)
+        .await
+        .context("Failed to update type")?;
+
+    println!("✅ Type updated successfully!");
+    println!("  🏷️  Name: {}", response.type_data.name);
+    println!("  🆔 ID: {}", response.type_data.id);
+    println!("  🔑 Key: {}", response.type_data.key);
+
+    if let Some(layout) = &response.type_data.layout {
+        println!("  📐 Layout: {layout}");
+    }
+
+    if let Some(plural_name) = &response.type_data.plural_name {
+        println!("  📚 Plural: {plural_name}");
+    }
+
+    if let Some(icon) = &response.type_data.icon {
+        if let Some(emoji) = &icon.emoji {
+            println!("  🎨 Icon: {emoji}");
+        }
+    }
+
+    if !response.type_data.properties.is_empty() {
+        println!(
+            "  🔑 Properties: {} total",
+            response.type_data.properties.len()
+        );
+        for prop in &response.type_data.properties {
+            println!("    • {} ({}) - {}", prop.name, prop.format, prop.key);
+        }
     }
 
     Ok(())

@@ -127,6 +127,24 @@ pub struct ListTypesResponse {
     pub pagination: Pagination,
 }
 
+/// Request to update an existing type
+#[derive(Debug, Serialize)]
+pub struct UpdateTypeRequest {
+    pub icon: Option<CreateTypeIcon>,
+    pub key: String,
+    pub layout: Layout,
+    pub name: String,
+    pub plural_name: String,
+    pub properties: Vec<CreateTypeProperty>,
+}
+
+/// Response when updating a type
+#[derive(Debug, Deserialize)]
+pub struct UpdateTypeResponse {
+    #[serde(rename = "type")]
+    pub type_data: Type,
+}
+
 impl AnytypeClient {
     /// List types in a space
     pub async fn list_types(&self, space_id: &str) -> Result<Vec<Type>> {
@@ -167,7 +185,21 @@ impl AnytypeClient {
         Ok(response.type_data)
     }
 
+    /// Update an existing type in a space
+    pub async fn update_type(
+        &self,
+        space_id: &str,
+        type_id: &str,
+        request: UpdateTypeRequest,
+    ) -> Result<UpdateTypeResponse> {
+        info!("Updating type '{}' in space: {}", type_id, space_id);
+        debug!("Request: {:?}", request);
+        debug!("Request JSON: {}", serde_json::to_string_pretty(&request)?);
+
+        self.patch(&format!("/v1/spaces/{space_id}/types/{type_id}"), &request)
+            .await
+    }
+
     // TODO: Add additional type management methods like:
-    // - update_type
     // - delete_type
 }

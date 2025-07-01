@@ -79,7 +79,7 @@ The ✅ means it's been vibe coded. I still need to go through and verify each o
 - ✅ Create type
 - ❌ Delete type
 - ✅ Get type
-- ❌ Update type
+- ✅ Update type
 
 ### Templates
 - ✅ List templates
