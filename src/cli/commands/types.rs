@@ -1,11 +1,25 @@
 use anyhow::{Context, Result};
-use anytype_rs::api::AnytypeClient;
+use anytype_rs::api::{
+    AnytypeClient, CreateTypeIcon, CreateTypeProperty, CreateTypeRequest, IconFormat, Layout,
+    PropertyFormat,
+};
 use clap::{Args, Subcommand};
 
 #[derive(Debug, Args)]
 pub struct TypesArgs {
     #[command(subcommand)]
     pub command: TypesCommand,
+}
+
+#[derive(Debug)]
+struct CreateTypeParams {
+    space_id: String,
+    key: String,
+    name: String,
+    plural_name: String,
+    layout: String,
+    icon_emoji: Option<String>,
+    properties: Vec<String>,
 }
 
 #[derive(Debug, Subcommand)]
@@ -18,6 +32,29 @@ pub enum TypesCommand {
         #[arg(short, long, default_value = "20")]
         limit: u32,
     },
+    /// Create a new type in a space
+    Create {
+        /// Space ID where the type will be created
+        space_id: String,
+        /// Type key (unique identifier)
+        #[arg(short, long)]
+        key: String,
+        /// Type name
+        #[arg(short, long)]
+        name: String,
+        /// Plural name for the type
+        #[arg(short, long)]
+        plural_name: String,
+        /// Layout for the type
+        #[arg(short, long, default_value = "basic")]
+        layout: String,
+        /// Icon emoji (optional)
+        #[arg(long)]
+        icon_emoji: Option<String>,
+        /// Property definitions in format "key:name:format" (can be repeated)
+        #[arg(long, value_delimiter = ',')]
+        properties: Vec<String>,
+    },
 }
 
 pub async fn handle_types_command(args: TypesArgs) -> Result<()> {
@@ -29,6 +66,26 @@ pub async fn handle_types_command(args: TypesArgs) -> Result<()> {
 
     match args.command {
         TypesCommand::List { space_id, limit } => list_types(&client, &space_id, limit).await,
+        TypesCommand::Create {
+            space_id,
+            key,
+            name,
+            plural_name,
+            layout,
+            icon_emoji,
+            properties,
+        } => {
+            let create_params = CreateTypeParams {
+                space_id,
+                key,
+                name,
+                plural_name,
+                layout,
+                icon_emoji,
+                properties,
+            };
+            create_type(&client, create_params).await
+        }
     }
 }
 
@@ -100,6 +157,108 @@ async fn list_types(client: &AnytypeClient, space_id: &str, limit: u32) -> Resul
 
     if total_types > display_count {
         println!("💡 Use --limit {total_types} to see more results");
+    }
+
+    Ok(())
+}
+
+async fn create_type(client: &AnytypeClient, params: CreateTypeParams) -> Result<()> {
+    println!("🏗️  Creating type '{}' in space '{}'...", params.name, params.space_id);
+
+    // Parse layout
+    let layout_enum = match params.layout.to_lowercase().as_str() {
+        "basic" => Layout::Basic,
+        "profile" => Layout::Profile,
+        "action" => Layout::Action,
+        "note" => Layout::Note,
+        "bookmark" => Layout::Bookmark,
+        "set" => Layout::Set,
+        "collection" => Layout::Collection,
+        "participant" => Layout::Participant,
+        _ => {
+            println!("❌ Invalid layout: {}. Valid options: basic, profile, action, note, bookmark, set, collection, participant", params.layout);
+            return Ok(());
+        }
+    };
+
+    // Parse icon
+    let icon = params.icon_emoji.map(|emoji| CreateTypeIcon {
+        emoji: Some(emoji),
+        format: IconFormat::Emoji,
+    });
+
+    // Parse properties
+    let mut parsed_properties = Vec::new();
+    for prop_str in &params.properties {
+        let parts: Vec<&str> = prop_str.split(':').collect();
+        if parts.len() != 3 {
+            println!("❌ Invalid property format: '{prop_str}'. Expected format: 'key:name:format'");
+            return Ok(());
+        }
+
+        let property_format = match parts[2].to_lowercase().as_str() {
+            "text" => PropertyFormat::Text,
+            "number" => PropertyFormat::Number,
+            "select" => PropertyFormat::Select,
+            "multi_select" | "multiselect" => PropertyFormat::MultiSelect,
+            "date" => PropertyFormat::Date,
+            "files" => PropertyFormat::Files,
+            "checkbox" => PropertyFormat::Checkbox,
+            "url" => PropertyFormat::Url,
+            "email" => PropertyFormat::Email,
+            "phone" => PropertyFormat::Phone,
+            "objects" => PropertyFormat::Objects,
+            _ => {
+                println!("❌ Invalid property format: '{}'. Valid options: text, number, select, multi_select, date, files, checkbox, url, email, phone, objects", parts[2]);
+                return Ok(());
+            }
+        };
+
+        parsed_properties.push(CreateTypeProperty {
+            key: parts[0].to_string(),
+            name: parts[1].to_string(),
+            format: property_format,
+        });
+    }
+
+    let request = CreateTypeRequest {
+        key: params.key,
+        name: params.name.clone(),
+        plural_name: params.plural_name,
+        layout: layout_enum,
+        icon,
+        properties: parsed_properties,
+    };
+
+    let response = client
+        .create_type(&params.space_id, request)
+        .await
+        .context("Failed to create type")?;
+
+    println!("✅ Type created successfully!");
+    println!("  🏷️  Name: {}", response.type_data.name);
+    println!("  🆔 ID: {}", response.type_data.id);
+    println!("  🔑 Key: {}", response.type_data.key);
+    
+    if let Some(layout) = &response.type_data.layout {
+        println!("  📐 Layout: {layout}");
+    }
+    
+    if let Some(plural_name) = &response.type_data.plural_name {
+        println!("  📚 Plural: {plural_name}");
+    }
+
+    if let Some(icon) = &response.type_data.icon {
+        if let Some(emoji) = &icon.emoji {
+            println!("  🎨 Icon: {emoji}");
+        }
+    }
+
+    if !response.type_data.properties.is_empty() {
+        println!("  🔑 Properties: {} created", response.type_data.properties.len());
+        for prop in &response.type_data.properties {
+            println!("    • {} ({}) - {}", prop.name, prop.format, prop.key);
+        }
     }
 
     Ok(())

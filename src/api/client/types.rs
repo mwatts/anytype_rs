@@ -7,6 +7,79 @@ use crate::{error::Result, types::Pagination};
 use serde::{Deserialize, Serialize};
 use tracing::{debug, info};
 
+/// Property format for type creation
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum PropertyFormat {
+    Text,
+    Number,
+    Select,
+    MultiSelect,
+    Date,
+    Files,
+    Checkbox,
+    Url,
+    Email,
+    Phone,
+    Objects,
+}
+
+/// Icon format for type creation
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum IconFormat {
+    Emoji,
+    File,
+    Icon,
+}
+
+/// Layout type for object types
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Layout {
+    Basic,
+    Profile,
+    Action,
+    Note,
+    Bookmark,
+    Set,
+    Collection,
+    Participant,
+}
+
+/// Icon for type creation
+#[derive(Debug, Serialize, Deserialize)]
+pub struct CreateTypeIcon {
+    pub emoji: Option<String>,
+    pub format: IconFormat,
+}
+
+/// Property for type creation
+#[derive(Debug, Serialize, Deserialize)]
+pub struct CreateTypeProperty {
+    pub format: PropertyFormat,
+    pub key: String,
+    pub name: String,
+}
+
+/// Request to create a new type
+#[derive(Debug, Serialize)]
+pub struct CreateTypeRequest {
+    pub icon: Option<CreateTypeIcon>,
+    pub key: String,
+    pub layout: Layout,
+    pub name: String,
+    pub plural_name: String,
+    pub properties: Vec<CreateTypeProperty>,
+}
+
+/// Response when creating a type
+#[derive(Debug, Deserialize)]
+pub struct CreateTypeResponse {
+    #[serde(rename = "type")]
+    pub type_data: Type,
+}
+
 /// Enhanced icon information for types
 #[derive(Debug, Deserialize, Serialize)]
 pub struct TypeIcon {
@@ -62,9 +135,22 @@ impl AnytypeClient {
         self.get(&format!("/v1/spaces/{space_id}/types")).await
     }
 
+    /// Create a new type in a space
+    pub async fn create_type(
+        &self,
+        space_id: &str,
+        request: CreateTypeRequest,
+    ) -> Result<CreateTypeResponse> {
+        info!("Creating type '{}' in space: {}", request.name, space_id);
+        debug!("Request: {:?}", request);
+        debug!("Request JSON: {}", serde_json::to_string_pretty(&request)?);
+
+        self.post(&format!("/v1/spaces/{space_id}/types"), &request)
+            .await
+    }
+
     // TODO: Add additional type management methods like:
     // - get_type
-    // - create_type
     // - update_type
     // - delete_type
 }

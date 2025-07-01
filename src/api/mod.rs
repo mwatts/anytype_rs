@@ -42,4 +42,7 @@ pub use client::tags::{ListTagsResponse, Tag};
 pub use client::templates::{
     GetTemplateResponse, Icon, ListTemplatesResponse, ObjectType, Template,
 };
-pub use client::types::{ListTypesResponse, Type, TypeIcon, TypeProperty};
+pub use client::types::{
+    CreateTypeIcon, CreateTypeProperty, CreateTypeRequest, CreateTypeResponse, IconFormat, Layout,
+    ListTypesResponse, PropertyFormat, Type, TypeIcon, TypeProperty,
+};
