@@ -98,7 +98,11 @@ impl AnytypeClient {
     }
 
     /// Delete an object in a space (marks it as archived)
-    pub async fn delete_object(&self, space_id: &str, object_id: &str) -> Result<DeleteObjectResponse> {
+    pub async fn delete_object(
+        &self,
+        space_id: &str,
+        object_id: &str,
+    ) -> Result<DeleteObjectResponse> {
         info!("Deleting object {} in space: {}", object_id, space_id);
 
         self.delete(&format!("/v1/spaces/{}/objects/{}", space_id, object_id))
@@ -116,8 +120,11 @@ impl AnytypeClient {
         debug!("Request: {:?}", request);
         debug!("Request JSON: {}", serde_json::to_string_pretty(&request)?);
 
-        self.patch(&format!("/v1/spaces/{}/objects/{}", space_id, object_id), &request)
-            .await
+        self.patch(
+            &format!("/v1/spaces/{}/objects/{}", space_id, object_id),
+            &request,
+        )
+        .await
     }
 
     /// List objects in a space with pagination information

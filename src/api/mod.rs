@@ -27,9 +27,12 @@ pub use client::auth::{
 pub use client::members::{
     GetMemberResponse, ListMembersResponse, Member, MemberRole, MemberStatus,
 };
-pub use client::objects::{CreateObjectRequest, CreateObjectResponse, DeleteObjectResponse, ListObjectsResponse, Object, UpdateObjectRequest, UpdateObjectResponse};
+pub use client::objects::{
+    CreateObjectRequest, CreateObjectResponse, DeleteObjectResponse, ListObjectsResponse, Object,
+    UpdateObjectRequest, UpdateObjectResponse,
+};
 pub use client::properties::{ListPropertiesResponse, Property};
-pub use client::search::{SearchObject, SearchRequest, SearchResponse};
+pub use client::search::{SearchObject, SearchRequest, SearchResponse, SearchSpaceRequest};
 pub use client::spaces::{
     CreateSpaceRequest, CreateSpaceResponse, ListSpacesResponse, Space, UpdateSpaceRequest,
     UpdateSpaceResponse,

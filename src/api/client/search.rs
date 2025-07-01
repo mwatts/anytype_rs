@@ -16,6 +16,17 @@ pub struct SearchRequest {
     pub space_id: Option<String>,
 }
 
+/// Search request parameters for space-specific search
+#[derive(Debug, Serialize)]
+pub struct SearchSpaceRequest {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub query: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub offset: Option<u32>,
+}
+
 /// Basic object information for search results
 #[derive(Debug, Deserialize, Serialize)]
 pub struct SearchObject {
@@ -52,5 +63,37 @@ impl AnytypeClient {
     /// Search for objects
     pub async fn search(&self, request: SearchRequest) -> Result<SearchResponse> {
         self.search_with_pagination(request).await
+    }
+
+    /// Search for objects within a specific space and return full response with pagination
+    pub async fn search_space_with_pagination(
+        &self,
+        space_id: &str,
+        request: SearchSpaceRequest,
+    ) -> Result<SearchResponse> {
+        info!("Searching objects in space: {}", space_id);
+        debug!("Search query: {:?}", request.query);
+
+        self.post(&format!("/v1/spaces/{}/search", space_id), &request)
+            .await
+    }
+
+    /// Search for objects within a specific space and return just the objects array
+    pub async fn search_space_objects(
+        &self,
+        space_id: &str,
+        request: SearchSpaceRequest,
+    ) -> Result<Vec<SearchObject>> {
+        let response = self.search_space_with_pagination(space_id, request).await?;
+        Ok(response.data)
+    }
+
+    /// Search for objects within a specific space
+    pub async fn search_space(
+        &self,
+        space_id: &str,
+        request: SearchSpaceRequest,
+    ) -> Result<SearchResponse> {
+        self.search_space_with_pagination(space_id, request).await
     }
 }

@@ -1,5 +1,5 @@
 use anyhow::{Context, Result};
-use anytype_rs::api::{AnytypeClient, SearchRequest};
+use anytype_rs::api::{AnytypeClient, SearchRequest, SearchSpaceRequest};
 use clap::Args;
 
 #[derive(Debug, Args)]
@@ -38,17 +38,33 @@ async fn search(client: &AnytypeClient, args: SearchArgs) -> Result<()> {
 
     println!("🔍 Searching for '{}'{}...", args.query, space_info);
 
-    let request = SearchRequest {
-        query: Some(args.query.clone()),
-        limit: Some(args.limit),
-        offset: Some(args.offset),
-        space_id: args.space_id.clone(),
+    let response = match &args.space_id {
+        Some(space_id) => {
+            // Use space-specific search endpoint
+            let request = SearchSpaceRequest {
+                query: Some(args.query.clone()),
+                limit: Some(args.limit),
+                offset: Some(args.offset),
+            };
+            client
+                .search_space(space_id, request)
+                .await
+                .context("Failed to perform space search")?
+        }
+        None => {
+            // Use global search endpoint
+            let request = SearchRequest {
+                query: Some(args.query.clone()),
+                limit: Some(args.limit),
+                offset: Some(args.offset),
+                space_id: None,
+            };
+            client
+                .search(request)
+                .await
+                .context("Failed to perform global search")?
+        }
     };
-
-    let response = client
-        .search(request)
-        .await
-        .context("Failed to perform search")?;
 
     if response.data.is_empty() {
         println!("📭 No results found for '{}'.", args.query);

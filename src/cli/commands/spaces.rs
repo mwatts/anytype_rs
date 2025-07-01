@@ -1,5 +1,7 @@
 use anyhow::{Context, Result};
-use anytype_rs::api::{AnytypeClient, CreateObjectRequest, CreateSpaceRequest, UpdateSpaceRequest, UpdateObjectRequest};
+use anytype_rs::api::{
+    AnytypeClient, CreateObjectRequest, CreateSpaceRequest, UpdateObjectRequest, UpdateSpaceRequest,
+};
 use clap::{Args, Subcommand};
 
 #[derive(Debug, Args)]
@@ -306,12 +308,11 @@ async fn update_space(
     Ok(())
 }
 
-async fn delete_object(
-    client: &AnytypeClient,
-    space_id: &str,
-    object_id: &str,
-) -> Result<()> {
-    println!("🗑️  Deleting object '{}' in space '{}'...", object_id, space_id);
+async fn delete_object(client: &AnytypeClient, space_id: &str, object_id: &str) -> Result<()> {
+    println!(
+        "🗑️  Deleting object '{}' in space '{}'...",
+        object_id, space_id
+    );
 
     let response = client
         .delete_object(space_id, object_id)
@@ -350,7 +351,10 @@ async fn update_object(
         ));
     }
 
-    println!("🔄 Updating object '{}' in space '{}'...", object_id, space_id);
+    println!(
+        "🔄 Updating object '{}' in space '{}'...",
+        object_id, space_id
+    );
 
     let request = UpdateObjectRequest {
         name,

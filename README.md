@@ -35,7 +35,7 @@ The ✅ means it's been vibe coded. I still need to go through and verify each o
 
 ### Search
 - ✅ Search objects across all spaces
-- ❌ Search objects within a space
+- ✅ Search objects within a space
 
 ### Spaces
 - ✅ List spaces
