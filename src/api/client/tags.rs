@@ -29,8 +29,7 @@ impl AnytypeClient {
     pub async fn list_tags(&self, space_id: &str, property_id: &str) -> Result<Vec<Tag>> {
         let response: ListTagsResponse = self
             .get(&format!(
-                "/v1/spaces/{}/properties/{}/tags",
-                space_id, property_id
+                "/v1/spaces/{space_id}/properties/{property_id}/tags"
             ))
             .await?;
         Ok(response.data)
@@ -52,8 +51,7 @@ impl AnytypeClient {
         );
 
         self.get(&format!(
-            "/v1/spaces/{}/properties/{}/tags",
-            space_id, property_id
+            "/v1/spaces/{space_id}/properties/{property_id}/tags"
         ))
         .await
     }

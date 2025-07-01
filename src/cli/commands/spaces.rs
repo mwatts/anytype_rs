@@ -139,7 +139,7 @@ async fn list_spaces(client: &AnytypeClient) -> Result<()> {
 }
 
 async fn get_space(client: &AnytypeClient, space_id: &str) -> Result<()> {
-    println!("🔍 Fetching space details for '{}'...", space_id);
+    println!("🔍 Fetching space details for '{space_id}'...");
 
     let space = client
         .get_space(space_id)
@@ -158,7 +158,7 @@ async fn create_space(
     name: &str,
     description: Option<String>,
 ) -> Result<()> {
-    println!("🏗️  Creating space '{}'...", name);
+    println!("🏗️  Creating space '{name}'...");
 
     let request = CreateSpaceRequest {
         name: name.to_string(),
@@ -174,20 +174,20 @@ async fn create_space(
     println!("   🆔 Space ID: {}", response.space.id);
     println!("   📛 Name: {}", response.space.name);
     if let Some(desc) = &response.space.description {
-        println!("   📝 Description: {}", desc);
+        println!("   📝 Description: {desc}");
     }
     if let Some(gateway) = &response.space.gateway_url {
-        println!("   🌐 Gateway URL: {}", gateway);
+        println!("   🌐 Gateway URL: {gateway}");
     }
     if let Some(network_id) = &response.space.network_id {
-        println!("   🌍 Network ID: {}", network_id);
+        println!("   🌍 Network ID: {network_id}");
     }
 
     Ok(())
 }
 
 async fn list_objects(client: &AnytypeClient, space_id: &str, limit: u32) -> Result<()> {
-    println!("📄 Fetching objects from space '{}'...", space_id);
+    println!("📄 Fetching objects from space '{space_id}'...");
 
     let objects = client
         .list_objects(space_id)
@@ -201,10 +201,7 @@ async fn list_objects(client: &AnytypeClient, space_id: &str, limit: u32) -> Res
 
     let display_count = (limit as usize).min(objects.len());
     let total_objects = objects.len();
-    println!(
-        "✅ Found {} objects (showing first {}):",
-        total_objects, display_count
-    );
+    println!("✅ Found {total_objects} objects (showing first {display_count}):");
 
     for object in objects.into_iter().take(display_count) {
         println!(
@@ -228,7 +225,7 @@ async fn list_objects(client: &AnytypeClient, space_id: &str, limit: u32) -> Res
     }
 
     if total_objects > display_count {
-        println!("💡 Use --limit {} to see more results", total_objects);
+        println!("💡 Use --limit {total_objects} to see more results");
     }
 
     Ok(())
@@ -240,7 +237,7 @@ async fn create_object(
     name: &str,
     type_key: &str,
 ) -> Result<()> {
-    println!("📝 Creating object '{}' in space '{}'...", name, space_id);
+    println!("📝 Creating object '{name}' in space '{space_id}'...");
 
     let request = CreateObjectRequest {
         name: Some(name.to_string()),
@@ -264,7 +261,7 @@ async fn create_object(
         response.object.name.as_deref().unwrap_or("Unnamed")
     );
     if let Some(object_type) = &response.object.object {
-        println!("   🏷️  Type: {}", object_type);
+        println!("   🏷️  Type: {object_type}");
     }
 
     Ok(())
@@ -283,7 +280,7 @@ async fn update_space(
         ));
     }
 
-    println!("🔄 Updating space '{}'...", space_id);
+    println!("🔄 Updating space '{space_id}'...");
 
     let request = UpdateSpaceRequest { name, description };
 
@@ -296,23 +293,20 @@ async fn update_space(
     println!("   🆔 Space ID: {}", response.space.id);
     println!("   📛 Name: {}", response.space.name);
     if let Some(desc) = &response.space.description {
-        println!("   📝 Description: {}", desc);
+        println!("   📝 Description: {desc}");
     }
     if let Some(gateway) = &response.space.gateway_url {
-        println!("   🌐 Gateway URL: {}", gateway);
+        println!("   🌐 Gateway URL: {gateway}");
     }
     if let Some(network_id) = &response.space.network_id {
-        println!("   🌍 Network ID: {}", network_id);
+        println!("   🌍 Network ID: {network_id}");
     }
 
     Ok(())
 }
 
 async fn delete_object(client: &AnytypeClient, space_id: &str, object_id: &str) -> Result<()> {
-    println!(
-        "🗑️  Deleting object '{}' in space '{}'...",
-        object_id, space_id
-    );
+    println!("🗑️  Deleting object '{object_id}' in space '{space_id}'...");
 
     let response = client
         .delete_object(space_id, object_id)
@@ -330,7 +324,7 @@ async fn delete_object(client: &AnytypeClient, space_id: &str, object_id: &str) 
         response.object.name.as_deref().unwrap_or("Unnamed")
     );
     if let Some(object_type) = &response.object.object {
-        println!("   🏷️  Type: {}", object_type);
+        println!("   🏷️  Type: {object_type}");
     }
     println!("   📦 Archived: The object has been marked as archived");
 
@@ -351,10 +345,7 @@ async fn update_object(
         ));
     }
 
-    println!(
-        "🔄 Updating object '{}' in space '{}'...",
-        object_id, space_id
-    );
+    println!("🔄 Updating object '{object_id}' in space '{space_id}'...");
 
     let request = UpdateObjectRequest {
         name,
@@ -378,7 +369,7 @@ async fn update_object(
         response.object.name.as_deref().unwrap_or("Unnamed")
     );
     if let Some(object_type) = &response.object.object {
-        println!("   🏷️  Type: {}", object_type);
+        println!("   🏷️  Type: {object_type}");
     }
     if let Some(markdown) = &response.markdown {
         println!("   📄 Markdown: {} characters", markdown.len());

@@ -28,7 +28,7 @@ impl AnytypeClient {
     /// List properties in a space
     pub async fn list_properties(&self, space_id: &str) -> Result<Vec<Property>> {
         let response: ListPropertiesResponse = self
-            .get(&format!("/v1/spaces/{}/properties", space_id))
+            .get(&format!("/v1/spaces/{space_id}/properties"))
             .await?;
         Ok(response.data)
     }
@@ -41,8 +41,7 @@ impl AnytypeClient {
         info!("Listing properties in space: {}", space_id);
         debug!("GET /v1/spaces/{}/properties", space_id);
 
-        self.get(&format!("/v1/spaces/{}/properties", space_id))
-            .await
+        self.get(&format!("/v1/spaces/{space_id}/properties")).await
     }
 
     // TODO: Add additional property management methods like:

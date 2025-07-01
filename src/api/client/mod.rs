@@ -169,7 +169,7 @@ impl AnytypeClient {
             Method::DELETE => self.http_client.delete(url),
             _ => {
                 return Err(crate::error::AnytypeError::Api {
-                    message: format!("Unsupported HTTP method: {}", method),
+                    message: format!("Unsupported HTTP method: {method}"),
                 });
             }
         };
@@ -219,7 +219,7 @@ impl AnytypeClient {
                     }
                 }
                 Err(e) => Err(crate::error::AnytypeError::Api {
-                    message: format!("HTTP {} - {}", status, e),
+                    message: format!("HTTP {status} - {e}"),
                 }),
             }
         }

@@ -62,7 +62,7 @@ impl AnytypeClient {
 
     /// Get a specific space by ID
     pub async fn get_space(&self, space_id: &str) -> Result<Space> {
-        self.get(&format!("/v1/spaces/{}", space_id)).await
+        self.get(&format!("/v1/spaces/{space_id}")).await
     }
 
     /// Create a new space
@@ -76,7 +76,7 @@ impl AnytypeClient {
         space_id: &str,
         request: UpdateSpaceRequest,
     ) -> Result<UpdateSpaceResponse> {
-        self.patch(&format!("/v1/spaces/{}", space_id), &request)
+        self.patch(&format!("/v1/spaces/{space_id}"), &request)
             .await
     }
 

@@ -33,7 +33,7 @@ pub async fn handle_types_command(args: TypesArgs) -> Result<()> {
 }
 
 async fn list_types(client: &AnytypeClient, space_id: &str, limit: u32) -> Result<()> {
-    println!("🏷️  Fetching types from space '{}'...", space_id);
+    println!("🏷️  Fetching types from space '{space_id}'...");
 
     let types = client
         .list_types(space_id)
@@ -47,21 +47,18 @@ async fn list_types(client: &AnytypeClient, space_id: &str, limit: u32) -> Resul
 
     let display_count = (limit as usize).min(types.len());
     let total_types = types.len();
-    println!(
-        "✅ Found {} types (showing first {}):",
-        total_types, display_count
-    );
+    println!("✅ Found {total_types} types (showing first {display_count}):");
 
     for type_obj in types.into_iter().take(display_count) {
         println!("  🏷️  {} ({})", type_obj.name, type_obj.key);
         println!("     🆔 ID: {}", type_obj.id);
 
         if let Some(layout) = &type_obj.layout {
-            println!("     📐 Layout: {}", layout);
+            println!("     📐 Layout: {layout}");
         }
 
         if let Some(plural_name) = &type_obj.plural_name {
-            println!("     📚 Plural: {}", plural_name);
+            println!("     📚 Plural: {plural_name}");
         }
 
         if let Some(archived) = type_obj.archived {
@@ -72,12 +69,12 @@ async fn list_types(client: &AnytypeClient, space_id: &str, limit: u32) -> Resul
 
         if let Some(icon) = &type_obj.icon {
             if let Some(emoji) = &icon.emoji {
-                println!("     🎨 Icon: {}", emoji);
+                println!("     🎨 Icon: {emoji}");
             } else if let Some(name) = &icon.name {
                 if let Some(color) = &icon.color {
-                    println!("     🎨 Icon: {} ({})", name, color);
+                    println!("     🎨 Icon: {name} ({color})");
                 } else {
-                    println!("     🎨 Icon: {}", name);
+                    println!("     🎨 Icon: {name}");
                 }
             }
         }
@@ -102,7 +99,7 @@ async fn list_types(client: &AnytypeClient, space_id: &str, limit: u32) -> Resul
     }
 
     if total_types > display_count {
-        println!("💡 Use --limit {} to see more results", total_types);
+        println!("💡 Use --limit {total_types} to see more results");
     }
 
     Ok(())

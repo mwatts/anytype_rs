@@ -105,7 +105,7 @@ async fn status() -> Result<()> {
                     println!("🏠 Connected successfully. Found {} spaces.", spaces.len());
                 }
                 Err(e) => {
-                    println!("⚠️  API key may be invalid or expired: {}", e);
+                    println!("⚠️  API key may be invalid or expired: {e}");
                 }
             }
         }

@@ -58,10 +58,7 @@ async fn list_templates(
     type_id: &str,
     limit: u32,
 ) -> Result<()> {
-    println!(
-        "📋 Fetching templates for type '{}' from space '{}'...",
-        type_id, space_id
-    );
+    println!("📋 Fetching templates for type '{type_id}' from space '{space_id}'...");
 
     let templates = client
         .list_templates(space_id, type_id)
@@ -75,10 +72,7 @@ async fn list_templates(
 
     let display_count = (limit as usize).min(templates.len());
     let total_templates = templates.len();
-    println!(
-        "✅ Found {} templates (showing first {}):",
-        total_templates, display_count
-    );
+    println!("✅ Found {total_templates} templates (showing first {display_count}):");
 
     for template in templates.into_iter().take(display_count) {
         println!(
@@ -89,7 +83,7 @@ async fn list_templates(
         println!("     🏠 Space: {}", template.space_id);
 
         if let Some(layout) = &template.layout {
-            println!("     📐 Layout: {}", layout);
+            println!("     📐 Layout: {layout}");
         }
 
         if let Some(archived) = template.archived {
@@ -100,7 +94,7 @@ async fn list_templates(
 
         if let Some(icon) = &template.icon {
             if let Some(emoji) = &icon.emoji {
-                println!("     🎨 Icon: {}", emoji);
+                println!("     🎨 Icon: {emoji}");
             }
         }
 
@@ -110,7 +104,7 @@ async fn list_templates(
             } else {
                 snippet.clone()
             };
-            println!("     📝 Snippet: {}", display_snippet);
+            println!("     📝 Snippet: {display_snippet}");
         }
 
         if let Some(object_type) = &template.object_type {
@@ -121,7 +115,7 @@ async fn list_templates(
     }
 
     if total_templates > display_count {
-        println!("💡 Use --limit {} to see more results", total_templates);
+        println!("💡 Use --limit {total_templates} to see more results");
     }
 
     Ok(())
@@ -134,8 +128,7 @@ async fn get_template(
     template_id: &str,
 ) -> Result<()> {
     println!(
-        "🔍 Fetching template '{}' for type '{}' from space '{}'...",
-        template_id, type_id, space_id
+        "🔍 Fetching template '{template_id}' for type '{type_id}' from space '{space_id}'..."
     );
 
     let template = client
@@ -153,7 +146,7 @@ async fn get_template(
     println!("  📄 Object: {}", template.object);
 
     if let Some(layout) = &template.layout {
-        println!("  📐 Layout: {}", layout);
+        println!("  📐 Layout: {layout}");
     }
 
     if let Some(archived) = template.archived {
@@ -162,12 +155,12 @@ async fn get_template(
 
     if let Some(icon) = &template.icon {
         if let Some(emoji) = &icon.emoji {
-            println!("  🎨 Icon: {}", emoji);
+            println!("  🎨 Icon: {emoji}");
         }
     }
 
     if let Some(snippet) = &template.snippet {
-        println!("  📝 Snippet: {}", snippet);
+        println!("  📝 Snippet: {snippet}");
     }
 
     if let Some(markdown) = &template.markdown {
@@ -177,7 +170,7 @@ async fn get_template(
         } else {
             markdown.clone()
         };
-        println!("     {}", preview);
+        println!("     {preview}");
     }
 
     if let Some(object_type) = &template.object_type {
@@ -185,10 +178,10 @@ async fn get_template(
         println!("     Name: {}", object_type.name);
         println!("     Key: {}", object_type.key);
         if let Some(layout) = &object_type.layout {
-            println!("     Layout: {}", layout);
+            println!("     Layout: {layout}");
         }
         if let Some(plural_name) = &object_type.plural_name {
-            println!("     Plural: {}", plural_name);
+            println!("     Plural: {plural_name}");
         }
         if let Some(archived) = object_type.archived {
             println!("     Archived: {}", if archived { "Yes" } else { "No" });

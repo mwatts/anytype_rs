@@ -74,7 +74,7 @@ impl AnytypeClient {
         info!("Searching objects in space: {}", space_id);
         debug!("Search query: {:?}", request.query);
 
-        self.post(&format!("/v1/spaces/{}/search", space_id), &request)
+        self.post(&format!("/v1/spaces/{space_id}/search"), &request)
             .await
     }
 

@@ -72,13 +72,13 @@ async fn main() -> Result<()> {
     };
 
     if let Err(ref error) = result {
-        eprintln!("❌ Error: {}", error);
+        eprintln!("❌ Error: {error}");
 
         // Print error chain if in debug mode
         if cli.debug {
             let mut source = error.source();
             while let Some(err) = source {
-                eprintln!("  Caused by: {}", err);
+                eprintln!("  Caused by: {err}");
                 source = err.source();
             }
         }
@@ -103,12 +103,12 @@ fn init_logging(debug: bool, verbose: bool) -> Result<()> {
     // Only show logs from our crates unless debug is enabled
     let env_filter = if debug {
         EnvFilter::from_default_env()
-            .add_directive(format!("api={}", level).parse()?)
-            .add_directive(format!("cli={}", level).parse()?)
+            .add_directive(format!("api={level}").parse()?)
+            .add_directive(format!("cli={level}").parse()?)
     } else {
         EnvFilter::from_default_env()
-            .add_directive(format!("api={}", level).parse()?)
-            .add_directive(format!("cli={}", level).parse()?)
+            .add_directive(format!("api={level}").parse()?)
+            .add_directive(format!("cli={level}").parse()?)
             .add_directive("hyper=warn".parse()?)
             .add_directive("reqwest=warn".parse()?)
     };

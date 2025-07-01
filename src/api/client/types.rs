@@ -50,8 +50,7 @@ pub struct ListTypesResponse {
 impl AnytypeClient {
     /// List types in a space
     pub async fn list_types(&self, space_id: &str) -> Result<Vec<Type>> {
-        let response: ListTypesResponse =
-            self.get(&format!("/v1/spaces/{}/types", space_id)).await?;
+        let response: ListTypesResponse = self.get(&format!("/v1/spaces/{space_id}/types")).await?;
         Ok(response.data)
     }
 
@@ -60,7 +59,7 @@ impl AnytypeClient {
         info!("Listing types in space: {}", space_id);
         debug!("GET /v1/spaces/{}/types", space_id);
 
-        self.get(&format!("/v1/spaces/{}/types", space_id)).await
+        self.get(&format!("/v1/spaces/{space_id}/types")).await
     }
 
     // TODO: Add additional type management methods like:

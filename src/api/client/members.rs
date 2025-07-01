@@ -69,16 +69,15 @@ impl AnytypeClient {
     /// Get a specific member by ID in a space
     pub async fn get_member(&self, space_id: &str, member_id: &str) -> Result<Member> {
         let response: GetMemberResponse = self
-            .get(&format!("/v1/spaces/{}/members/{}", space_id, member_id))
+            .get(&format!("/v1/spaces/{space_id}/members/{member_id}"))
             .await?;
         Ok(response.member)
     }
 
     /// List members in a space
     pub async fn list_members(&self, space_id: &str) -> Result<Vec<Member>> {
-        let response: ListMembersResponse = self
-            .get(&format!("/v1/spaces/{}/members", space_id))
-            .await?;
+        let response: ListMembersResponse =
+            self.get(&format!("/v1/spaces/{space_id}/members")).await?;
         Ok(response.data)
     }
 
@@ -87,7 +86,7 @@ impl AnytypeClient {
         &self,
         space_id: &str,
     ) -> Result<ListMembersResponse> {
-        self.get(&format!("/v1/spaces/{}/members", space_id)).await
+        self.get(&format!("/v1/spaces/{space_id}/members")).await
     }
 
     // TODO: Add additional member management methods like:

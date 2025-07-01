@@ -71,15 +71,14 @@ pub struct UpdateObjectResponse {
 impl AnytypeClient {
     /// List objects in a space
     pub async fn list_objects(&self, space_id: &str) -> Result<Vec<Object>> {
-        let response: ListObjectsResponse = self
-            .get(&format!("/v1/spaces/{}/objects", space_id))
-            .await?;
+        let response: ListObjectsResponse =
+            self.get(&format!("/v1/spaces/{space_id}/objects")).await?;
         Ok(response.data)
     }
 
     /// Get a specific object by ID
     pub async fn get_object(&self, space_id: &str, object_id: &str) -> Result<Object> {
-        self.get(&format!("/v1/spaces/{}/objects/{}", space_id, object_id))
+        self.get(&format!("/v1/spaces/{space_id}/objects/{object_id}"))
             .await
     }
 
@@ -93,7 +92,7 @@ impl AnytypeClient {
         debug!("Request: {:?}", request);
         debug!("Request JSON: {}", serde_json::to_string_pretty(&request)?);
 
-        self.post(&format!("/v1/spaces/{}/objects", space_id), &request)
+        self.post(&format!("/v1/spaces/{space_id}/objects"), &request)
             .await
     }
 
@@ -105,7 +104,7 @@ impl AnytypeClient {
     ) -> Result<DeleteObjectResponse> {
         info!("Deleting object {} in space: {}", object_id, space_id);
 
-        self.delete(&format!("/v1/spaces/{}/objects/{}", space_id, object_id))
+        self.delete(&format!("/v1/spaces/{space_id}/objects/{object_id}"))
             .await
     }
 
@@ -121,7 +120,7 @@ impl AnytypeClient {
         debug!("Request JSON: {}", serde_json::to_string_pretty(&request)?);
 
         self.patch(
-            &format!("/v1/spaces/{}/objects/{}", space_id, object_id),
+            &format!("/v1/spaces/{space_id}/objects/{object_id}"),
             &request,
         )
         .await
@@ -132,6 +131,6 @@ impl AnytypeClient {
         &self,
         space_id: &str,
     ) -> Result<ListObjectsResponse> {
-        self.get(&format!("/v1/spaces/{}/objects", space_id)).await
+        self.get(&format!("/v1/spaces/{space_id}/objects")).await
     }
 }

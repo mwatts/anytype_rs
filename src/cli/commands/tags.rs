@@ -44,10 +44,7 @@ async fn list_tags(
     property_id: &str,
     limit: u32,
 ) -> Result<()> {
-    println!(
-        "🏷️  Fetching tags for property '{}' from space '{}'...",
-        property_id, space_id
-    );
+    println!("🏷️  Fetching tags for property '{property_id}' from space '{space_id}'...");
 
     let tags = client
         .list_tags(space_id, property_id)
@@ -61,17 +58,14 @@ async fn list_tags(
 
     let display_count = (limit as usize).min(tags.len());
     let total_tags = tags.len();
-    println!(
-        "✅ Found {} tags (showing first {}):",
-        total_tags, display_count
-    );
+    println!("✅ Found {total_tags} tags (showing first {display_count}):");
 
     for tag in tags.into_iter().take(display_count) {
         println!("  🏷️  {} ({})", tag.name, tag.key);
         println!("     🆔 ID: {}", tag.id);
 
         if let Some(color) = &tag.color {
-            println!("     🎨 Color: {}", color);
+            println!("     🎨 Color: {color}");
         }
 
         println!("     📄 Object: {}", tag.object);
@@ -79,7 +73,7 @@ async fn list_tags(
     }
 
     if total_tags > display_count {
-        println!("💡 Use --limit {} to see more results", total_tags);
+        println!("💡 Use --limit {total_tags} to see more results");
     }
 
     Ok(())

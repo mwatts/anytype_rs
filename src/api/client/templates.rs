@@ -62,10 +62,7 @@ impl AnytypeClient {
     /// List templates in a space for a specific type
     pub async fn list_templates(&self, space_id: &str, type_id: &str) -> Result<Vec<Template>> {
         let response: ListTemplatesResponse = self
-            .get(&format!(
-                "/v1/spaces/{}/types/{}/templates",
-                space_id, type_id
-            ))
+            .get(&format!("/v1/spaces/{space_id}/types/{type_id}/templates"))
             .await?;
         Ok(response.data)
     }
@@ -82,11 +79,8 @@ impl AnytypeClient {
         );
         debug!("GET /v1/spaces/{}/types/{}/templates", space_id, type_id);
 
-        self.get(&format!(
-            "/v1/spaces/{}/types/{}/templates",
-            space_id, type_id
-        ))
-        .await
+        self.get(&format!("/v1/spaces/{space_id}/types/{type_id}/templates"))
+            .await
     }
 
     /// Get a specific template by ID
@@ -107,8 +101,7 @@ impl AnytypeClient {
 
         let response: GetTemplateResponse = self
             .get(&format!(
-                "/v1/spaces/{}/types/{}/templates/{}",
-                space_id, type_id, template_id
+                "/v1/spaces/{space_id}/types/{type_id}/templates/{template_id}"
             ))
             .await?;
 

@@ -32,7 +32,7 @@ pub async fn handle_search_command(args: SearchArgs) -> Result<()> {
 
 async fn search(client: &AnytypeClient, args: SearchArgs) -> Result<()> {
     let space_info = match &args.space_id {
-        Some(space_id) => format!(" in space '{}'", space_id),
+        Some(space_id) => format!(" in space '{space_id}'"),
         None => " globally".to_string(),
     };
 
@@ -98,7 +98,7 @@ async fn search(client: &AnytypeClient, args: SearchArgs) -> Result<()> {
                             } else {
                                 text.to_string()
                             };
-                            println!("   📝 {}: {}", prop_name, display_text);
+                            println!("   📝 {prop_name}: {display_text}");
                             shown_props += 1;
                         }
                     }
@@ -120,7 +120,7 @@ async fn search(client: &AnytypeClient, args: SearchArgs) -> Result<()> {
                             serde_json::to_string(&other).unwrap_or_else(|_| "N/A".to_string())
                         }
                     };
-                    println!("   🔑 {}: {}", key, display_value);
+                    println!("   🔑 {key}: {display_value}");
                 }
             }
         }

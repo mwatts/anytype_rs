@@ -35,7 +35,7 @@ pub async fn handle_properties_command(args: PropertiesArgs) -> Result<()> {
 }
 
 async fn list_properties(client: &AnytypeClient, space_id: &str, limit: u32) -> Result<()> {
-    println!("🔧 Fetching properties from space '{}'...", space_id);
+    println!("🔧 Fetching properties from space '{space_id}'...");
 
     let properties = client
         .list_properties(space_id)
@@ -49,10 +49,7 @@ async fn list_properties(client: &AnytypeClient, space_id: &str, limit: u32) -> 
 
     let display_count = (limit as usize).min(properties.len());
     let total_properties = properties.len();
-    println!(
-        "✅ Found {} properties (showing first {}):",
-        total_properties, display_count
-    );
+    println!("✅ Found {total_properties} properties (showing first {display_count}):");
 
     for property in properties.into_iter().take(display_count) {
         println!("  🔧 {} ({})", property.name, property.key);
@@ -63,7 +60,7 @@ async fn list_properties(client: &AnytypeClient, space_id: &str, limit: u32) -> 
     }
 
     if total_properties > display_count {
-        println!("💡 Use --limit {} to see more results", total_properties);
+        println!("💡 Use --limit {total_properties} to see more results");
     }
 
     Ok(())
