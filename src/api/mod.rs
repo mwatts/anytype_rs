@@ -24,6 +24,7 @@ pub use types::*;
 pub use client::auth::{
     CreateApiKeyRequest, CreateApiKeyResponse, CreateChallengeRequest, CreateChallengeResponse,
 };
+pub use client::lists::{AddListObjectsRequest, AddListObjectsResponse};
 pub use client::members::{
     GetMemberResponse, ListMembersResponse, Member, MemberRole, MemberStatus,
 };

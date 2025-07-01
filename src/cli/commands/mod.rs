@@ -1,4 +1,5 @@
 pub mod auth;
+pub mod lists;
 pub mod members;
 pub mod properties;
 pub mod search;

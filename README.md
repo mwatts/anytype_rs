@@ -44,7 +44,7 @@ The ✅ means it's been vibe coded. I still need to go through and verify each o
 - ✅ Update space
 
 ### Lists
-- ❌ Add objects to list
+- ✅ Add objects to list
 - ❌ Remove objects from list
 - ❌ Get list views
 - ❌ Get objects in list

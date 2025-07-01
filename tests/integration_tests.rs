@@ -143,3 +143,25 @@ async fn test_unauthenticated_list_properties_request_fails() {
         panic!("Expected authentication error, got: {result:?}");
     }
 }
+
+#[tokio::test]
+async fn test_unauthenticated_add_list_objects_request_fails() {
+    let client = AnytypeClient::new().expect("Failed to create client");
+
+    // This should fail because no API key is set
+    let result = client
+        .add_list_objects(
+            "test-space",
+            "test-list",
+            vec!["obj1".to_string(), "obj2".to_string()],
+        )
+        .await;
+    assert!(result.is_err());
+
+    // The error should be an authentication error
+    if let Err(anytype_rs::api::AnytypeError::Auth { message }) = result {
+        assert!(message.contains("API key not set"));
+    } else {
+        panic!("Expected auth error, got: {result:?}");
+    }
+}
