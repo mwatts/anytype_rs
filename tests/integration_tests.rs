@@ -168,7 +168,9 @@ async fn test_unauthenticated_add_list_objects_request_fails() {
 
 #[tokio::test]
 async fn test_unauthenticated_create_type_request_fails() {
-    use anytype_rs::api::{CreateTypeIcon, CreateTypeProperty, CreateTypeRequest, IconFormat, Layout, PropertyFormat};
+    use anytype_rs::api::{
+        CreateTypeIcon, CreateTypeProperty, CreateTypeRequest, IconFormat, Layout, PropertyFormat,
+    };
 
     let client = AnytypeClient::new().expect("Failed to create client");
 
@@ -190,6 +192,22 @@ async fn test_unauthenticated_create_type_request_fails() {
 
     // This should fail because no API key is set
     let result = client.create_type("test-space", request).await;
+    assert!(result.is_err());
+
+    // The error should be an authentication error
+    if let Err(anytype_rs::api::AnytypeError::Auth { message }) = result {
+        assert!(message.contains("API key not set"));
+    } else {
+        panic!("Expected auth error, got: {result:?}");
+    }
+}
+
+#[tokio::test]
+async fn test_unauthenticated_get_type_request_fails() {
+    let client = AnytypeClient::new().expect("Failed to create client");
+
+    // This should fail because no API key is set
+    let result = client.get_type("test-space", "test-type-id").await;
     assert!(result.is_err());
 
     // The error should be an authentication error

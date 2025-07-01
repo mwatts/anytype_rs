@@ -32,6 +32,13 @@ pub enum TypesCommand {
         #[arg(short, long, default_value = "20")]
         limit: u32,
     },
+    /// Get details of a specific type
+    Get {
+        /// Space ID where the type exists
+        space_id: String,
+        /// Type ID to retrieve
+        type_id: String,
+    },
     /// Create a new type in a space
     Create {
         /// Space ID where the type will be created
@@ -66,6 +73,7 @@ pub async fn handle_types_command(args: TypesArgs) -> Result<()> {
 
     match args.command {
         TypesCommand::List { space_id, limit } => list_types(&client, &space_id, limit).await,
+        TypesCommand::Get { space_id, type_id } => get_type(&client, &space_id, &type_id).await,
         TypesCommand::Create {
             space_id,
             key,
@@ -163,7 +171,10 @@ async fn list_types(client: &AnytypeClient, space_id: &str, limit: u32) -> Resul
 }
 
 async fn create_type(client: &AnytypeClient, params: CreateTypeParams) -> Result<()> {
-    println!("🏗️  Creating type '{}' in space '{}'...", params.name, params.space_id);
+    println!(
+        "🏗️  Creating type '{}' in space '{}'...",
+        params.name, params.space_id
+    );
 
     // Parse layout
     let layout_enum = match params.layout.to_lowercase().as_str() {
@@ -176,7 +187,10 @@ async fn create_type(client: &AnytypeClient, params: CreateTypeParams) -> Result
         "collection" => Layout::Collection,
         "participant" => Layout::Participant,
         _ => {
-            println!("❌ Invalid layout: {}. Valid options: basic, profile, action, note, bookmark, set, collection, participant", params.layout);
+            println!(
+                "❌ Invalid layout: {}. Valid options: basic, profile, action, note, bookmark, set, collection, participant",
+                params.layout
+            );
             return Ok(());
         }
     };
@@ -192,7 +206,9 @@ async fn create_type(client: &AnytypeClient, params: CreateTypeParams) -> Result
     for prop_str in &params.properties {
         let parts: Vec<&str> = prop_str.split(':').collect();
         if parts.len() != 3 {
-            println!("❌ Invalid property format: '{prop_str}'. Expected format: 'key:name:format'");
+            println!(
+                "❌ Invalid property format: '{prop_str}'. Expected format: 'key:name:format'"
+            );
             return Ok(());
         }
 
@@ -209,7 +225,10 @@ async fn create_type(client: &AnytypeClient, params: CreateTypeParams) -> Result
             "phone" => PropertyFormat::Phone,
             "objects" => PropertyFormat::Objects,
             _ => {
-                println!("❌ Invalid property format: '{}'. Valid options: text, number, select, multi_select, date, files, checkbox, url, email, phone, objects", parts[2]);
+                println!(
+                    "❌ Invalid property format: '{}'. Valid options: text, number, select, multi_select, date, files, checkbox, url, email, phone, objects",
+                    parts[2]
+                );
                 return Ok(());
             }
         };
@@ -239,11 +258,11 @@ async fn create_type(client: &AnytypeClient, params: CreateTypeParams) -> Result
     println!("  🏷️  Name: {}", response.type_data.name);
     println!("  🆔 ID: {}", response.type_data.id);
     println!("  🔑 Key: {}", response.type_data.key);
-    
+
     if let Some(layout) = &response.type_data.layout {
         println!("  📐 Layout: {layout}");
     }
-    
+
     if let Some(plural_name) = &response.type_data.plural_name {
         println!("  📚 Plural: {plural_name}");
     }
@@ -255,10 +274,64 @@ async fn create_type(client: &AnytypeClient, params: CreateTypeParams) -> Result
     }
 
     if !response.type_data.properties.is_empty() {
-        println!("  🔑 Properties: {} created", response.type_data.properties.len());
+        println!(
+            "  🔑 Properties: {} created",
+            response.type_data.properties.len()
+        );
         for prop in &response.type_data.properties {
             println!("    • {} ({}) - {}", prop.name, prop.format, prop.key);
         }
+    }
+
+    Ok(())
+}
+
+async fn get_type(client: &AnytypeClient, space_id: &str, type_id: &str) -> Result<()> {
+    println!("🔍 Fetching type '{type_id}' from space '{space_id}'...");
+
+    let type_obj = client
+        .get_type(space_id, type_id)
+        .await
+        .context("Failed to fetch type")?;
+
+    println!("✅ Type found:");
+    println!("  🏷️  Name: {} ({})", type_obj.name, type_obj.key);
+    println!("  🆔 ID: {}", type_obj.id);
+    println!("  📦 Object: {}", type_obj.object);
+
+    if let Some(layout) = &type_obj.layout {
+        println!("  📐 Layout: {layout}");
+    }
+
+    if let Some(plural_name) = &type_obj.plural_name {
+        println!("  📚 Plural: {plural_name}");
+    }
+
+    if let Some(archived) = type_obj.archived {
+        if archived {
+            println!("  📦 Archived: Yes");
+        }
+    }
+
+    if let Some(icon) = &type_obj.icon {
+        if let Some(emoji) = &icon.emoji {
+            println!("  🎨 Icon: {emoji}");
+        } else if let Some(name) = &icon.name {
+            if let Some(color) = &icon.color {
+                println!("  🎨 Icon: {name} ({color})");
+            } else {
+                println!("  🎨 Icon: {name}");
+            }
+        }
+    }
+
+    if !type_obj.properties.is_empty() {
+        println!("  🔑 Properties: {} total", type_obj.properties.len());
+        for prop in &type_obj.properties {
+            println!("    • {} ({}) - {}", prop.name, prop.format, prop.key);
+        }
+    } else {
+        println!("  🔑 Properties: None");
     }
 
     Ok(())

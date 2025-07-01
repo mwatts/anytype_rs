@@ -80,6 +80,13 @@ pub struct CreateTypeResponse {
     pub type_data: Type,
 }
 
+/// Response when getting a type
+#[derive(Debug, Deserialize)]
+pub struct GetTypeResponse {
+    #[serde(rename = "type")]
+    pub type_data: Type,
+}
+
 /// Enhanced icon information for types
 #[derive(Debug, Deserialize, Serialize)]
 pub struct TypeIcon {
@@ -149,8 +156,18 @@ impl AnytypeClient {
             .await
     }
 
+    /// Get a specific type by ID
+    pub async fn get_type(&self, space_id: &str, type_id: &str) -> Result<Type> {
+        info!("Getting type '{}' from space: {}", type_id, space_id);
+        debug!("GET /v1/spaces/{}/types/{}", space_id, type_id);
+
+        let response: GetTypeResponse = self
+            .get(&format!("/v1/spaces/{space_id}/types/{type_id}"))
+            .await?;
+        Ok(response.type_data)
+    }
+
     // TODO: Add additional type management methods like:
-    // - get_type
     // - update_type
     // - delete_type
 }
