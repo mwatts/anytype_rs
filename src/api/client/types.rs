@@ -145,6 +145,13 @@ pub struct UpdateTypeResponse {
     pub type_data: Type,
 }
 
+/// Response when deleting a type
+#[derive(Debug, Deserialize)]
+pub struct DeleteTypeResponse {
+    #[serde(rename = "type")]
+    pub type_data: Type,
+}
+
 impl AnytypeClient {
     /// List types in a space
     pub async fn list_types(&self, space_id: &str) -> Result<Vec<Type>> {
@@ -200,6 +207,15 @@ impl AnytypeClient {
             .await
     }
 
-    // TODO: Add additional type management methods like:
-    // - delete_type
+    /// Delete (archive) a type in a space
+    pub async fn delete_type(&self, space_id: &str, type_id: &str) -> Result<DeleteTypeResponse> {
+        info!(
+            "Deleting (archiving) type '{}' in space: {}",
+            type_id, space_id
+        );
+        debug!("DELETE /v1/spaces/{}/types/{}", space_id, type_id);
+
+        self.delete(&format!("/v1/spaces/{space_id}/types/{type_id}"))
+            .await
+    }
 }

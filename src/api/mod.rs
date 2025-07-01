@@ -43,7 +43,7 @@ pub use client::templates::{
     GetTemplateResponse, Icon, ListTemplatesResponse, ObjectType, Template,
 };
 pub use client::types::{
-    CreateTypeIcon, CreateTypeProperty, CreateTypeRequest, CreateTypeResponse, GetTypeResponse,
-    IconFormat, Layout, ListTypesResponse, PropertyFormat, Type, TypeIcon, TypeProperty,
-    UpdateTypeRequest, UpdateTypeResponse,
+    CreateTypeIcon, CreateTypeProperty, CreateTypeRequest, CreateTypeResponse, DeleteTypeResponse,
+    GetTypeResponse, IconFormat, Layout, ListTypesResponse, PropertyFormat, Type, TypeIcon,
+    TypeProperty, UpdateTypeRequest, UpdateTypeResponse,
 };

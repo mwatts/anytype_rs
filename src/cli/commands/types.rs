@@ -87,6 +87,13 @@ pub enum TypesCommand {
         #[arg(long, value_delimiter = ',')]
         properties: Vec<String>,
     },
+    /// Delete (archive) a type in a space
+    Delete {
+        /// Space ID where the type exists
+        space_id: String,
+        /// Type ID to delete
+        type_id: String,
+    },
 }
 
 pub async fn handle_types_command(args: TypesArgs) -> Result<()> {
@@ -139,6 +146,9 @@ pub async fn handle_types_command(args: TypesArgs) -> Result<()> {
                 properties,
             };
             update_type(&client, &type_id, update_params).await
+        }
+        TypesCommand::Delete { space_id, type_id } => {
+            delete_type(&client, &space_id, &type_id).await
         }
     }
 }
@@ -383,7 +393,11 @@ async fn get_type(client: &AnytypeClient, space_id: &str, type_id: &str) -> Resu
     Ok(())
 }
 
-async fn update_type(client: &AnytypeClient, type_id: &str, params: CreateTypeParams) -> Result<()> {
+async fn update_type(
+    client: &AnytypeClient,
+    type_id: &str,
+    params: CreateTypeParams,
+) -> Result<()> {
     println!(
         "🔄 Updating type '{}' in space '{}'...",
         type_id, params.space_id
@@ -493,6 +507,59 @@ async fn update_type(client: &AnytypeClient, type_id: &str, params: CreateTypePa
         );
         for prop in &response.type_data.properties {
             println!("    • {} ({}) - {}", prop.name, prop.format, prop.key);
+        }
+    }
+
+    Ok(())
+}
+
+async fn delete_type(client: &AnytypeClient, space_id: &str, type_id: &str) -> Result<()> {
+    println!("⚠️  Deleting (archiving) type '{type_id}' in space '{space_id}'...");
+    println!("📝 Note: This will mark the type as archived, not permanently delete it.");
+
+    let response = client
+        .delete_type(space_id, type_id)
+        .await
+        .context("Failed to delete type")?;
+
+    println!("✅ Type deleted (archived) successfully!");
+    println!("  🏷️  Name: {}", response.type_data.name);
+    println!("  🆔 ID: {}", response.type_data.id);
+    println!("  🔑 Key: {}", response.type_data.key);
+
+    if let Some(archived) = response.type_data.archived {
+        if archived {
+            println!("  📦 Archived: Yes");
+        }
+    }
+
+    if let Some(layout) = &response.type_data.layout {
+        println!("  📐 Layout: {layout}");
+    }
+
+    if let Some(plural_name) = &response.type_data.plural_name {
+        println!("  📚 Plural: {plural_name}");
+    }
+
+    if let Some(icon) = &response.type_data.icon {
+        if let Some(emoji) = &icon.emoji {
+            println!("  🎨 Icon: {emoji}");
+        }
+    }
+
+    if !response.type_data.properties.is_empty() {
+        println!(
+            "  🔑 Properties: {} total",
+            response.type_data.properties.len()
+        );
+        for prop in response.type_data.properties.iter().take(3) {
+            println!("    • {} ({}) - {}", prop.name, prop.format, prop.key);
+        }
+        if response.type_data.properties.len() > 3 {
+            println!(
+                "    ... and {} more properties",
+                response.type_data.properties.len() - 3
+            );
         }
     }
 
