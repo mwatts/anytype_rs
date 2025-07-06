@@ -24,6 +24,16 @@ pub enum ListsCommand {
         #[arg(long, value_delimiter = ',')]
         object_ids: Vec<String>,
     },
+    /// Get views for a list
+    Views {
+        /// Space ID where the list exists
+        #[arg(short, long)]
+        space_id: String,
+
+        /// List ID to get views for
+        #[arg(short, long)]
+        list_id: String,
+    },
 }
 
 pub async fn handle_lists_command(args: ListsArgs) -> Result<()> {
@@ -39,6 +49,9 @@ pub async fn handle_lists_command(args: ListsArgs) -> Result<()> {
             list_id,
             object_ids,
         } => add_objects_to_list(&client, &space_id, &list_id, object_ids).await,
+        ListsCommand::Views { space_id, list_id } => {
+            get_list_views(&client, &space_id, &list_id).await
+        }
     }
 }
 
@@ -86,6 +99,54 @@ async fn add_objects_to_list(
                 println!("   ❌ {object_id}");
             }
         }
+    }
+
+    Ok(())
+}
+
+async fn get_list_views(
+    client: &AnytypeClient,
+    space_id: &str,
+    list_id: &str,
+) -> Result<()> {
+    println!(
+        "🔍 Retrieving views for list '{list_id}' in space '{space_id}'..."
+    );
+
+    let response = client.get_list_views(space_id, list_id).await?;
+
+    if response.data.is_empty() {
+        println!("📭 No views found for this list.");
+        return Ok(());
+    }
+
+    println!("✅ Found {} views:", response.data.len());
+    println!("📋 Views for this list:");
+
+    for (i, view) in response.data.iter().enumerate() {
+        println!("   {}. 📊 {} ({})", i + 1, view.name, view.id);
+        println!("      📐 Layout: {}", view.layout);
+        
+        if !view.filters.is_empty() {
+            println!("      🔍 Filters: {}", view.filters.len());
+            for filter in &view.filters {
+                println!("         - {} {} {}", filter.property_key, filter.condition, filter.value);
+            }
+        }
+        
+        if !view.sorts.is_empty() {
+            println!("      🔀 Sorts: {}", view.sorts.len());
+            for sort in &view.sorts {
+                println!("         - {} ({})", sort.property_key, sort.sort_type);
+            }
+        }
+        
+        println!();
+    }
+
+    println!("📄 Total: {} views", response.pagination.total);
+    if response.pagination.has_more {
+        println!("💡 There are more views available. Use pagination to see all.");
     }
 
     Ok(())
