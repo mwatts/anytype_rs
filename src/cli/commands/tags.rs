@@ -57,6 +57,15 @@ pub enum TagsCommand {
         #[arg(short, long, default_value = "grey")]
         color: String,
     },
+    /// Delete a tag from a property in a space
+    Delete {
+        /// Space ID
+        space_id: String,
+        /// Property ID (the property that contains the tag)
+        property_id: String,
+        /// Tag ID to delete
+        tag_id: String,
+    },
 }
 
 pub async fn handle_tags_command(args: TagsArgs) -> Result<()> {
@@ -90,6 +99,11 @@ pub async fn handle_tags_command(args: TagsArgs) -> Result<()> {
             name,
             color,
         } => update_tag(&client, &space_id, &property_id, &tag_id, &name, &color).await,
+        TagsCommand::Delete {
+            space_id,
+            property_id,
+            tag_id,
+        } => delete_tag(&client, &space_id, &property_id, &tag_id).await,
     }
 }
 
@@ -258,6 +272,30 @@ async fn update_tag(
     println!("  📄 Object: {}", response.tag.object);
 
     if let Some(color) = &response.tag.color {
+        println!("  🎨 Color: {color}");
+    }
+
+    Ok(())
+}
+
+async fn delete_tag(
+    client: &AnytypeClient,
+    space_id: &str,
+    property_id: &str,
+    tag_id: &str,
+) -> Result<()> {
+    let response = client
+        .delete_tag(space_id, property_id, tag_id)
+        .await
+        .context("Failed to delete tag")?;
+
+    println!("✅ Tag deleted successfully!");
+    println!("  🏷️  Name: {}", response.name);
+    println!("  🆔 ID: {}", response.id);
+    println!("  🔑 Key: {}", response.key);
+    println!("  📄 Object: {}", response.object);
+
+    if let Some(color) = &response.color {
         println!("  🎨 Color: {color}");
     }
 

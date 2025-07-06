@@ -72,6 +72,12 @@ pub struct UpdateTagResponse {
     pub tag: Tag,
 }
 
+/// Response when deleting a tag
+#[derive(Debug, Deserialize)]
+pub struct DeleteTagResponse {
+    pub tag: Tag,
+}
+
 impl AnytypeClient {
     /// List tags for a specific property in a space
     pub async fn list_tags(&self, space_id: &str, property_id: &str) -> Result<Vec<Tag>> {
@@ -166,6 +172,22 @@ impl AnytypeClient {
         .await
     }
 
-    // TODO: Add additional tag management methods like:
-    // - delete_tag
+    /// Delete a tag by marking it as archived
+    pub async fn delete_tag(&self, space_id: &str, property_id: &str, tag_id: &str) -> Result<Tag> {
+        info!(
+            "Deleting tag '{}' for property '{}' in space: {}",
+            tag_id, property_id, space_id
+        );
+        debug!(
+            "DELETE /v1/spaces/{}/properties/{}/tags/{}",
+            space_id, property_id, tag_id
+        );
+
+        let response: DeleteTagResponse = self
+            .delete(&format!(
+                "/v1/spaces/{space_id}/properties/{property_id}/tags/{tag_id}"
+            ))
+            .await?;
+        Ok(response.tag)
+    }
 }

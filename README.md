@@ -70,7 +70,7 @@ The ✅ means it's been vibe coded. I still need to go through and verify each o
 ### Tags
 - ✅ List tags
 - ✅ Create tag
-- ❌ Delete tag
+- ✅ Delete tag
 - ✅ Get tag
 - ✅ Update tag
 
