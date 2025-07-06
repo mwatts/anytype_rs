@@ -18,6 +18,13 @@ pub enum PropertiesCommand {
         #[arg(short, long, default_value = "20")]
         limit: u32,
     },
+    /// Get details of a specific property
+    Get {
+        /// Space ID
+        space_id: String,
+        /// Property ID to retrieve
+        property_id: String,
+    },
 }
 
 pub async fn handle_properties_command(args: PropertiesArgs) -> Result<()> {
@@ -31,6 +38,10 @@ pub async fn handle_properties_command(args: PropertiesArgs) -> Result<()> {
         PropertiesCommand::List { space_id, limit } => {
             list_properties(&client, &space_id, limit).await
         }
+        PropertiesCommand::Get {
+            space_id,
+            property_id,
+        } => get_property(&client, &space_id, &property_id).await,
     }
 }
 
@@ -62,6 +73,23 @@ async fn list_properties(client: &AnytypeClient, space_id: &str, limit: u32) -> 
     if total_properties > display_count {
         println!("💡 Use --limit {total_properties} to see more results");
     }
+
+    Ok(())
+}
+
+async fn get_property(client: &AnytypeClient, space_id: &str, property_id: &str) -> Result<()> {
+    println!("🔧 Fetching property '{property_id}' from space '{space_id}'...");
+
+    let property = client
+        .get_property(space_id, property_id)
+        .await
+        .context("Failed to fetch property")?;
+
+    println!("✅ Property found:");
+    println!("  🔧 {} ({})", property.name, property.key);
+    println!("  🆔 ID: {}", property.id);
+    println!("  📐 Format: {}", property.format);
+    println!("  📄 Object: {}", property.object);
 
     Ok(())
 }
