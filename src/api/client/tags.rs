@@ -59,6 +59,19 @@ pub struct GetTagResponse {
     pub tag: Tag,
 }
 
+/// Request to update an existing tag
+#[derive(Debug, Serialize)]
+pub struct UpdateTagRequest {
+    pub name: String,
+    pub color: Color,
+}
+
+/// Response when updating a tag
+#[derive(Debug, Deserialize)]
+pub struct UpdateTagResponse {
+    pub tag: Tag,
+}
+
 impl AnytypeClient {
     /// List tags for a specific property in a space
     pub async fn list_tags(&self, space_id: &str, property_id: &str) -> Result<Vec<Tag>> {
@@ -131,7 +144,28 @@ impl AnytypeClient {
         Ok(response.tag)
     }
 
+    /// Update an existing tag for a property in a space
+    pub async fn update_tag(
+        &self,
+        space_id: &str,
+        property_id: &str,
+        tag_id: &str,
+        request: UpdateTagRequest,
+    ) -> Result<UpdateTagResponse> {
+        info!(
+            "Updating tag '{}' for property '{}' in space: {}",
+            tag_id, property_id, space_id
+        );
+        debug!("Request: {:?}", request);
+        debug!("Request JSON: {}", serde_json::to_string_pretty(&request)?);
+
+        self.patch(
+            &format!("/v1/spaces/{space_id}/properties/{property_id}/tags/{tag_id}"),
+            &request,
+        )
+        .await
+    }
+
     // TODO: Add additional tag management methods like:
-    // - update_tag
     // - delete_tag
 }

@@ -314,3 +314,28 @@ async fn test_unauthenticated_get_tag_request_fails() {
         panic!("Expected auth error, got: {result:?}");
     }
 }
+
+#[tokio::test]
+async fn test_unauthenticated_update_tag_request_fails() {
+    use anytype_rs::api::{Color, UpdateTagRequest};
+
+    let client = AnytypeClient::new().expect("Failed to create client");
+
+    let request = UpdateTagRequest {
+        name: "updated_tag".to_string(),
+        color: Color::Red,
+    };
+
+    // This should fail because no API key is set
+    let result = client
+        .update_tag("test-space", "test-property", "test-tag-id", request)
+        .await;
+    assert!(result.is_err());
+
+    // The error should be an authentication error
+    if let Err(anytype_rs::api::AnytypeError::Auth { message }) = result {
+        assert!(message.contains("API key not set"));
+    } else {
+        panic!("Expected auth error, got: {result:?}");
+    }
+}

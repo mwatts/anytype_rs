@@ -1,5 +1,5 @@
 use anyhow::{Context, Result};
-use anytype_rs::api::{AnytypeClient, Color, CreateTagRequest};
+use anytype_rs::api::{AnytypeClient, Color, CreateTagRequest, UpdateTagRequest};
 use clap::{Args, Subcommand};
 
 #[derive(Debug, Args)]
@@ -42,6 +42,21 @@ pub enum TagsCommand {
         /// Tag ID to retrieve
         tag_id: String,
     },
+    /// Update an existing tag in a space
+    Update {
+        /// Space ID
+        space_id: String,
+        /// Property ID (the property that contains the tag)
+        property_id: String,
+        /// Tag ID to update
+        tag_id: String,
+        /// Tag name
+        #[arg(short, long)]
+        name: String,
+        /// Tag color
+        #[arg(short, long, default_value = "grey")]
+        color: String,
+    },
 }
 
 pub async fn handle_tags_command(args: TagsArgs) -> Result<()> {
@@ -68,6 +83,13 @@ pub async fn handle_tags_command(args: TagsArgs) -> Result<()> {
             property_id,
             tag_id,
         } => get_tag(&client, &space_id, &property_id, &tag_id).await,
+        TagsCommand::Update {
+            space_id,
+            property_id,
+            tag_id,
+            name,
+            color,
+        } => update_tag(&client, &space_id, &property_id, &tag_id, &name, &color).await,
     }
 }
 
@@ -183,6 +205,59 @@ async fn get_tag(
     println!("  📄 Object: {}", tag.object);
 
     if let Some(color) = &tag.color {
+        println!("  🎨 Color: {color}");
+    }
+
+    Ok(())
+}
+
+async fn update_tag(
+    client: &AnytypeClient,
+    space_id: &str,
+    property_id: &str,
+    tag_id: &str,
+    name: &str,
+    color_str: &str,
+) -> Result<()> {
+    println!("🔄 Updating tag '{tag_id}' for property '{property_id}' in space '{space_id}'...");
+
+    // Parse color
+    let color = match color_str.to_lowercase().as_str() {
+        "grey" => Color::Grey,
+        "yellow" => Color::Yellow,
+        "orange" => Color::Orange,
+        "red" => Color::Red,
+        "pink" => Color::Pink,
+        "purple" => Color::Purple,
+        "blue" => Color::Blue,
+        "ice" => Color::Ice,
+        "teal" => Color::Teal,
+        "lime" => Color::Lime,
+        _ => {
+            println!(
+                "❌ Invalid color: {color_str}. Valid options: grey, yellow, orange, red, pink, purple, blue, ice, teal, lime"
+            );
+            return Ok(());
+        }
+    };
+
+    let request = UpdateTagRequest {
+        name: name.to_string(),
+        color,
+    };
+
+    let response = client
+        .update_tag(space_id, property_id, tag_id, request)
+        .await
+        .context("Failed to update tag")?;
+
+    println!("✅ Tag updated successfully!");
+    println!("  🏷️  Name: {}", response.tag.name);
+    println!("  🆔 ID: {}", response.tag.id);
+    println!("  🔑 Key: {}", response.tag.key);
+    println!("  📄 Object: {}", response.tag.object);
+
+    if let Some(color) = &response.tag.color {
         println!("  🎨 Color: {color}");
     }
 

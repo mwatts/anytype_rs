@@ -72,7 +72,7 @@ The ✅ means it's been vibe coded. I still need to go through and verify each o
 - ✅ Create tag
 - ❌ Delete tag
 - ✅ Get tag
-- ❌ Update tag
+- ✅ Update tag
 
 ### Types
 - ✅ List types

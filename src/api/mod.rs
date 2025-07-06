@@ -40,6 +40,7 @@ pub use client::spaces::{
 };
 pub use client::tags::{
     Color, CreateTagRequest, CreateTagResponse, GetTagResponse, ListTagsResponse, Tag,
+    UpdateTagRequest, UpdateTagResponse,
 };
 pub use client::templates::{
     GetTemplateResponse, Icon, ListTemplatesResponse, ObjectType, Template,
