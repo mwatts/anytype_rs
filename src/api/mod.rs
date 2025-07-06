@@ -25,8 +25,9 @@ pub use client::auth::{
     CreateApiKeyRequest, CreateApiKeyResponse, CreateChallengeRequest, CreateChallengeResponse,
 };
 pub use client::lists::{
-    AddListObjectsRequest, AddListObjectsResponse, GetListViewsResponse, ListViewData,
-    ListViewFilter, ListViewSort,
+    AddListObjectsRequest, AddListObjectsResponse, GetListObjectsResponse, GetListViewsResponse,
+    ListObject, ListObjectType, ListViewData, ListViewFilter, ListViewSort, ObjectIcon,
+    ObjectTypeProperty,
 };
 pub use client::members::{
     GetMemberResponse, ListMembersResponse, Member, MemberRole, MemberStatus,

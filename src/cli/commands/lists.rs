@@ -34,6 +34,20 @@ pub enum ListsCommand {
         #[arg(short, long)]
         list_id: String,
     },
+    /// Get objects in a list
+    Objects {
+        /// Space ID where the list exists
+        #[arg(short, long)]
+        space_id: String,
+
+        /// List ID to get objects from
+        #[arg(short, long)]
+        list_id: String,
+
+        /// Limit the number of results
+        #[arg(long, default_value = "20")]
+        limit: u32,
+    },
 }
 
 pub async fn handle_lists_command(args: ListsArgs) -> Result<()> {
@@ -52,6 +66,11 @@ pub async fn handle_lists_command(args: ListsArgs) -> Result<()> {
         ListsCommand::Views { space_id, list_id } => {
             get_list_views(&client, &space_id, &list_id).await
         }
+        ListsCommand::Objects {
+            space_id,
+            list_id,
+            limit,
+        } => get_list_objects(&client, &space_id, &list_id, limit).await,
     }
 }
 
@@ -104,14 +123,8 @@ async fn add_objects_to_list(
     Ok(())
 }
 
-async fn get_list_views(
-    client: &AnytypeClient,
-    space_id: &str,
-    list_id: &str,
-) -> Result<()> {
-    println!(
-        "🔍 Retrieving views for list '{list_id}' in space '{space_id}'..."
-    );
+async fn get_list_views(client: &AnytypeClient, space_id: &str, list_id: &str) -> Result<()> {
+    println!("🔍 Retrieving views for list '{list_id}' in space '{space_id}'...");
 
     let response = client.get_list_views(space_id, list_id).await?;
 
@@ -126,27 +139,88 @@ async fn get_list_views(
     for (i, view) in response.data.iter().enumerate() {
         println!("   {}. 📊 {} ({})", i + 1, view.name, view.id);
         println!("      📐 Layout: {}", view.layout);
-        
+
         if !view.filters.is_empty() {
             println!("      🔍 Filters: {}", view.filters.len());
             for filter in &view.filters {
-                println!("         - {} {} {}", filter.property_key, filter.condition, filter.value);
+                println!(
+                    "         - {} {} {}",
+                    filter.property_key, filter.condition, filter.value
+                );
             }
         }
-        
+
         if !view.sorts.is_empty() {
             println!("      🔀 Sorts: {}", view.sorts.len());
             for sort in &view.sorts {
                 println!("         - {} ({})", sort.property_key, sort.sort_type);
             }
         }
-        
+
         println!();
     }
 
     println!("📄 Total: {} views", response.pagination.total);
     if response.pagination.has_more {
         println!("💡 There are more views available. Use pagination to see all.");
+    }
+
+    Ok(())
+}
+
+async fn get_list_objects(
+    client: &AnytypeClient,
+    space_id: &str,
+    list_id: &str,
+    limit: u32,
+) -> Result<()> {
+    println!("📋 Retrieving objects in list '{list_id}' in space '{space_id}'...",);
+
+    let response = client.get_list_objects(space_id, list_id).await?;
+
+    if response.data.is_empty() {
+        println!("📭 No objects found in this list.");
+        return Ok(());
+    }
+
+    let display_count = (limit as usize).min(response.data.len());
+    let total_objects = response.data.len();
+
+    println!("✅ Found {total_objects} objects in list (showing first {display_count}):");
+
+    for (i, object) in response.data.iter().take(display_count).enumerate() {
+        println!("   {}. 📄 {} ({})", i + 1, object.name, object.id);
+        println!(
+            "      🏷️  Type: {} ({})",
+            object.object_type.name, object.object_type.key
+        );
+        println!("      📐 Layout: {}", object.layout);
+
+        if let Some(icon) = &object.icon {
+            if let Some(emoji) = &icon.emoji {
+                println!("      🎨 Icon: {emoji}");
+            }
+        }
+
+        if let Some(snippet) = &object.snippet {
+            if !snippet.is_empty() {
+                println!("      📝 Snippet: {snippet}");
+            }
+        }
+
+        if object.archived {
+            println!("      🗄️  Archived");
+        }
+
+        println!();
+    }
+
+    println!("📄 Total: {} objects", response.pagination.total);
+    if response.pagination.has_more {
+        println!(
+            "💡 There are more objects available. Use --limit {} to see more.",
+            response.pagination.total
+        );
     }
 
     Ok(())

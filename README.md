@@ -47,7 +47,7 @@ The ✅ means it's been vibe coded. I still need to go through and verify each o
 - ✅ Add objects to list
 - ❌ Remove objects from list
 - ✅ Get list views
-- ❌ Get objects in list
+- ✅ Get objects in list
 
 ### Members
 - ✅ List members
