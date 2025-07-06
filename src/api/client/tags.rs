@@ -24,6 +24,35 @@ pub struct ListTagsResponse {
     pub pagination: Pagination,
 }
 
+/// Color for tags
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Color {
+    Grey,
+    Yellow,
+    Orange,
+    Red,
+    Pink,
+    Purple,
+    Blue,
+    Ice,
+    Teal,
+    Lime,
+}
+
+/// Request to create a new tag
+#[derive(Debug, Serialize)]
+pub struct CreateTagRequest {
+    pub name: String,
+    pub color: Color,
+}
+
+/// Response when creating a tag
+#[derive(Debug, Deserialize)]
+pub struct CreateTagResponse {
+    pub tag: Tag,
+}
+
 impl AnytypeClient {
     /// List tags for a specific property in a space
     pub async fn list_tags(&self, space_id: &str, property_id: &str) -> Result<Vec<Tag>> {
@@ -56,8 +85,28 @@ impl AnytypeClient {
         .await
     }
 
+    /// Create a new tag for a property in a space
+    pub async fn create_tag(
+        &self,
+        space_id: &str,
+        property_id: &str,
+        request: CreateTagRequest,
+    ) -> Result<CreateTagResponse> {
+        info!(
+            "Creating tag '{}' for property '{}' in space: {}",
+            request.name, property_id, space_id
+        );
+        debug!("Request: {:?}", request);
+        debug!("Request JSON: {}", serde_json::to_string_pretty(&request)?);
+
+        self.post(
+            &format!("/v1/spaces/{space_id}/properties/{property_id}/tags"),
+            &request,
+        )
+        .await
+    }
+
     // TODO: Add additional tag management methods like:
-    // - create_tag
     // - update_tag
     // - delete_tag
 }

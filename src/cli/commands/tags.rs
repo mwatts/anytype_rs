@@ -1,5 +1,5 @@
 use anyhow::{Context, Result};
-use anytype_rs::api::AnytypeClient;
+use anytype_rs::api::{AnytypeClient, Color, CreateTagRequest};
 use clap::{Args, Subcommand};
 
 #[derive(Debug, Args)]
@@ -20,6 +20,19 @@ pub enum TagsCommand {
         #[arg(short, long, default_value = "20")]
         limit: u32,
     },
+    /// Create a new tag for a property in a space
+    Create {
+        /// Space ID
+        space_id: String,
+        /// Property ID (the property for which to create the tag)
+        property_id: String,
+        /// Tag name
+        #[arg(short, long)]
+        name: String,
+        /// Tag color
+        #[arg(short, long, default_value = "grey")]
+        color: String,
+    },
 }
 
 pub async fn handle_tags_command(args: TagsArgs) -> Result<()> {
@@ -35,6 +48,12 @@ pub async fn handle_tags_command(args: TagsArgs) -> Result<()> {
             property_id,
             limit,
         } => list_tags(&client, &space_id, &property_id, limit).await,
+        TagsCommand::Create {
+            space_id,
+            property_id,
+            name,
+            color,
+        } => create_tag(&client, &space_id, &property_id, &name, &color).await,
     }
 }
 
@@ -74,6 +93,58 @@ async fn list_tags(
 
     if total_tags > display_count {
         println!("💡 Use --limit {total_tags} to see more results");
+    }
+
+    Ok(())
+}
+
+async fn create_tag(
+    client: &AnytypeClient,
+    space_id: &str,
+    property_id: &str,
+    name: &str,
+    color_str: &str,
+) -> Result<()> {
+    println!("🏗️  Creating tag '{name}' for property '{property_id}' in space '{space_id}'...");
+
+    // Parse color
+    let color = match color_str.to_lowercase().as_str() {
+        "grey" => Color::Grey,
+        "yellow" => Color::Yellow,
+        "orange" => Color::Orange,
+        "red" => Color::Red,
+        "pink" => Color::Pink,
+        "purple" => Color::Purple,
+        "blue" => Color::Blue,
+        "ice" => Color::Ice,
+        "teal" => Color::Teal,
+        "lime" => Color::Lime,
+        _ => {
+            println!(
+                "❌ Invalid color: {color_str}. Valid options: grey, yellow, orange, red, pink, purple, blue, ice, teal, lime"
+            );
+            return Ok(());
+        }
+    };
+
+    let request = CreateTagRequest {
+        name: name.to_string(),
+        color,
+    };
+
+    let response = client
+        .create_tag(space_id, property_id, request)
+        .await
+        .context("Failed to create tag")?;
+
+    println!("✅ Tag created successfully!");
+    println!("  🏷️  Name: {}", response.tag.name);
+    println!("  🆔 ID: {}", response.tag.id);
+    println!("  🔑 Key: {}", response.tag.key);
+    println!("  📄 Object: {}", response.tag.object);
+
+    if let Some(color) = &response.tag.color {
+        println!("  🎨 Color: {color}");
     }
 
     Ok(())

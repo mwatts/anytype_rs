@@ -38,7 +38,7 @@ pub use client::spaces::{
     CreateSpaceRequest, CreateSpaceResponse, ListSpacesResponse, Space, UpdateSpaceRequest,
     UpdateSpaceResponse,
 };
-pub use client::tags::{ListTagsResponse, Tag};
+pub use client::tags::{Color, CreateTagRequest, CreateTagResponse, ListTagsResponse, Tag};
 pub use client::templates::{
     GetTemplateResponse, Icon, ListTemplatesResponse, ObjectType, Template,
 };
