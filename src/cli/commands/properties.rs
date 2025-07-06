@@ -51,6 +51,13 @@ pub enum PropertiesCommand {
         #[arg(short, long, default_value = "text")]
         format: String,
     },
+    /// Delete a property in a space
+    Delete {
+        /// Space ID
+        space_id: String,
+        /// Property ID to delete
+        property_id: String,
+    },
 }
 
 pub async fn handle_properties_command(args: PropertiesArgs) -> Result<()> {
@@ -79,6 +86,10 @@ pub async fn handle_properties_command(args: PropertiesArgs) -> Result<()> {
             name,
             format,
         } => update_property(&client, &space_id, &property_id, &name, &format).await,
+        PropertiesCommand::Delete {
+            space_id,
+            property_id,
+        } => delete_property(&client, &space_id, &property_id).await,
     }
 }
 
@@ -223,6 +234,26 @@ async fn update_property(
         .context("Failed to update property")?;
 
     println!("✅ Property updated successfully!");
+    println!(
+        "  🔧 {} ({})",
+        response.property.name, response.property.key
+    );
+    println!("  🆔 ID: {}", response.property.id);
+    println!("  📐 Format: {}", response.property.format);
+    println!("  📄 Object: {}", response.property.object);
+
+    Ok(())
+}
+
+async fn delete_property(client: &AnytypeClient, space_id: &str, property_id: &str) -> Result<()> {
+    println!("🗑️  Deleting property '{property_id}' from space '{space_id}'...");
+
+    let response = client
+        .delete_property(space_id, property_id)
+        .await
+        .context("Failed to delete property")?;
+
+    println!("✅ Property deleted successfully!");
     println!(
         "  🔧 {} ({})",
         response.property.name, response.property.key
