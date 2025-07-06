@@ -1,5 +1,5 @@
 use anyhow::{Context, Result};
-use anytype_rs::api::AnytypeClient;
+use anytype_rs::api::{AnytypeClient, CreatePropertyRequest, PropertyFormat};
 use clap::{Args, Subcommand};
 
 #[derive(Debug, Args)]
@@ -25,6 +25,17 @@ pub enum PropertiesCommand {
         /// Property ID to retrieve
         property_id: String,
     },
+    /// Create a new property in a space
+    Create {
+        /// Space ID
+        space_id: String,
+        /// Property name
+        #[arg(short, long)]
+        name: String,
+        /// Property format
+        #[arg(short, long, default_value = "text")]
+        format: String,
+    },
 }
 
 pub async fn handle_properties_command(args: PropertiesArgs) -> Result<()> {
@@ -42,6 +53,11 @@ pub async fn handle_properties_command(args: PropertiesArgs) -> Result<()> {
             space_id,
             property_id,
         } => get_property(&client, &space_id, &property_id).await,
+        PropertiesCommand::Create {
+            space_id,
+            name,
+            format,
+        } => create_property(&client, &space_id, &name, &format).await,
     }
 }
 
@@ -90,6 +106,57 @@ async fn get_property(client: &AnytypeClient, space_id: &str, property_id: &str)
     println!("  🆔 ID: {}", property.id);
     println!("  📐 Format: {}", property.format);
     println!("  📄 Object: {}", property.object);
+
+    Ok(())
+}
+
+async fn create_property(
+    client: &AnytypeClient,
+    space_id: &str,
+    name: &str,
+    format_str: &str,
+) -> Result<()> {
+    // Parse the format string to PropertyFormat enum
+    let format = match format_str.to_lowercase().as_str() {
+        "text" => PropertyFormat::Text,
+        "number" => PropertyFormat::Number,
+        "select" => PropertyFormat::Select,
+        "multi_select" | "multiselect" => PropertyFormat::MultiSelect,
+        "date" => PropertyFormat::Date,
+        "files" => PropertyFormat::Files,
+        "checkbox" => PropertyFormat::Checkbox,
+        "url" => PropertyFormat::Url,
+        "email" => PropertyFormat::Email,
+        "phone" => PropertyFormat::Phone,
+        "objects" => PropertyFormat::Objects,
+        _ => {
+            println!(
+                "❌ Invalid format: {format_str}. Valid options: text, number, select, multi_select, date, files, checkbox, url, email, phone, objects"
+            );
+            return Ok(());
+        }
+    };
+
+    let request = CreatePropertyRequest {
+        name: name.to_string(),
+        format,
+    };
+
+    println!("🔧 Creating property '{name}' in space '{space_id}'...");
+
+    let response = client
+        .create_property(space_id, request)
+        .await
+        .context("Failed to create property")?;
+
+    println!("✅ Property created successfully!");
+    println!(
+        "  🔧 {} ({})",
+        response.property.name, response.property.key
+    );
+    println!("  🆔 ID: {}", response.property.id);
+    println!("  📐 Format: {}", response.property.format);
+    println!("  📄 Object: {}", response.property.object);
 
     Ok(())
 }
