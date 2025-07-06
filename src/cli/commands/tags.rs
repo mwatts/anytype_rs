@@ -33,6 +33,15 @@ pub enum TagsCommand {
         #[arg(short, long, default_value = "grey")]
         color: String,
     },
+    /// Get details of a specific tag
+    Get {
+        /// Space ID
+        space_id: String,
+        /// Property ID (the property that contains the tag)
+        property_id: String,
+        /// Tag ID to retrieve
+        tag_id: String,
+    },
 }
 
 pub async fn handle_tags_command(args: TagsArgs) -> Result<()> {
@@ -54,6 +63,11 @@ pub async fn handle_tags_command(args: TagsArgs) -> Result<()> {
             name,
             color,
         } => create_tag(&client, &space_id, &property_id, &name, &color).await,
+        TagsCommand::Get {
+            space_id,
+            property_id,
+            tag_id,
+        } => get_tag(&client, &space_id, &property_id, &tag_id).await,
     }
 }
 
@@ -144,6 +158,31 @@ async fn create_tag(
     println!("  📄 Object: {}", response.tag.object);
 
     if let Some(color) = &response.tag.color {
+        println!("  🎨 Color: {color}");
+    }
+
+    Ok(())
+}
+
+async fn get_tag(
+    client: &AnytypeClient,
+    space_id: &str,
+    property_id: &str,
+    tag_id: &str,
+) -> Result<()> {
+    println!("🔍 Fetching tag '{tag_id}' for property '{property_id}' from space '{space_id}'...");
+
+    let tag = client
+        .get_tag(space_id, property_id, tag_id)
+        .await
+        .context("Failed to fetch tag")?;
+
+    println!("✅ Tag found:");
+    println!("  🏷️  Name: {} ({})", tag.name, tag.key);
+    println!("  🆔 ID: {}", tag.id);
+    println!("  📄 Object: {}", tag.object);
+
+    if let Some(color) = &tag.color {
         println!("  🎨 Color: {color}");
     }
 

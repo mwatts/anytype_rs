@@ -53,6 +53,12 @@ pub struct CreateTagResponse {
     pub tag: Tag,
 }
 
+/// Response when getting a tag
+#[derive(Debug, Deserialize)]
+pub struct GetTagResponse {
+    pub tag: Tag,
+}
+
 impl AnytypeClient {
     /// List tags for a specific property in a space
     pub async fn list_tags(&self, space_id: &str, property_id: &str) -> Result<Vec<Tag>> {
@@ -104,6 +110,25 @@ impl AnytypeClient {
             &request,
         )
         .await
+    }
+
+    /// Get a specific tag by ID for a property in a space
+    pub async fn get_tag(&self, space_id: &str, property_id: &str, tag_id: &str) -> Result<Tag> {
+        info!(
+            "Getting tag '{}' for property '{}' in space: {}",
+            tag_id, property_id, space_id
+        );
+        debug!(
+            "GET /v1/spaces/{}/properties/{}/tags/{}",
+            space_id, property_id, tag_id
+        );
+
+        let response: GetTagResponse = self
+            .get(&format!(
+                "/v1/spaces/{space_id}/properties/{property_id}/tags/{tag_id}"
+            ))
+            .await?;
+        Ok(response.tag)
     }
 
     // TODO: Add additional tag management methods like:
