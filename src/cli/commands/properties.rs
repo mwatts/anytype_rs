@@ -1,5 +1,7 @@
 use anyhow::{Context, Result};
-use anytype_rs::api::{AnytypeClient, CreatePropertyRequest, PropertyFormat};
+use anytype_rs::api::{
+    AnytypeClient, CreatePropertyRequest, PropertyFormat, UpdatePropertyRequest,
+};
 use clap::{Args, Subcommand};
 
 #[derive(Debug, Args)]
@@ -36,6 +38,19 @@ pub enum PropertiesCommand {
         #[arg(short, long, default_value = "text")]
         format: String,
     },
+    /// Update an existing property in a space
+    Update {
+        /// Space ID
+        space_id: String,
+        /// Property ID to update
+        property_id: String,
+        /// Property name
+        #[arg(short, long)]
+        name: String,
+        /// Property format
+        #[arg(short, long, default_value = "text")]
+        format: String,
+    },
 }
 
 pub async fn handle_properties_command(args: PropertiesArgs) -> Result<()> {
@@ -58,6 +73,12 @@ pub async fn handle_properties_command(args: PropertiesArgs) -> Result<()> {
             name,
             format,
         } => create_property(&client, &space_id, &name, &format).await,
+        PropertiesCommand::Update {
+            space_id,
+            property_id,
+            name,
+            format,
+        } => update_property(&client, &space_id, &property_id, &name, &format).await,
     }
 }
 
@@ -150,6 +171,58 @@ async fn create_property(
         .context("Failed to create property")?;
 
     println!("✅ Property created successfully!");
+    println!(
+        "  🔧 {} ({})",
+        response.property.name, response.property.key
+    );
+    println!("  🆔 ID: {}", response.property.id);
+    println!("  📐 Format: {}", response.property.format);
+    println!("  📄 Object: {}", response.property.object);
+
+    Ok(())
+}
+
+async fn update_property(
+    client: &AnytypeClient,
+    space_id: &str,
+    property_id: &str,
+    name: &str,
+    format_str: &str,
+) -> Result<()> {
+    // Parse the format string to PropertyFormat enum
+    let format = match format_str.to_lowercase().as_str() {
+        "text" => PropertyFormat::Text,
+        "number" => PropertyFormat::Number,
+        "select" => PropertyFormat::Select,
+        "multi_select" | "multiselect" => PropertyFormat::MultiSelect,
+        "date" => PropertyFormat::Date,
+        "files" => PropertyFormat::Files,
+        "checkbox" => PropertyFormat::Checkbox,
+        "url" => PropertyFormat::Url,
+        "email" => PropertyFormat::Email,
+        "phone" => PropertyFormat::Phone,
+        "objects" => PropertyFormat::Objects,
+        _ => {
+            println!(
+                "❌ Invalid format: {format_str}. Valid options: text, number, select, multi_select, date, files, checkbox, url, email, phone, objects"
+            );
+            return Ok(());
+        }
+    };
+
+    let request = UpdatePropertyRequest {
+        name: name.to_string(),
+        format,
+    };
+
+    println!("🔧 Updating property '{property_id}' in space '{space_id}'...");
+
+    let response = client
+        .update_property(space_id, property_id, request)
+        .await
+        .context("Failed to update property")?;
+
+    println!("✅ Property updated successfully!");
     println!(
         "  🔧 {} ({})",
         response.property.name, response.property.key

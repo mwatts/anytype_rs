@@ -65,7 +65,7 @@ The ✅ means it's been vibe coded. I still need to go through and verify each o
 - ✅ Create property
 - ❌ Delete property
 - ✅ Get property
-- ❌ Update property
+- ✅ Update property
 
 ### Tags
 - ✅ List tags

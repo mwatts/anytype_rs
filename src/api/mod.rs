@@ -34,7 +34,7 @@ pub use client::objects::{
 };
 pub use client::properties::{
     CreatePropertyRequest, CreatePropertyResponse, GetPropertyResponse, ListPropertiesResponse,
-    Property,
+    Property, UpdatePropertyRequest, UpdatePropertyResponse,
 };
 pub use client::search::{SearchObject, SearchRequest, SearchResponse, SearchSpaceRequest};
 pub use client::spaces::{
