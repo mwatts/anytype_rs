@@ -48,6 +48,20 @@ pub enum ListsCommand {
         #[arg(long, default_value = "20")]
         limit: u32,
     },
+    /// Remove objects from a list (collection)
+    Remove {
+        /// Space ID where the list exists
+        #[arg(short, long)]
+        space_id: String,
+
+        /// List ID to remove objects from
+        #[arg(short, long)]
+        list_id: String,
+
+        /// Object IDs to remove from the list (comma-separated or multiple --object-id flags)
+        #[arg(long, value_delimiter = ',')]
+        object_ids: Vec<String>,
+    },
 }
 
 pub async fn handle_lists_command(args: ListsArgs) -> Result<()> {
@@ -71,6 +85,11 @@ pub async fn handle_lists_command(args: ListsArgs) -> Result<()> {
             list_id,
             limit,
         } => get_list_objects(&client, &space_id, &list_id, limit).await,
+        ListsCommand::Remove {
+            space_id,
+            list_id,
+            object_ids,
+        } => remove_objects_from_list(&client, &space_id, &list_id, object_ids).await,
     }
 }
 
@@ -221,6 +240,41 @@ async fn get_list_objects(
             "💡 There are more objects available. Use --limit {} to see more.",
             response.pagination.total
         );
+    }
+
+    Ok(())
+}
+
+async fn remove_objects_from_list(
+    client: &AnytypeClient,
+    space_id: &str,
+    list_id: &str,
+    object_ids: Vec<String>,
+) -> Result<()> {
+    if object_ids.is_empty() {
+        println!("❌ Error: No object IDs provided");
+        return Ok(());
+    }
+
+    println!(
+        "🗑️ Removing {} objects from list '{}' in space '{}'...",
+        object_ids.len(),
+        list_id,
+        space_id
+    );
+
+    let response = client
+        .remove_list_objects(space_id, list_id, object_ids.clone())
+        .await?;
+
+    println!("✅ {}", response.message);
+    println!(
+        "📋 Successfully requested removal of {} objects:",
+        object_ids.len()
+    );
+
+    for (i, object_id) in object_ids.iter().enumerate() {
+        println!("   {}. 📄 {}", i + 1, object_id);
     }
 
     Ok(())

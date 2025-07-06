@@ -139,6 +139,24 @@ impl AnytypeClient {
         self.handle_response(response).await
     }
 
+    /// Make an authenticated DELETE request with body
+    pub(crate) async fn delete_with_body<T: DeserializeOwned, B: Serialize>(
+        &self,
+        path: &str,
+        body: &B,
+    ) -> Result<T> {
+        let url = format!("{}{}", self.config.base_url, path);
+        debug!("DELETE {} (with body)", url);
+
+        let response = self
+            .authenticated_request(Method::DELETE, &url)?
+            .json(body)
+            .send()
+            .await?;
+
+        self.handle_response(response).await
+    }
+
     /// Make an unauthenticated POST request (for auth endpoints)
     pub(crate) async fn post_unauthenticated<T: DeserializeOwned, B: Serialize>(
         &self,

@@ -36,6 +36,20 @@ pub struct AddListObjectsResponse {
     pub added_objects: Vec<String>,
 }
 
+/// Request to remove objects from a list
+#[derive(Debug, Serialize)]
+pub struct RemoveListObjectsRequest {
+    /// Array of object IDs to remove from the list
+    pub object_ids: Vec<String>,
+}
+
+/// Response when removing objects from a list
+#[derive(Debug, Deserialize)]
+pub struct RemoveListObjectsResponse {
+    /// Confirmation message
+    pub message: String,
+}
+
 /// Filter condition for list views
 #[derive(Debug, Deserialize, Serialize)]
 pub struct ListViewFilter {
@@ -224,7 +238,27 @@ impl AnytypeClient {
             .await
     }
 
-    // TODO: Add other list management methods:
-    // - remove_list_objects
-    // - clear_list
+    /// Remove objects from a list
+    pub async fn remove_list_objects(
+        &self,
+        space_id: &str,
+        list_id: &str,
+        object_ids: Vec<String>,
+    ) -> Result<RemoveListObjectsResponse> {
+        info!(
+            "Removing {} objects from list {} in space {}",
+            object_ids.len(),
+            list_id,
+            space_id
+        );
+        debug!("Object IDs: {:?}", object_ids);
+
+        let request = RemoveListObjectsRequest { object_ids };
+
+        self.delete_with_body(
+            &format!("/v1/spaces/{space_id}/lists/{list_id}/objects"),
+            &request,
+        )
+        .await
+    }
 }
