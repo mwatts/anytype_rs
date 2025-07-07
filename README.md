@@ -27,11 +27,11 @@ The following lists the currently implemented endpoints for the 2025-05-20 API v
 
 The ✅ means it's been reviewed and cleaned up after the initial vibe coding approach. It should be treated as "safe to use" on a real Anytype instance.
 
-The ⚠️ means it's been vibe coded. I still need to go through and verify each of the ⚠️ endpoints, but the basics are there. They might be missing some functionality but the basics worked.
+The ⚠️ means it's been vibe coded. I still need to go through and verify each of the ⚠️ endpoints, but the basics are there. They might be missing some functionality but the basics worked. It should be considered "experimental" and used with caution on a real Anytype instance.
 
 ### Authentication
-- ⚠️ Create API key
-- ⚠️ Create challenge
+- ✅ Create API key
+- ✅ Create challenge
 
 ### Search
 - ⚠️ Search objects across all spaces

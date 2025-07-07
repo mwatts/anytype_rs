@@ -58,9 +58,9 @@ pub enum ListsCommand {
         #[arg(short, long)]
         list_id: String,
 
-        /// Object IDs to remove from the list (comma-separated or multiple --object-id flags)
-        #[arg(long, value_delimiter = ',')]
-        object_ids: Vec<String>,
+        /// Object ID to remove from the list
+        #[arg(long)]
+        object_id: String,
     },
 }
 
@@ -88,8 +88,8 @@ pub async fn handle_lists_command(args: ListsArgs) -> Result<()> {
         ListsCommand::Remove {
             space_id,
             list_id,
-            object_ids,
-        } => remove_objects_from_list(&client, &space_id, &list_id, object_ids).await,
+            object_id,
+        } => remove_object_from_list(&client, &space_id, &list_id, &object_id).await,
     }
 }
 
@@ -245,37 +245,23 @@ async fn get_list_objects(
     Ok(())
 }
 
-async fn remove_objects_from_list(
+async fn remove_object_from_list(
     client: &AnytypeClient,
     space_id: &str,
     list_id: &str,
-    object_ids: Vec<String>,
+    object_id: &str,
 ) -> Result<()> {
-    if object_ids.is_empty() {
-        println!("❌ Error: No object IDs provided");
-        return Ok(());
-    }
-
     println!(
-        "🗑️ Removing {} objects from list '{}' in space '{}'...",
-        object_ids.len(),
-        list_id,
-        space_id
+        "🗑️ Removing {} object from list '{}' in space '{}'...",
+        object_id, list_id, space_id
     );
 
     let response = client
-        .remove_list_objects(space_id, list_id, object_ids.clone())
+        .remove_list_object(space_id, list_id, object_id)
         .await?;
 
     println!("✅ {}", response.message);
-    println!(
-        "📋 Successfully requested removal of {} objects:",
-        object_ids.len()
-    );
-
-    for (i, object_id) in object_ids.iter().enumerate() {
-        println!("   {}. 📄 {}", i + 1, object_id);
-    }
+    println!("📋 Successfully requested removal of {} object:", object_id);
 
     Ok(())
 }

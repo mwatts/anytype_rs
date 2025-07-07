@@ -10,21 +10,24 @@ use tracing::info;
 /// Request to create an authentication challenge
 #[derive(Debug, Serialize)]
 pub struct CreateChallengeRequest {
+    /// The name of the application requesting the challenge
     pub app_name: String,
 }
 
 /// Response containing challenge information
 #[derive(Debug, Deserialize)]
 pub struct CreateChallengeResponse {
+    /// The unique identifier for the challenge
     pub challenge_id: String,
-    // Add other fields as discovered from API
 }
 
 /// Request to create an API key using challenge response
 #[derive(Debug, Serialize)]
 pub struct CreateApiKeyRequest {
+    /// The unique identifier for the challenge, returned from the challenge creation
     pub challenge_id: String,
-    pub code: String, // 4-digit code
+    /// The 4-digit code provided by the user from the Anytype application in response to the challenge
+    pub code: String,
 }
 
 /// Response containing the API key

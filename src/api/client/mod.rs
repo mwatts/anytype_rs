@@ -20,6 +20,9 @@ pub mod templates;
 pub mod types;
 
 const DEFAULT_BASE_URL: &str = "http://localhost:31009";
+const ANYTYPE_API_HEADER: &str = "Anytype-Version";
+// TODO: Better support multiple API versions
+const ANYTYPE_API_VERSION: &str = "2025-05-20";
 
 /// Configuration for the Anytype client
 #[derive(Debug, Clone)]
@@ -126,31 +129,12 @@ impl AnytypeClient {
     }
 
     /// Make an authenticated DELETE request
-    #[allow(dead_code)] // Future use
     pub(crate) async fn delete<T: DeserializeOwned>(&self, path: &str) -> Result<T> {
         let url = format!("{}{}", self.config.base_url, path);
         debug!("DELETE {}", url);
 
         let response = self
             .authenticated_request(Method::DELETE, &url)?
-            .send()
-            .await?;
-
-        self.handle_response(response).await
-    }
-
-    /// Make an authenticated DELETE request with body
-    pub(crate) async fn delete_with_body<T: DeserializeOwned, B: Serialize>(
-        &self,
-        path: &str,
-        body: &B,
-    ) -> Result<T> {
-        let url = format!("{}{}", self.config.base_url, path);
-        debug!("DELETE {} (with body)", url);
-
-        let response = self
-            .authenticated_request(Method::DELETE, &url)?
-            .json(body)
             .send()
             .await?;
 
@@ -166,7 +150,13 @@ impl AnytypeClient {
         let url = format!("{}{}", self.config.base_url, path);
         debug!("POST {} (unauthenticated)", url);
 
-        let response = self.http_client.post(&url).json(body).send().await?;
+        let response = self
+            .http_client
+            .post(&url)
+            .header(ANYTYPE_API_HEADER, ANYTYPE_API_VERSION)
+            .json(body)
+            .send()
+            .await?;
 
         self.handle_response(response).await
     }
@@ -192,7 +182,9 @@ impl AnytypeClient {
             }
         };
 
-        Ok(builder.bearer_auth(api_key))
+        Ok(builder
+            .header(ANYTYPE_API_HEADER, ANYTYPE_API_VERSION)
+            .bearer_auth(api_key))
     }
 
     /// Handle HTTP response and deserialize JSON

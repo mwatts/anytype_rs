@@ -27,7 +27,7 @@ pub use client::auth::{
 pub use client::lists::{
     AddListObjectsRequest, AddListObjectsResponse, GetListObjectsResponse, GetListViewsResponse,
     ListObject, ListObjectType, ListViewData, ListViewFilter, ListViewSort, ObjectIcon,
-    ObjectTypeProperty, RemoveListObjectsRequest, RemoveListObjectsResponse,
+    ObjectTypeProperty, RemoveListObjectsResponse,
 };
 pub use client::members::{
     GetMemberResponse, ListMembersResponse, Member, MemberRole, MemberStatus,

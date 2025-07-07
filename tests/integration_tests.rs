@@ -482,7 +482,7 @@ async fn test_unauthenticated_remove_list_objects_request_fails() {
 
     // This should fail because no API key is set
     let result = client
-        .remove_list_objects("test-space-id", "test-list-id", vec!["obj1".to_string()])
+        .remove_list_object("test-space-id", "test-list-id", "obj1")
         .await;
     assert!(result.is_err());
 
