@@ -25,65 +25,65 @@ This project provides bindings to the Anytype API and a CLI tool to interact wit
 
 The following lists the currently implemented endpoints for the 2025-05-20 API version.
 
-The ✅ means it's been vibe coded. I still need to go through and verify each of the ✅ endpoints, but the basics are there. They might be missing some functionality but the basics worked.
+The ✅ means it's been reviewed and cleaned up after the initial vibe coding approach. It should be treated as "safe to use" on a real Anytype instance.
 
-❌ means it has not been implemented yet in any fashion.
+The ⚠️ means it's been vibe coded. I still need to go through and verify each of the ⚠️ endpoints, but the basics are there. They might be missing some functionality but the basics worked.
 
 ### Authentication
-- ✅ Create API key
-- ✅ Create challenge
+- ⚠️ Create API key
+- ⚠️ Create challenge
 
 ### Search
-- ✅ Search objects across all spaces
-- ✅ Search objects within a space
+- ⚠️ Search objects across all spaces
+- ⚠️ Search objects within a space
 
 ### Spaces
-- ✅ List spaces
-- ✅ Create space
-- ✅ Get space
-- ✅ Update space
+- ⚠️ List spaces
+- ⚠️ Create space
+- ⚠️ Get space
+- ⚠️ Update space
 
 ### Lists
-- ✅ Add objects to list
-- ✅ Remove objects from list
-- ✅ Get list views
-- ✅ Get objects in list
+- ⚠️ Add objects to list
+- ⚠️ Remove objects from list
+- ⚠️ Get list views
+- ⚠️ Get objects in list
 
 ### Members
-- ✅ List members
-- ✅ Get member
+- ⚠️ List members
+- ⚠️ Get member
 
 ### Objects
-- ✅ List objects
-- ✅ Create object
-- ✅ Delete object
-- ✅ Get object
-- ✅ Update object
+- ⚠️ List objects
+- ⚠️ Create object
+- ⚠️ Delete object
+- ⚠️ Get object
+- ⚠️ Update object
 
 ### Properties
-- ✅ List properties
-- ✅ Create property
-- ✅ Delete property
-- ✅ Get property
-- ✅ Update property
+- ⚠️ List properties
+- ⚠️ Create property
+- ⚠️ Delete property
+- ⚠️ Get property
+- ⚠️ Update property
 
 ### Tags
-- ✅ List tags
-- ✅ Create tag
-- ✅ Delete tag
-- ✅ Get tag
-- ✅ Update tag
+- ⚠️ List tags
+- ⚠️ Create tag
+- ⚠️ Delete tag
+- ⚠️ Get tag
+- ⚠️ Update tag
 
 ### Types
-- ✅ List types
-- ✅ Create type
-- ✅ Delete type
-- ✅ Get type
-- ✅ Update type
+- ⚠️ List types
+- ⚠️ Create type
+- ⚠️ Delete type
+- ⚠️ Get type
+- ⚠️ Update type
 
 ### Templates
-- ✅ List templates
-- ✅ Get template
+- ⚠️ List templates
+- ⚠️ Get template
 
 ## Installation
 
