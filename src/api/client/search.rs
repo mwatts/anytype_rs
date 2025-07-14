@@ -11,20 +11,17 @@ use tracing::{debug, info};
 #[derive(Debug, Serialize)]
 pub struct SearchRequest {
     pub query: Option<String>,
-    pub limit: Option<u32>,
-    pub offset: Option<u32>,
+    pub limit: Option<usize>,
+    pub offset: Option<usize>,
     pub space_id: Option<String>,
 }
 
 /// Search request parameters for space-specific search
 #[derive(Debug, Serialize)]
 pub struct SearchSpaceRequest {
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub query: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub limit: Option<u32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub offset: Option<u32>,
+    pub limit: Option<usize>,
+    pub offset: Option<usize>,
 }
 
 /// Basic object information for search results

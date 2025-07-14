@@ -13,7 +13,7 @@ pub struct ApiErrorResponse {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Pagination {
     pub has_more: bool,
-    pub limit: u32,
-    pub offset: u32,
-    pub total: u32,
+    pub limit: usize,
+    pub offset: usize,
+    pub total: usize,
 }

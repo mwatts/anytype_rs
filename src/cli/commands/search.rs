@@ -9,11 +9,11 @@ pub struct SearchArgs {
 
     /// Limit the number of results
     #[arg(short, long, default_value = "10")]
-    pub limit: u32,
+    pub limit: usize,
 
     /// Offset for pagination
     #[arg(short, long, default_value = "0")]
-    pub offset: u32,
+    pub offset: usize,
 
     /// Search within a specific space
     #[arg(short, long)]
@@ -76,7 +76,7 @@ async fn search(client: &AnytypeClient, args: SearchArgs) -> Result<()> {
     println!("✅ Found {} results{}:", response.data.len(), total_info);
 
     for (i, object) in response.data.iter().enumerate() {
-        let index = args.offset + i as u32 + 1;
+        let index = args.offset + i + 1;
         println!("{}. 📄 Object ID: {}", index, object.id);
         println!(
             "   🏠 Space: {}",
@@ -130,7 +130,7 @@ async fn search(client: &AnytypeClient, args: SearchArgs) -> Result<()> {
 
     // Pagination info
     let total = response.pagination.total;
-    let shown_end = args.offset + response.data.len() as u32;
+    let shown_end = args.offset + response.data.len() as usize;
     if shown_end < total {
         println!(
             "💡 Showing results {}-{} of {}. Use --offset {} to see more.",
