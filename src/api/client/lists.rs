@@ -3,7 +3,7 @@
 //! Handles list management operations.
 
 use super::AnytypeClient;
-use crate::{error::Result, types::Pagination};
+use crate::{error::Result, types::Pagination, api::types::Icon};
 use serde::{Deserialize, Serialize};
 use tracing::{debug, info};
 
@@ -95,22 +95,13 @@ pub struct GetListViewsResponse {
     pub pagination: Pagination,
 }
 
-/// Icon for objects - can be emoji, file, or named icon
-#[derive(Debug, Deserialize, Serialize)]
-pub struct ObjectIcon {
-    /// The emoji of the icon (if format is emoji)
-    pub emoji: Option<String>,
-    /// The format of the icon
-    pub format: String,
-}
-
 /// Type information for objects in lists
 #[derive(Debug, Deserialize, Serialize)]
 pub struct ListObjectType {
     /// Whether the type is archived
     pub archived: bool,
     /// The icon of the type
-    pub icon: Option<ObjectIcon>,
+    pub icon: Icon,
     /// The id of the type (which is unique across spaces)
     pub id: String,
     /// The key of the type (can be the same across spaces for known types)
@@ -148,7 +139,7 @@ pub struct ListObject {
     /// Whether the object is archived
     pub archived: bool,
     /// The icon of the object
-    pub icon: Option<ObjectIcon>,
+    pub icon: Icon,
     /// The id of the object
     pub id: String,
     /// The layout of the object

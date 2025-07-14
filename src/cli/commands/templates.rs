@@ -92,9 +92,15 @@ async fn list_templates(
             }
         }
 
-        if let Some(icon) = &template.icon {
-            if let Some(emoji) = &icon.emoji {
+        match &template.icon {
+            anytype_rs::api::Icon::Emoji { emoji } => {
                 println!("     🎨 Icon: {emoji}");
+            }
+            anytype_rs::api::Icon::File { file } => {
+                println!("     🎨 Icon: {file}");
+            }
+            anytype_rs::api::Icon::Icon { name, color } => {
+                println!("     🎨 Icon: {name} ({color:?})");
             }
         }
 
@@ -153,9 +159,15 @@ async fn get_template(
         println!("  📦 Archived: {}", if archived { "Yes" } else { "No" });
     }
 
-    if let Some(icon) = &template.icon {
-        if let Some(emoji) = &icon.emoji {
+    match &template.icon {
+        anytype_rs::api::Icon::Emoji { emoji } => {
             println!("  🎨 Icon: {emoji}");
+        }
+        anytype_rs::api::Icon::File { file } => {
+            println!("  🎨 Icon: {file}");
+        }
+        anytype_rs::api::Icon::Icon { name, color } => {
+            println!("  🎨 Icon: {name} ({color:?})");
         }
     }
 

@@ -3,7 +3,7 @@
 //! Handles type management operations such as creating, updating, and deleting object types.
 
 use super::AnytypeClient;
-use crate::{error::Result, types::Pagination};
+use crate::{error::Result, types::Pagination, api::types::Icon};
 use serde::{Deserialize, Serialize};
 use tracing::{debug, info};
 
@@ -24,15 +24,6 @@ pub enum PropertyFormat {
     Objects,
 }
 
-/// Icon format for type creation
-#[derive(Debug, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum IconFormat {
-    Emoji,
-    File,
-    Icon,
-}
-
 /// Layout type for object types
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -47,13 +38,6 @@ pub enum Layout {
     Participant,
 }
 
-/// Icon for type creation
-#[derive(Debug, Serialize, Deserialize)]
-pub struct CreateTypeIcon {
-    pub emoji: Option<String>,
-    pub format: IconFormat,
-}
-
 /// Property for type creation
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CreateTypeProperty {
@@ -65,7 +49,7 @@ pub struct CreateTypeProperty {
 /// Request to create a new type
 #[derive(Debug, Serialize)]
 pub struct CreateTypeRequest {
-    pub icon: Option<CreateTypeIcon>,
+    pub icon: Icon,
     pub key: String,
     pub layout: Layout,
     pub name: String,
@@ -87,15 +71,6 @@ pub struct GetTypeResponse {
     pub type_data: Type,
 }
 
-/// Enhanced icon information for types
-#[derive(Debug, Deserialize, Serialize)]
-pub struct TypeIcon {
-    pub color: Option<String>,
-    pub format: Option<String>,
-    pub name: Option<String>,
-    pub emoji: Option<String>,
-}
-
 /// Property information for types
 #[derive(Debug, Deserialize, Serialize)]
 pub struct TypeProperty {
@@ -110,7 +85,7 @@ pub struct TypeProperty {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Type {
     pub archived: Option<bool>,
-    pub icon: Option<TypeIcon>,
+    pub icon: Icon,
     pub id: String,
     pub key: String,
     pub layout: Option<String>,
@@ -130,7 +105,7 @@ pub struct ListTypesResponse {
 /// Request to update an existing type
 #[derive(Debug, Serialize)]
 pub struct UpdateTypeRequest {
-    pub icon: Option<CreateTypeIcon>,
+    pub icon: Icon,
     pub key: String,
     pub layout: Layout,
     pub name: String,

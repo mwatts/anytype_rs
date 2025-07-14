@@ -3,22 +3,15 @@
 //! Handles template management operations.
 
 use super::AnytypeClient;
-use crate::{error::Result, types::Pagination};
+use crate::{error::Result, types::Pagination, api::types::Icon};
 use serde::{Deserialize, Serialize};
 use tracing::{debug, info};
-
-/// Icon information for templates and objects
-#[derive(Debug, Deserialize, Serialize)]
-pub struct Icon {
-    pub emoji: Option<String>,
-    pub format: Option<String>,
-}
 
 /// Object type information
 #[derive(Debug, Deserialize, Serialize)]
 pub struct ObjectType {
     pub archived: Option<bool>,
-    pub icon: Option<Icon>,
+    pub icon: Icon,
     pub id: String,
     pub key: String,
     pub layout: Option<String>,
@@ -32,7 +25,7 @@ pub struct ObjectType {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Template {
     pub archived: Option<bool>,
-    pub icon: Option<Icon>,
+    pub icon: Icon,
     pub id: String,
     pub layout: Option<String>,
     pub markdown: Option<String>,

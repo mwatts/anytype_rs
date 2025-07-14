@@ -25,8 +25,7 @@ pub struct ListTagsResponse {
 }
 
 /// Color for tags
-#[derive(Debug, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum Color {
     Grey,
     Yellow,

@@ -1,6 +1,6 @@
 use anyhow::{Context, Result};
 use anytype_rs::api::{
-    AnytypeClient, CreateTypeIcon, CreateTypeProperty, CreateTypeRequest, IconFormat, Layout,
+    AnytypeClient, CreateTypeProperty, CreateTypeRequest, Icon, Layout,
     PropertyFormat, UpdateTypeRequest,
 };
 use clap::{Args, Subcommand};
@@ -188,15 +188,15 @@ async fn list_types(client: &AnytypeClient, space_id: &str, limit: u32) -> Resul
             }
         }
 
-        if let Some(icon) = &type_obj.icon {
-            if let Some(emoji) = &icon.emoji {
+        match &type_obj.icon {
+            Icon::Emoji { emoji } => {
                 println!("     🎨 Icon: {emoji}");
-            } else if let Some(name) = &icon.name {
-                if let Some(color) = &icon.color {
-                    println!("     🎨 Icon: {name} ({color})");
-                } else {
-                    println!("     🎨 Icon: {name}");
-                }
+            }
+            Icon::File { file } => {
+                println!("     🎨 Icon: {file}");
+            }
+            Icon::Icon { name, color } => {
+                println!("     🎨 Icon: {name} ({color:?})");
             }
         }
 
@@ -251,10 +251,11 @@ async fn create_type(client: &AnytypeClient, params: CreateTypeParams) -> Result
         }
     };
 
-    // Parse icon
-    let icon = params.icon_emoji.map(|emoji| CreateTypeIcon {
-        emoji: Some(emoji),
-        format: IconFormat::Emoji,
+    // Parse icon - provide default if none specified
+    let icon = params.icon_emoji.map(|emoji| Icon::Emoji {
+        emoji,
+    }).unwrap_or(Icon::Emoji {
+        emoji: "📄".to_string(), // Default icon
     });
 
     // Parse properties
@@ -323,9 +324,15 @@ async fn create_type(client: &AnytypeClient, params: CreateTypeParams) -> Result
         println!("  📚 Plural: {plural_name}");
     }
 
-    if let Some(icon) = &response.type_data.icon {
-        if let Some(emoji) = &icon.emoji {
+    match &response.type_data.icon {
+        Icon::Emoji { emoji } => {
             println!("  🎨 Icon: {emoji}");
+        }
+        Icon::File { file } => {
+            println!("  🎨 Icon: {file}");
+        }
+        Icon::Icon { name, color } => {
+            println!("  🎨 Icon: {name} ({color:?})");
         }
     }
 
@@ -369,15 +376,15 @@ async fn get_type(client: &AnytypeClient, space_id: &str, type_id: &str) -> Resu
         }
     }
 
-    if let Some(icon) = &type_obj.icon {
-        if let Some(emoji) = &icon.emoji {
+    match &type_obj.icon {
+        Icon::Emoji { emoji } => {
             println!("  🎨 Icon: {emoji}");
-        } else if let Some(name) = &icon.name {
-            if let Some(color) = &icon.color {
-                println!("  🎨 Icon: {name} ({color})");
-            } else {
-                println!("  🎨 Icon: {name}");
-            }
+        }
+        Icon::File { file } => {
+            println!("  🎨 Icon: {file}");
+        }
+        Icon::Icon { name, color } => {
+            println!("  🎨 Icon: {name} ({color:?})");
         }
     }
 
@@ -422,10 +429,11 @@ async fn update_type(
         }
     };
 
-    // Parse icon
-    let icon = params.icon_emoji.map(|emoji| CreateTypeIcon {
-        emoji: Some(emoji),
-        format: IconFormat::Emoji,
+    // Parse icon - provide default if none specified
+    let icon = params.icon_emoji.map(|emoji| Icon::Emoji {
+        emoji,
+    }).unwrap_or(Icon::Emoji {
+        emoji: "📄".to_string(), // Default icon
     });
 
     // Parse properties
@@ -494,9 +502,15 @@ async fn update_type(
         println!("  📚 Plural: {plural_name}");
     }
 
-    if let Some(icon) = &response.type_data.icon {
-        if let Some(emoji) = &icon.emoji {
+    match &response.type_data.icon {
+        Icon::Emoji { emoji } => {
             println!("  🎨 Icon: {emoji}");
+        }
+        Icon::File { file } => {
+            println!("  🎨 Icon: {file}");
+        }
+        Icon::Icon { name, color } => {
+            println!("  🎨 Icon: {name} ({color:?})");
         }
     }
 
@@ -541,9 +555,15 @@ async fn delete_type(client: &AnytypeClient, space_id: &str, type_id: &str) -> R
         println!("  📚 Plural: {plural_name}");
     }
 
-    if let Some(icon) = &response.type_data.icon {
-        if let Some(emoji) = &icon.emoji {
+    match &response.type_data.icon {
+        Icon::Emoji { emoji } => {
             println!("  🎨 Icon: {emoji}");
+        }
+        Icon::File { file } => {
+            println!("  🎨 Icon: {file}");
+        }
+        Icon::Icon { name, color } => {
+            println!("  🎨 Icon: {name} ({color:?})");
         }
     }
 

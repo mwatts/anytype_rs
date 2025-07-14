@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+use crate::Color;
+
 /// Generic API error response
 #[derive(Debug, Deserialize)]
 pub struct ApiErrorResponse {
@@ -16,4 +18,28 @@ pub struct Pagination {
     pub limit: usize,
     pub offset: usize,
     pub total: usize,
+}
+
+/// Icon format type
+#[derive(Debug, Deserialize, Serialize, Clone)]
+pub enum IconFormat {
+    Emoji,
+    File,
+    Icon,
+}
+
+/// Icon enum that can be one of three types
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(tag = "format")]
+pub enum Icon {
+    Emoji {
+        emoji: String,
+    },
+    File {
+        file: String,
+    },
+    Icon {
+        color: Color,
+        name: String,
+    },
 }

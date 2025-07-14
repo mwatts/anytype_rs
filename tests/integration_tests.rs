@@ -169,7 +169,7 @@ async fn test_unauthenticated_add_list_objects_request_fails() {
 #[tokio::test]
 async fn test_unauthenticated_create_type_request_fails() {
     use anytype_rs::api::{
-        CreateTypeIcon, CreateTypeProperty, CreateTypeRequest, IconFormat, Layout, PropertyFormat,
+        CreateTypeProperty, CreateTypeRequest, Icon, Layout, PropertyFormat,
     };
 
     let client = AnytypeClient::new().expect("Failed to create client");
@@ -179,10 +179,9 @@ async fn test_unauthenticated_create_type_request_fails() {
         name: "Test Type".to_string(),
         plural_name: "Test Types".to_string(),
         layout: Layout::Basic,
-        icon: Some(CreateTypeIcon {
-            emoji: Some("📄".to_string()),
-            format: IconFormat::Emoji,
-        }),
+        icon: Icon::Emoji {
+            emoji: "📄".to_string(),
+        },
         properties: vec![CreateTypeProperty {
             key: "title".to_string(),
             name: "Title".to_string(),
@@ -221,7 +220,7 @@ async fn test_unauthenticated_get_type_request_fails() {
 #[tokio::test]
 async fn test_unauthenticated_update_type_request_fails() {
     use anytype_rs::api::{
-        CreateTypeIcon, CreateTypeProperty, IconFormat, Layout, PropertyFormat, UpdateTypeRequest,
+        CreateTypeProperty, Icon, Layout, PropertyFormat, UpdateTypeRequest,
     };
 
     let client = AnytypeClient::new().expect("Failed to create client");
@@ -231,10 +230,9 @@ async fn test_unauthenticated_update_type_request_fails() {
         name: "Test Type".to_string(),
         plural_name: "Test Types".to_string(),
         layout: Layout::Basic,
-        icon: Some(CreateTypeIcon {
-            emoji: Some("📝".to_string()),
-            format: IconFormat::Emoji,
-        }),
+        icon: Icon::Emoji {
+            emoji: "📝".to_string(),
+        },
         properties: vec![CreateTypeProperty {
             key: "test_prop".to_string(),
             name: "Test Property".to_string(),

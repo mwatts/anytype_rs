@@ -78,9 +78,23 @@ async fn search(client: &AnytypeClient, args: SearchArgs) -> Result<()> {
     for (i, object) in response.data.iter().enumerate() {
         let index = args.offset + i + 1;
         println!("{}. 📄 Object ID: {}", index, object.id);
+        
+        // Display icon
+        match &object.icon {
+            anytype_rs::api::Icon::Emoji { emoji } => {
+                println!("   🎨 Icon: {emoji}");
+            }
+            anytype_rs::api::Icon::File { file } => {
+                println!("   🎨 Icon: 📁 File ({file})");
+            }
+            anytype_rs::api::Icon::Icon { name, color } => {
+                println!("   🎨 Icon: {name} ({color:?})");
+            }
+        }
+        
         println!(
             "   🏠 Space: {}",
-            object.space_id.as_deref().unwrap_or("Unknown")
+            object.space_id
         );
 
         // Display relevant properties

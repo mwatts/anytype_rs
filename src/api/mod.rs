@@ -26,7 +26,7 @@ pub use client::auth::{
 };
 pub use client::lists::{
     AddListObjectsRequest, AddListObjectsResponse, GetListObjectsResponse, GetListViewsResponse,
-    ListObject, ListObjectType, ListViewData, ListViewFilter, ListViewSort, ObjectIcon,
+    ListObject, ListObjectType, ListViewData, ListViewFilter, ListViewSort,
     ObjectTypeProperty, RemoveListObjectsResponse,
 };
 pub use client::members::{
@@ -50,10 +50,11 @@ pub use client::tags::{
     ListTagsResponse, Tag, UpdateTagRequest, UpdateTagResponse,
 };
 pub use client::templates::{
-    GetTemplateResponse, Icon, ListTemplatesResponse, ObjectType, Template,
+    GetTemplateResponse, ListTemplatesResponse, ObjectType, Template,
 };
 pub use client::types::{
-    CreateTypeIcon, CreateTypeProperty, CreateTypeRequest, CreateTypeResponse, DeleteTypeResponse,
-    GetTypeResponse, IconFormat, Layout, ListTypesResponse, PropertyFormat, Type, TypeIcon,
+    CreateTypeProperty, CreateTypeRequest, CreateTypeResponse, DeleteTypeResponse,
+    GetTypeResponse, Layout, ListTypesResponse, PropertyFormat, Type, 
     TypeProperty, UpdateTypeRequest, UpdateTypeResponse,
 };
+pub use types::{Icon, IconFormat};

@@ -215,9 +215,15 @@ async fn get_list_objects(
         );
         println!("      📐 Layout: {}", object.layout);
 
-        if let Some(icon) = &object.icon {
-            if let Some(emoji) = &icon.emoji {
+        match &object.icon {
+            anytype_rs::api::Icon::Emoji { emoji } => {
                 println!("      🎨 Icon: {emoji}");
+            }
+            anytype_rs::api::Icon::File { file } => {
+                println!("      🎨 Icon: {file}");
+            }
+            anytype_rs::api::Icon::Icon { name, color } => {
+                println!("      🎨 Icon: {name} ({color:?})");
             }
         }
 
@@ -261,7 +267,7 @@ async fn remove_object_from_list(
         .await?;
 
     println!("✅ {}", response.message);
-    println!("📋 Successfully requested removal of {} object:", object_id);
+    println!("📋 Successfully requested removal of {object_id} object:");
 
     Ok(())
 }
