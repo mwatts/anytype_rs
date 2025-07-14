@@ -32,14 +32,10 @@ pub enum IconFormat {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "format")]
 pub enum Icon {
-    Emoji {
-        emoji: String,
-    },
-    File {
-        file: String,
-    },
-    Icon {
-        color: Color,
-        name: String,
-    },
+    #[serde(rename = "emoji")]
+    Emoji { emoji: String },
+    #[serde(rename = "file")]
+    File { file: String },
+    #[serde(rename = "icon")]
+    Icon { color: Color, name: String },
 }

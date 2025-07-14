@@ -1,5 +1,7 @@
 use anyhow::{Context, Result};
-use anytype_rs::api::{AnytypeClient, SearchRequest, SearchSpaceRequest};
+use anytype_rs::api::{
+    AnytypeClient, SearchRequest, SearchSpaceRequest, Sort, SortDirection, SortProperty,
+};
 use clap::Args;
 
 #[derive(Debug, Args)]
@@ -18,6 +20,14 @@ pub struct SearchArgs {
     /// Search within a specific space
     #[arg(short, long)]
     pub space_id: Option<String>,
+
+    /// Sort by property (created_date, last_modified_date, last_opened_date, name)
+    #[arg(long)]
+    pub sort_by: Option<String>,
+
+    /// Sort direction (asc, desc)
+    #[arg(long)]
+    pub sort_direction: Option<String>,
 }
 
 pub async fn handle_search_command(args: SearchArgs) -> Result<()> {
@@ -30,6 +40,48 @@ pub async fn handle_search_command(args: SearchArgs) -> Result<()> {
     search(&client, args).await
 }
 
+fn parse_sort_options(sort_by: Option<&str>, sort_direction: Option<&str>) -> Result<Option<Sort>> {
+    match (sort_by, sort_direction) {
+        (Some(sort_by), Some(sort_direction)) => {
+            let property = match sort_by {
+                "created_date" => SortProperty::CreatedDate,
+                "last_modified_date" => SortProperty::LastModifiedDate,
+                "last_opened_date" => SortProperty::LastOpenedDate,
+                "name" => SortProperty::Name,
+                _ => {
+                    return Err(anyhow::anyhow!(
+                        "Invalid sort property: {}. Valid options: created_date, last_modified_date, last_opened_date, name",
+                        sort_by
+                    ));
+                }
+            };
+
+            let direction = match sort_direction {
+                "asc" => SortDirection::Asc,
+                "desc" => SortDirection::Desc,
+                _ => {
+                    return Err(anyhow::anyhow!(
+                        "Invalid sort direction: {}. Valid options: asc, desc",
+                        sort_direction
+                    ));
+                }
+            };
+
+            Ok(Some(Sort {
+                direction,
+                property_key: property,
+            }))
+        }
+        (Some(_), None) => Err(anyhow::anyhow!(
+            "When --sort-by is specified, --sort-direction must also be provided"
+        )),
+        (None, Some(_)) => Err(anyhow::anyhow!(
+            "When --sort-direction is specified, --sort-by must also be provided"
+        )),
+        (None, None) => Ok(None),
+    }
+}
+
 async fn search(client: &AnytypeClient, args: SearchArgs) -> Result<()> {
     let space_info = match &args.space_id {
         Some(space_id) => format!(" in space '{space_id}'"),
@@ -38,6 +90,9 @@ async fn search(client: &AnytypeClient, args: SearchArgs) -> Result<()> {
 
     println!("🔍 Searching for '{}'{}...", args.query, space_info);
 
+    // Parse sort options
+    let sort = parse_sort_options(args.sort_by.as_deref(), args.sort_direction.as_deref())?;
+
     let response = match &args.space_id {
         Some(space_id) => {
             // Use space-specific search endpoint
@@ -45,6 +100,7 @@ async fn search(client: &AnytypeClient, args: SearchArgs) -> Result<()> {
                 query: Some(args.query.clone()),
                 limit: Some(args.limit),
                 offset: Some(args.offset),
+                sort,
             };
             client
                 .search_space(space_id, request)
@@ -58,6 +114,7 @@ async fn search(client: &AnytypeClient, args: SearchArgs) -> Result<()> {
                 limit: Some(args.limit),
                 offset: Some(args.offset),
                 space_id: None,
+                sort,
             };
             client
                 .search(request)
@@ -78,24 +135,24 @@ async fn search(client: &AnytypeClient, args: SearchArgs) -> Result<()> {
     for (i, object) in response.data.iter().enumerate() {
         let index = args.offset + i + 1;
         println!("{}. 📄 Object ID: {}", index, object.id);
-        
+
         // Display icon
         match &object.icon {
-            anytype_rs::api::Icon::Emoji { emoji } => {
+            Some(anytype_rs::api::Icon::Emoji { emoji }) => {
                 println!("   🎨 Icon: {emoji}");
             }
-            anytype_rs::api::Icon::File { file } => {
+            Some(anytype_rs::api::Icon::File { file }) => {
                 println!("   🎨 Icon: 📁 File ({file})");
             }
-            anytype_rs::api::Icon::Icon { name, color } => {
+            Some(anytype_rs::api::Icon::Icon { name, color }) => {
                 println!("   🎨 Icon: {name} ({color:?})");
             }
+            None => {
+                println!("   🎨 Icon: (none)");
+            }
         }
-        
-        println!(
-            "   🏠 Space: {}",
-            object.space_id
-        );
+
+        println!("   🏠 Space: {}", object.space_id);
 
         // Display relevant properties
         if let Some(properties) = object.properties.as_object() {

@@ -26,8 +26,8 @@ pub use client::auth::{
 };
 pub use client::lists::{
     AddListObjectsRequest, AddListObjectsResponse, GetListObjectsResponse, GetListViewsResponse,
-    ListObject, ListObjectType, ListViewData, ListViewFilter, ListViewSort,
-    ObjectTypeProperty, RemoveListObjectsResponse,
+    ListObject, ListObjectType, ListViewData, ListViewFilter, ListViewSort, ObjectTypeProperty,
+    RemoveListObjectsResponse,
 };
 pub use client::members::{
     GetMemberResponse, ListMembersResponse, Member, MemberRole, MemberStatus,
@@ -40,7 +40,10 @@ pub use client::properties::{
     CreatePropertyRequest, CreatePropertyResponse, DeletePropertyResponse, GetPropertyResponse,
     ListPropertiesResponse, Property, UpdatePropertyRequest, UpdatePropertyResponse,
 };
-pub use client::search::{SearchObject, SearchRequest, SearchResponse, SearchSpaceRequest};
+pub use client::search::{
+    SearchObject, SearchRequest, SearchResponse, SearchSpaceRequest, Sort, SortDirection,
+    SortProperty,
+};
 pub use client::spaces::{
     CreateSpaceRequest, CreateSpaceResponse, ListSpacesResponse, Space, UpdateSpaceRequest,
     UpdateSpaceResponse,
@@ -49,12 +52,10 @@ pub use client::tags::{
     Color, CreateTagRequest, CreateTagResponse, DeleteTagResponse, GetTagResponse,
     ListTagsResponse, Tag, UpdateTagRequest, UpdateTagResponse,
 };
-pub use client::templates::{
-    GetTemplateResponse, ListTemplatesResponse, ObjectType, Template,
-};
+pub use client::templates::{GetTemplateResponse, ListTemplatesResponse, ObjectType, Template};
 pub use client::types::{
-    CreateTypeProperty, CreateTypeRequest, CreateTypeResponse, DeleteTypeResponse,
-    GetTypeResponse, Layout, ListTypesResponse, PropertyFormat, Type, 
-    TypeProperty, UpdateTypeRequest, UpdateTypeResponse,
+    CreateTypeProperty, CreateTypeRequest, CreateTypeResponse, DeleteTypeResponse, GetTypeResponse,
+    Layout, ListTypesResponse, PropertyFormat, Type, TypeProperty, UpdateTypeRequest,
+    UpdateTypeResponse,
 };
 pub use types::{Icon, IconFormat};

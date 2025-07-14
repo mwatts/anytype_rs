@@ -1,7 +1,7 @@
 use anyhow::{Context, Result};
 use anytype_rs::api::{
-    AnytypeClient, CreateTypeProperty, CreateTypeRequest, Icon, Layout,
-    PropertyFormat, UpdateTypeRequest,
+    AnytypeClient, CreateTypeProperty, CreateTypeRequest, Icon, Layout, PropertyFormat,
+    UpdateTypeRequest,
 };
 use clap::{Args, Subcommand};
 
@@ -252,11 +252,12 @@ async fn create_type(client: &AnytypeClient, params: CreateTypeParams) -> Result
     };
 
     // Parse icon - provide default if none specified
-    let icon = params.icon_emoji.map(|emoji| Icon::Emoji {
-        emoji,
-    }).unwrap_or(Icon::Emoji {
-        emoji: "📄".to_string(), // Default icon
-    });
+    let icon = params
+        .icon_emoji
+        .map(|emoji| Icon::Emoji { emoji })
+        .unwrap_or(Icon::Emoji {
+            emoji: "📄".to_string(), // Default icon
+        });
 
     // Parse properties
     let mut parsed_properties = Vec::new();
@@ -430,11 +431,12 @@ async fn update_type(
     };
 
     // Parse icon - provide default if none specified
-    let icon = params.icon_emoji.map(|emoji| Icon::Emoji {
-        emoji,
-    }).unwrap_or(Icon::Emoji {
-        emoji: "📄".to_string(), // Default icon
-    });
+    let icon = params
+        .icon_emoji
+        .map(|emoji| Icon::Emoji { emoji })
+        .unwrap_or(Icon::Emoji {
+            emoji: "📄".to_string(), // Default icon
+        });
 
     // Parse properties
     let mut parsed_properties = Vec::new();

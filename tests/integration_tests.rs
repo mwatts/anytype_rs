@@ -168,9 +168,7 @@ async fn test_unauthenticated_add_list_objects_request_fails() {
 
 #[tokio::test]
 async fn test_unauthenticated_create_type_request_fails() {
-    use anytype_rs::api::{
-        CreateTypeProperty, CreateTypeRequest, Icon, Layout, PropertyFormat,
-    };
+    use anytype_rs::api::{CreateTypeProperty, CreateTypeRequest, Icon, Layout, PropertyFormat};
 
     let client = AnytypeClient::new().expect("Failed to create client");
 
@@ -219,9 +217,7 @@ async fn test_unauthenticated_get_type_request_fails() {
 
 #[tokio::test]
 async fn test_unauthenticated_update_type_request_fails() {
-    use anytype_rs::api::{
-        CreateTypeProperty, Icon, Layout, PropertyFormat, UpdateTypeRequest,
-    };
+    use anytype_rs::api::{CreateTypeProperty, Icon, Layout, PropertyFormat, UpdateTypeRequest};
 
     let client = AnytypeClient::new().expect("Failed to create client");
 

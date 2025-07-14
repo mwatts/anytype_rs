@@ -257,10 +257,7 @@ async fn remove_object_from_list(
     list_id: &str,
     object_id: &str,
 ) -> Result<()> {
-    println!(
-        "🗑️ Removing {} object from list '{}' in space '{}'...",
-        object_id, list_id, space_id
-    );
+    println!("🗑️ Removing {object_id} object from list '{list_id}' in space '{space_id}'...");
 
     let response = client
         .remove_list_object(space_id, list_id, object_id)

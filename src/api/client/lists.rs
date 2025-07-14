@@ -3,7 +3,7 @@
 //! Handles list management operations.
 
 use super::AnytypeClient;
-use crate::{error::Result, types::Pagination, api::types::Icon};
+use crate::{api::types::Icon, error::Result, types::Pagination};
 use serde::{Deserialize, Serialize};
 use tracing::{debug, info};
 

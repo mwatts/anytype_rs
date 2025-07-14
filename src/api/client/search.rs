@@ -3,18 +3,46 @@
 //! Handles search operations across spaces and objects.
 
 use super::AnytypeClient;
-use crate::{error::Result, types::Pagination, api::types::Icon};
+use crate::{api::types::Icon, error::Result, types::Pagination};
 use serde::{Deserialize, Serialize};
 use tracing::{debug, info};
+
+/// Sort direction for search results
+#[derive(Debug, Serialize, Deserialize, Clone, Default)]
+#[serde(rename_all = "lowercase")]
+pub enum SortDirection {
+    Asc,
+    #[default]
+    Desc,
+}
+
+/// Sort property for search results
+#[derive(Debug, Serialize, Deserialize, Clone, Default)]
+#[serde(rename_all = "snake_case")]
+pub enum SortProperty {
+    CreatedDate,
+    #[default]
+    LastModifiedDate,
+    LastOpenedDate,
+    Name,
+}
+
+/// Sort options for search results
+#[derive(Debug, Serialize, Deserialize, Clone, Default)]
+pub struct Sort {
+    pub direction: SortDirection,
+    pub property_key: SortProperty,
+}
 
 /// Search request parameters
 #[derive(Debug, Serialize)]
 pub struct SearchRequest {
     pub offset: Option<usize>,
-    // TODO: Enforce max value of 1000 
+    // TODO: Enforce max value of 1000
     pub limit: Option<usize>,
     pub query: Option<String>,
     pub space_id: Option<String>,
+    pub sort: Option<Sort>,
 }
 
 /// Search request parameters for space-specific search
@@ -23,14 +51,15 @@ pub struct SearchSpaceRequest {
     pub query: Option<String>,
     pub limit: Option<usize>,
     pub offset: Option<usize>,
+    pub sort: Option<Sort>,
 }
 
 /// Basic object information for search results
 #[derive(Debug, Deserialize, Serialize)]
 pub struct SearchObject {
     pub archived: bool,
-    /// The icon of the object
-    pub icon: Icon,
+    /// The icon of the object (optional in search results)
+    pub icon: Option<Icon>,
     pub id: String,
     pub name: String,
     pub object: String,

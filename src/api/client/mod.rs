@@ -198,13 +198,25 @@ impl AnytypeClient {
         debug!("Response status: {} for {}", status, url);
 
         if status.is_success() {
-            let response = response.json::<T>().await;
+            // Get the response text first for debugging
+            let response_text =
+                response
+                    .text()
+                    .await
+                    .map_err(|e| crate::error::AnytypeError::InvalidResponse {
+                        message: format!("Failed to read response body: {e}"),
+                    })?;
+
+            debug!("Response body: {response_text}");
+
+            let response = serde_json::from_str::<T>(&response_text);
 
             match response {
                 Ok(data) => Ok(data),
                 Err(e) => {
                     error!("Failed to deserialize response: {}", e);
                     error!("Expected type: {}", std::any::type_name::<T>());
+                    error!("Response body was: {}", response_text);
                     Err(crate::error::AnytypeError::InvalidResponse {
                         message: format!(
                             "Failed to parse JSON response: {}. Expected type: {}",
