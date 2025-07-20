@@ -49,8 +49,8 @@ pub use client::spaces::{
     UpdateSpaceResponse,
 };
 pub use client::tags::{
-    Color, CreateTagRequest, CreateTagResponse, DeleteTagResponse, GetTagResponse,
-    ListTagsResponse, Tag, UpdateTagRequest, UpdateTagResponse,
+    CreateTagRequest, CreateTagResponse, DeleteTagResponse, GetTagResponse, ListTagsResponse, Tag,
+    UpdateTagRequest, UpdateTagResponse,
 };
 pub use client::templates::{GetTemplateResponse, ListTemplatesResponse, ObjectType, Template};
 pub use client::types::{

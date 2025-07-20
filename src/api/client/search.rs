@@ -3,7 +3,8 @@
 //! Handles search operations across spaces and objects.
 
 use super::AnytypeClient;
-use crate::{api::types::Icon, error::Result, types::Pagination};
+use crate::api::types::{Icon, Type};
+use crate::{error::Result, types::Pagination};
 use serde::{Deserialize, Serialize};
 use tracing::{debug, info};
 
@@ -67,7 +68,7 @@ pub struct SearchObject {
     pub properties: serde_json::Value,
     pub snippet: String,
     pub space_id: String,
-    // TODO: The type object
+    pub r#type: Option<Type>,
 }
 
 /// Search response

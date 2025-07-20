@@ -3,14 +3,17 @@
 //! Handles tag management operations for properties.
 
 use super::AnytypeClient;
-use crate::{error::Result, types::Pagination};
+use crate::{
+    error::Result,
+    types::{Color, Pagination},
+};
 use serde::{Deserialize, Serialize};
 use tracing::{debug, info};
 
 /// Tag information
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Tag {
-    pub color: Option<String>,
+    pub color: Option<Color>,
     pub id: String,
     pub key: String,
     pub name: String,
@@ -24,61 +27,46 @@ pub struct ListTagsResponse {
     pub pagination: Pagination,
 }
 
-/// Color for tags
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub enum Color {
-    Grey,
-    Yellow,
-    Orange,
-    Red,
-    Pink,
-    Purple,
-    Blue,
-    Ice,
-    Teal,
-    Lime,
-}
-
-/// Request to create a new tag
+/// Request for creating a tag
 #[derive(Debug, Serialize)]
 pub struct CreateTagRequest {
     pub name: String,
-    pub color: Color,
+    pub color: Option<Color>,
 }
 
-/// Response when creating a tag
+/// Response for creating a tag
 #[derive(Debug, Deserialize)]
 pub struct CreateTagResponse {
     pub tag: Tag,
 }
 
-/// Response when getting a tag
+/// Response for getting a tag
 #[derive(Debug, Deserialize)]
 pub struct GetTagResponse {
     pub tag: Tag,
 }
 
-/// Request to update an existing tag
+/// Request for updating a tag
 #[derive(Debug, Serialize)]
 pub struct UpdateTagRequest {
-    pub name: String,
-    pub color: Color,
+    pub name: Option<String>,
+    pub color: Option<Color>,
 }
 
-/// Response when updating a tag
+/// Response for updating a tag
 #[derive(Debug, Deserialize)]
 pub struct UpdateTagResponse {
     pub tag: Tag,
 }
 
-/// Response when deleting a tag
+/// Response for deleting a tag
 #[derive(Debug, Deserialize)]
 pub struct DeleteTagResponse {
     pub tag: Tag,
 }
 
 impl AnytypeClient {
-    /// List tags for a specific property in a space
+    /// List all tags for a given property
     pub async fn list_tags(&self, space_id: &str, property_id: &str) -> Result<Vec<Tag>> {
         let response: ListTagsResponse = self
             .get(&format!(

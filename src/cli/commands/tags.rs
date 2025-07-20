@@ -179,7 +179,7 @@ async fn create_tag(
 
     let request = CreateTagRequest {
         name: name.to_string(),
-        color,
+        color: Some(color),
     };
 
     let response = client
@@ -256,8 +256,8 @@ async fn update_tag(
     };
 
     let request = UpdateTagRequest {
-        name: name.to_string(),
-        color,
+        name: Some(name.to_string()),
+        color: Some(color),
     };
 
     let response = client
