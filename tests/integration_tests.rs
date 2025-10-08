@@ -274,7 +274,7 @@ async fn test_unauthenticated_create_tag_request_fails() {
 
     let request = CreateTagRequest {
         name: "test_tag".to_string(),
-        color: Color::Blue,
+        color: Some(Color::Blue),
     };
 
     // This should fail because no API key is set
@@ -316,8 +316,8 @@ async fn test_unauthenticated_update_tag_request_fails() {
     let client = AnytypeClient::new().expect("Failed to create client");
 
     let request = UpdateTagRequest {
-        name: "updated_tag".to_string(),
-        color: Color::Red,
+        name: Some("updated_tag".to_string()),
+        color: Some(Color::Red),
     };
 
     // This should fail because no API key is set
