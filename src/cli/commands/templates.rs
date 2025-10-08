@@ -86,10 +86,10 @@ async fn list_templates(
             println!("     📐 Layout: {layout}");
         }
 
-        if let Some(archived) = template.archived {
-            if archived {
-                println!("     📦 Archived: Yes");
-            }
+        if let Some(archived) = template.archived
+            && archived
+        {
+            println!("     📦 Archived: Yes");
         }
 
         match &template.icon {
