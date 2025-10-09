@@ -197,6 +197,7 @@ impl Plugin for AnytypePlugin {
             Box::new(crate::commands::ObjectGet),
             Box::new(crate::commands::MemberList),
             Box::new(crate::commands::TemplateList),
+            Box::new(crate::commands::Search),
         ]
     }
 }
