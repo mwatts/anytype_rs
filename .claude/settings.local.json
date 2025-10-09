@@ -3,7 +3,8 @@
     "allow": [
       "Bash(cargo:*)",
       "Bash(timeout 180 cargo build)",
-      "Bash(git reset:*)"
+      "Bash(git reset:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nfeat(plugin): implement space commands (Phase 4)\n\nImplement space management commands for the Nushell plugin with full\nintegration of the custom value system and resolver.\n\n**Phase 4: Space Commands**\n- ✅ Implemented `anytype space list` command\n  - Returns Vec<AnytypeValue::Space>\n  - Converts API Space → AnytypeValue::Space (no context needed)\n  - Lists all available spaces\n  \n- ✅ Implemented `anytype space get <name>` command\n  - Name-based resolution using Resolver.resolve_space()\n  - Fetches space details via API\n  - Returns AnytypeValue::Space custom value\n  \n- ✅ Implemented `anytype space create <name>` command\n  - Accepts --description and --icon flags\n  - Creates space via API\n  - Invalidates cache after creation\n  - Returns created AnytypeValue::Space\n\n**Key Features:**\n- Full integration with resolver and cache system\n- Custom value support for pipeline operations\n- Error handling with helpful messages\n- Authentication validation for all commands\n- Cache invalidation on mutations\n\n**Files Changed:**\n- src/commands/space.rs (new) - Space command implementations\n- src/commands/mod.rs - Export space commands\n- src/plugin.rs - Register space commands\n\nReady for Phase 5 (Type Commands)\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")"
     ],
     "deny": [],
     "ask": []

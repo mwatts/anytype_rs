@@ -188,6 +188,9 @@ impl Plugin for AnytypePlugin {
             Box::new(crate::commands::AuthCreate),
             Box::new(crate::commands::AuthDelete),
             Box::new(crate::commands::AuthStatus),
+            Box::new(crate::commands::SpaceList),
+            Box::new(crate::commands::SpaceGet),
+            Box::new(crate::commands::SpaceCreate),
         ]
     }
 }
