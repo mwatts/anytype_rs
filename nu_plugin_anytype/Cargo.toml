@@ -1,0 +1,27 @@
+[package]
+name = "nu_plugin_anytype"
+version = "0.0.1"
+authors = ["Mark Watts <18381+mwatts@users.noreply.github.com>"]
+description = "A Nushell plugin for interacting with Anytype via anytype_rs"
+repository = "https://github.com/mwatts/anytype_rs"
+edition = "2024"
+license = "GPL-3.0"
+
+[[bin]]
+name = "nu_plugin_anytype"
+path = "src/main.rs"
+
+[dependencies]
+nu-plugin = "0.99"
+nu-protocol = "0.99"
+anytype_rs = { path = "../" }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tokio = { version = "1.47", features = ["full"] }
+dashmap = "6.1"
+anyhow = "1.0"
+thiserror = "2.0"
+
+[lib]
+name = "nu_plugin_anytype"
+path = "src/lib.rs"
