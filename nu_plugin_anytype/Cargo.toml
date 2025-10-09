@@ -12,8 +12,8 @@ name = "nu_plugin_anytype"
 path = "src/main.rs"
 
 [dependencies]
-nu-plugin = "0.99"
-nu-protocol = "0.99"
+nu-plugin = "0.106.1"
+nu-protocol = "0.106.1"
 anytype_rs = { path = "../" }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"

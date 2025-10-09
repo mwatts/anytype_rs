@@ -1,6 +1,6 @@
 use crate::{commands::common::get_space_id, AnytypePlugin};
 use nu_plugin::{EngineInterface, EvaluatedCall, PluginCommand};
-use nu_protocol::{Category, LabeledError, Record, Signature, SyntaxShape, Value};
+use nu_protocol::{Category, LabeledError, PipelineData, Record, Signature, SyntaxShape, Value};
 
 /// Command: anytype resolve space
 pub struct ResolveSpace;
@@ -12,7 +12,7 @@ impl PluginCommand for ResolveSpace {
         "anytype resolve space"
     }
 
-    fn usage(&self) -> &str {
+    fn description(&self) -> &str {
         "Resolve a space name to its ID"
     }
 
@@ -27,8 +27,8 @@ impl PluginCommand for ResolveSpace {
         plugin: &Self::Plugin,
         _engine: &EngineInterface,
         call: &EvaluatedCall,
-        _input: &Value,
-    ) -> Result<Value, LabeledError> {
+        _input: PipelineData,
+    ) -> Result<PipelineData, LabeledError> {
         let span = call.head;
         let name: String = call.req(0)?;
 
@@ -47,7 +47,7 @@ impl PluginCommand for ResolveSpace {
         record.push("name", Value::string(name, span));
         record.push("id", Value::string(id, span));
 
-        Ok(Value::record(record, span))
+        Ok(PipelineData::Value(Value::record(record, span), None))
     }
 }
 
@@ -61,7 +61,7 @@ impl PluginCommand for ResolveType {
         "anytype resolve type"
     }
 
-    fn usage(&self) -> &str {
+    fn description(&self) -> &str {
         "Resolve a type name to its ID within a space"
     }
 
@@ -76,7 +76,7 @@ impl PluginCommand for ResolveType {
             )
             .input_output_type(
                 nu_protocol::Type::Custom("AnytypeValue".into()),
-                nu_protocol::Type::Record(vec![]),
+                nu_protocol::Type::Record(vec![].into()),
             )
             .category(Category::Custom("anytype".into()))
     }
@@ -86,13 +86,14 @@ impl PluginCommand for ResolveType {
         plugin: &Self::Plugin,
         _engine: &EngineInterface,
         call: &EvaluatedCall,
-        input: &Value,
-    ) -> Result<Value, LabeledError> {
+        input: PipelineData,
+    ) -> Result<PipelineData, LabeledError> {
         let span = call.head;
+        let input = input.into_value(span)?;
         let name: String = call.req(0)?;
 
         // Get space_id from multiple sources
-        let space_id = get_space_id(plugin, call, input, span)?;
+        let space_id = get_space_id(plugin, call, &input, span)?;
 
         let resolver = plugin.resolver().map_err(|e| {
             LabeledError::new(format!("Failed to get resolver: {}", e))
@@ -123,7 +124,7 @@ impl PluginCommand for ResolveType {
         record.push("id", Value::string(type_id, span));
         record.push("key", Value::string(type_data.key, span));
 
-        Ok(Value::record(record, span))
+        Ok(PipelineData::Value(Value::record(record, span), None))
     }
 }
 
@@ -137,7 +138,7 @@ impl PluginCommand for ResolveObject {
         "anytype resolve object"
     }
 
-    fn usage(&self) -> &str {
+    fn description(&self) -> &str {
         "Resolve an object name to its ID within a space"
     }
 
@@ -152,7 +153,7 @@ impl PluginCommand for ResolveObject {
             )
             .input_output_type(
                 nu_protocol::Type::Custom("AnytypeValue".into()),
-                nu_protocol::Type::Record(vec![]),
+                nu_protocol::Type::Record(vec![].into()),
             )
             .category(Category::Custom("anytype".into()))
     }
@@ -162,13 +163,14 @@ impl PluginCommand for ResolveObject {
         plugin: &Self::Plugin,
         _engine: &EngineInterface,
         call: &EvaluatedCall,
-        input: &Value,
-    ) -> Result<Value, LabeledError> {
+        input: PipelineData,
+    ) -> Result<PipelineData, LabeledError> {
         let span = call.head;
+        let input = input.into_value(span)?;
         let name: String = call.req(0)?;
 
         // Get space_id from multiple sources
-        let space_id = get_space_id(plugin, call, input, span)?;
+        let space_id = get_space_id(plugin, call, &input, span)?;
 
         let resolver = plugin.resolver().map_err(|e| {
             LabeledError::new(format!("Failed to get resolver: {}", e))
@@ -188,7 +190,7 @@ impl PluginCommand for ResolveObject {
         record.push("name", Value::string(name, span));
         record.push("id", Value::string(object_id, span));
 
-        Ok(Value::record(record, span))
+        Ok(PipelineData::Value(Value::record(record, span), None))
     }
 }
 
@@ -202,7 +204,7 @@ impl PluginCommand for CacheClear {
         "anytype cache clear"
     }
 
-    fn usage(&self) -> &str {
+    fn description(&self) -> &str {
         "Clear the resolution cache"
     }
 
@@ -215,8 +217,8 @@ impl PluginCommand for CacheClear {
         plugin: &Self::Plugin,
         _engine: &EngineInterface,
         call: &EvaluatedCall,
-        _input: &Value,
-    ) -> Result<Value, LabeledError> {
+        _input: PipelineData,
+    ) -> Result<PipelineData, LabeledError> {
         let span = call.head;
 
         let resolver = plugin.resolver().map_err(|e| {
@@ -226,7 +228,7 @@ impl PluginCommand for CacheClear {
 
         resolver.clear_cache();
 
-        Ok(Value::string("Cache cleared", span))
+        Ok(PipelineData::Value(Value::string("Cache cleared", span), None))
     }
 }
 
@@ -240,7 +242,7 @@ impl PluginCommand for CacheStats {
         "anytype cache stats"
     }
 
-    fn usage(&self) -> &str {
+    fn description(&self) -> &str {
         "Show cache statistics"
     }
 
@@ -253,11 +255,11 @@ impl PluginCommand for CacheStats {
         plugin: &Self::Plugin,
         _engine: &EngineInterface,
         call: &EvaluatedCall,
-        _input: &Value,
-    ) -> Result<Value, LabeledError> {
+        _input: PipelineData,
+    ) -> Result<PipelineData, LabeledError> {
         let span = call.head;
 
-        let resolver = plugin.resolver().map_err(|e| {
+        let _resolver = plugin.resolver().map_err(|e| {
             LabeledError::new(format!("Failed to get resolver: {}", e))
                 .with_label("Authentication required", span)
         })?;
@@ -274,6 +276,6 @@ impl PluginCommand for CacheStats {
         );
         record.push("ttl_seconds", Value::int(plugin.config.cache_ttl as i64, span));
 
-        Ok(Value::record(record, span))
+        Ok(PipelineData::Value(Value::record(record, span), None))
     }
 }

@@ -1,6 +1,6 @@
-use crate::{commands::common::get_space_id, value::AnytypeValue, AnytypePlugin};
+use crate::{commands::common::get_space_id, AnytypePlugin};
 use nu_plugin::{EngineInterface, EvaluatedCall, PluginCommand};
-use nu_protocol::{Category, LabeledError, Signature, Span, SyntaxShape, Value};
+use nu_protocol::{Category, LabeledError, PipelineData, Signature, SyntaxShape};
 
 /// Command: anytype template list
 pub struct TemplateList;
@@ -12,7 +12,7 @@ impl PluginCommand for TemplateList {
         "anytype template list"
     }
 
-    fn usage(&self) -> &str {
+    fn description(&self) -> &str {
         "List all templates in a space"
     }
 
@@ -32,31 +32,31 @@ impl PluginCommand for TemplateList {
         plugin: &Self::Plugin,
         _engine: &EngineInterface,
         call: &EvaluatedCall,
-        input: &Value,
-    ) -> Result<Value, LabeledError> {
+        input: PipelineData,
+    ) -> Result<PipelineData, LabeledError> {
         let span = call.head;
-        let space_id = get_space_id(plugin, call, input, span)?;
+        let _input = input.into_value(span)?;
+        let _space_id = get_space_id(plugin, call, &_input, span)?;
 
-        let client = plugin.client().map_err(|e| {
-            LabeledError::new(format!("Failed to get client: {}", e))
-        })?;
+        // NOTE: list_templates API requires a type_id parameter which is not currently
+        // exposed in this command. This needs to be implemented properly with a --type flag
+        // or by listing all types and then fetching templates for each type.
+        // For now, return an error message to the user.
+        Err(LabeledError::new(
+            "Template listing is not yet fully implemented. The API requires a type_id parameter."
+        ).with_label(
+            "This command needs to be enhanced to accept a --type parameter",
+            span
+        ))
 
-        let templates = plugin
-            .run_async(client.list_templates(&space_id))
-            .map_err(|e| LabeledError::new(format!("Failed to list templates: {}", e)))?;
-
-        // Templates need type_id which is in the template.object field
-        // For now, we'll use a placeholder approach
-        let values: Vec<Value> = templates
-            .into_iter()
-            .map(|template| {
-                // Extract type_id - templates already have space_id in API response
-                let type_id = "".to_string(); // Templates don't expose type_id directly
-                let anytype_value: AnytypeValue = (template, space_id.clone(), type_id).into();
-                Value::custom(Box::new(anytype_value), span)
-            })
-            .collect();
-
-        Ok(Value::list(values, span))
+        // TODO: Implement this properly, either by:
+        // 1. Adding a required --type parameter to specify which type to list templates for
+        // 2. Or by listing all types first and fetching templates for each type
+        //
+        // Example implementation with --type flag:
+        // let type_name: String = call.req_flag("type")?;
+        // let resolver = plugin.resolver()?;
+        // let type_id = plugin.run_async(resolver.resolve_type(&space_id, &type_name))?;
+        // let templates = plugin.run_async(client.list_templates(&space_id, &type_id))?;
     }
 }

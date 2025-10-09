@@ -1,6 +1,6 @@
 use crate::AnytypePlugin;
 use nu_plugin::{EngineInterface, EvaluatedCall, PluginCommand};
-use nu_protocol::{Category, LabeledError, Record, Signature, Span, SyntaxShape, Value};
+use nu_protocol::{Category, LabeledError, PipelineData, Record, Signature, Value};
 use std::io::{self, Write};
 
 /// Command: anytype auth create
@@ -13,7 +13,7 @@ impl PluginCommand for AuthCreate {
         "anytype auth create"
     }
 
-    fn usage(&self) -> &str {
+    fn description(&self) -> &str {
         "Authenticate with the local Anytype app"
     }
 
@@ -26,8 +26,8 @@ impl PluginCommand for AuthCreate {
         plugin: &Self::Plugin,
         _engine: &EngineInterface,
         call: &EvaluatedCall,
-        _input: &Value,
-    ) -> Result<Value, LabeledError> {
+        _input: PipelineData,
+    ) -> Result<PipelineData, LabeledError> {
         let span = call.head;
 
         // Create unauthenticated client for auth flow
@@ -100,7 +100,7 @@ impl PluginCommand for AuthCreate {
             ),
         );
 
-        Ok(Value::record(record, span))
+        Ok(PipelineData::Value(Value::record(record, span), None))
     }
 }
 
@@ -114,7 +114,7 @@ impl PluginCommand for AuthDelete {
         "anytype auth delete"
     }
 
-    fn usage(&self) -> &str {
+    fn description(&self) -> &str {
         "Remove stored authentication credentials"
     }
 
@@ -127,8 +127,8 @@ impl PluginCommand for AuthDelete {
         _plugin: &Self::Plugin,
         _engine: &EngineInterface,
         call: &EvaluatedCall,
-        _input: &Value,
-    ) -> Result<Value, LabeledError> {
+        _input: PipelineData,
+    ) -> Result<PipelineData, LabeledError> {
         let span = call.head;
 
         eprintln!("🔐 Removing authentication...");
@@ -146,7 +146,7 @@ impl PluginCommand for AuthDelete {
             Value::string("API key removed successfully", span),
         );
 
-        Ok(Value::record(record, span))
+        Ok(PipelineData::Value(Value::record(record, span), None))
     }
 }
 
@@ -160,7 +160,7 @@ impl PluginCommand for AuthStatus {
         "anytype auth status"
     }
 
-    fn usage(&self) -> &str {
+    fn description(&self) -> &str {
         "Check current authentication status"
     }
 
@@ -173,8 +173,8 @@ impl PluginCommand for AuthStatus {
         plugin: &Self::Plugin,
         _engine: &EngineInterface,
         call: &EvaluatedCall,
-        _input: &Value,
-    ) -> Result<Value, LabeledError> {
+        _input: PipelineData,
+    ) -> Result<PipelineData, LabeledError> {
         let span = call.head;
 
         eprintln!("🔍 Checking authentication status...");
@@ -247,7 +247,7 @@ impl PluginCommand for AuthStatus {
             }
         }
 
-        Ok(Value::record(record, span))
+        Ok(PipelineData::Value(Value::record(record, span), None))
     }
 }
 

@@ -1,6 +1,6 @@
 use crate::{commands::common::get_space_id, value::AnytypeValue, AnytypePlugin};
 use nu_plugin::{EngineInterface, EvaluatedCall, PluginCommand};
-use nu_protocol::{Category, LabeledError, Signature, SyntaxShape, Value};
+use nu_protocol::{Category, LabeledError, PipelineData, Signature, SyntaxShape, Value};
 
 /// Command: anytype type list
 pub struct TypeList;
@@ -12,7 +12,7 @@ impl PluginCommand for TypeList {
         "anytype type list"
     }
 
-    fn usage(&self) -> &str {
+    fn description(&self) -> &str {
         "List all types in a space"
     }
 
@@ -36,12 +36,13 @@ impl PluginCommand for TypeList {
         plugin: &Self::Plugin,
         _engine: &EngineInterface,
         call: &EvaluatedCall,
-        input: &Value,
-    ) -> Result<Value, LabeledError> {
+        input: PipelineData,
+    ) -> Result<PipelineData, LabeledError> {
         let span = call.head;
+        let input = input.into_value(span)?;
 
         // Get space_id from multiple sources
-        let space_id = get_space_id(plugin, call, input, span)?;
+        let space_id = get_space_id(plugin, call, &input, span)?;
 
         // Get client
         let client = plugin.client().map_err(|e| {
@@ -64,7 +65,7 @@ impl PluginCommand for TypeList {
             })
             .collect();
 
-        Ok(Value::list(values, span))
+        Ok(PipelineData::Value(Value::list(values, span), None))
     }
 }
 
@@ -78,7 +79,7 @@ impl PluginCommand for TypeGet {
         "anytype type get"
     }
 
-    fn usage(&self) -> &str {
+    fn description(&self) -> &str {
         "Get a type by name"
     }
 
@@ -103,15 +104,16 @@ impl PluginCommand for TypeGet {
         plugin: &Self::Plugin,
         _engine: &EngineInterface,
         call: &EvaluatedCall,
-        input: &Value,
-    ) -> Result<Value, LabeledError> {
+        input: PipelineData,
+    ) -> Result<PipelineData, LabeledError> {
         let span = call.head;
+        let input = input.into_value(span)?;
 
         // Get type name from arguments
         let name: String = call.req(0)?;
 
         // Get space_id from multiple sources
-        let space_id = get_space_id(plugin, call, input, span)?;
+        let space_id = get_space_id(plugin, call, &input, span)?;
 
         // Get resolver
         let resolver = plugin.resolver().map_err(|e| {
@@ -142,7 +144,7 @@ impl PluginCommand for TypeGet {
 
         // Convert to AnytypeValue::Type with space_id context
         let anytype_value: AnytypeValue = (type_data, space_id).into();
-        Ok(Value::custom(Box::new(anytype_value), span))
+        Ok(PipelineData::Value(Value::custom(Box::new(anytype_value), span), None))
     }
 }
 

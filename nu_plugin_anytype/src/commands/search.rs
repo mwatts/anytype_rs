@@ -1,7 +1,7 @@
 use crate::{commands::common::get_space_id, value::AnytypeValue, AnytypePlugin};
 use anytype_rs::client::search::{SearchRequest, SearchSpaceRequest, Sort, SortDirection, SortProperty};
 use nu_plugin::{EngineInterface, EvaluatedCall, PluginCommand};
-use nu_protocol::{Category, LabeledError, Signature, SyntaxShape, Value};
+use nu_protocol::{Category, LabeledError, PipelineData, Signature, SyntaxShape, Value};
 
 /// Command: anytype search
 pub struct Search;
@@ -13,7 +13,7 @@ impl PluginCommand for Search {
         "anytype search"
     }
 
-    fn usage(&self) -> &str {
+    fn description(&self) -> &str {
         "Search for objects across spaces or within a specific space"
     }
 
@@ -62,15 +62,16 @@ impl PluginCommand for Search {
         plugin: &Self::Plugin,
         _engine: &EngineInterface,
         call: &EvaluatedCall,
-        input: &Value,
-    ) -> Result<Value, LabeledError> {
+        input: PipelineData,
+    ) -> Result<PipelineData, LabeledError> {
         let span = call.head;
+        let input = input.into_value(span)?;
 
         // Get search query from arguments
         let query: String = call.req(0)?;
 
         // Try to get space_id - if not available, search across all spaces
-        let space_id = get_space_id(plugin, call, input, span).ok();
+        let space_id = get_space_id(plugin, call, &input, span).ok();
 
         // Get optional parameters
         let limit: Option<i64> = call.get_flag("limit")?;
@@ -174,23 +175,13 @@ impl PluginCommand for Search {
 
             // Convert SearchObject to Object-like structure
             // Note: SearchObject has a slightly different structure than Object
-            let obj = anytype_rs::client::object::Object {
-                archived: Some(search_obj.archived),
-                created_by: None,
-                created_date: None,
-                details: None,
-                icon: search_obj.icon,
+            // The Object struct from anytype_rs is simplified and doesn't have all the fields
+            let obj = anytype_rs::client::objects::Object {
                 id: search_obj.id,
-                last_modified_by: None,
-                last_modified_date: None,
-                last_opened_date: None,
-                markdown: None, // SearchObject doesn't include markdown
                 name: Some(search_obj.name),
+                space_id: Some(space_id.clone()),
                 object: Some(type_key.clone()),
                 properties: search_obj.properties,
-                snippet: Some(search_obj.snippet),
-                space_id: Some(space_id.clone()),
-                r#type: search_obj.r#type,
             };
 
             // Use From<(Object, String, String, String)> for conversion
@@ -198,6 +189,6 @@ impl PluginCommand for Search {
             values.push(Value::custom(Box::new(anytype_value), span));
         }
 
-        Ok(Value::list(values, span))
+        Ok(PipelineData::Value(Value::list(values, span), None))
     }
 }

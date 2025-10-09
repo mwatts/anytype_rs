@@ -1,6 +1,6 @@
 use crate::{value::AnytypeValue, AnytypePlugin};
 use nu_plugin::{EngineInterface, EvaluatedCall, PluginCommand};
-use nu_protocol::{Category, LabeledError, Signature, Span, SyntaxShape, Value};
+use nu_protocol::{Category, LabeledError, PipelineData, Signature, SyntaxShape, Value};
 
 /// Command: anytype space list
 pub struct SpaceList;
@@ -12,7 +12,7 @@ impl PluginCommand for SpaceList {
         "anytype space list"
     }
 
-    fn usage(&self) -> &str {
+    fn description(&self) -> &str {
         "List all available spaces"
     }
 
@@ -25,8 +25,8 @@ impl PluginCommand for SpaceList {
         plugin: &Self::Plugin,
         _engine: &EngineInterface,
         call: &EvaluatedCall,
-        _input: &Value,
-    ) -> Result<Value, LabeledError> {
+        _input: PipelineData,
+    ) -> Result<PipelineData, LabeledError> {
         let span = call.head;
 
         // Get authenticated client
@@ -49,7 +49,7 @@ impl PluginCommand for SpaceList {
             })
             .collect();
 
-        Ok(Value::list(values, span))
+        Ok(PipelineData::Value(Value::list(values, span), None))
     }
 }
 
@@ -63,7 +63,7 @@ impl PluginCommand for SpaceGet {
         "anytype space get"
     }
 
-    fn usage(&self) -> &str {
+    fn description(&self) -> &str {
         "Get a space by name"
     }
 
@@ -78,8 +78,8 @@ impl PluginCommand for SpaceGet {
         plugin: &Self::Plugin,
         _engine: &EngineInterface,
         call: &EvaluatedCall,
-        _input: &Value,
-    ) -> Result<Value, LabeledError> {
+        _input: PipelineData,
+    ) -> Result<PipelineData, LabeledError> {
         let span = call.head;
 
         // Get space name from arguments
@@ -111,7 +111,7 @@ impl PluginCommand for SpaceGet {
 
         // Convert to AnytypeValue::Space
         let anytype_value: AnytypeValue = space.into();
-        Ok(Value::custom(Box::new(anytype_value), span))
+        Ok(PipelineData::Value(Value::custom(Box::new(anytype_value), span), None))
     }
 }
 
@@ -125,7 +125,7 @@ impl PluginCommand for SpaceCreate {
         "anytype space create"
     }
 
-    fn usage(&self) -> &str {
+    fn description(&self) -> &str {
         "Create a new space"
     }
 
@@ -152,14 +152,14 @@ impl PluginCommand for SpaceCreate {
         plugin: &Self::Plugin,
         _engine: &EngineInterface,
         call: &EvaluatedCall,
-        _input: &Value,
-    ) -> Result<Value, LabeledError> {
+        _input: PipelineData,
+    ) -> Result<PipelineData, LabeledError> {
         let span = call.head;
 
         // Get arguments
         let name: String = call.req(0)?;
         let description: Option<String> = call.get_flag("description")?;
-        let icon_emoji: Option<String> = call.get_flag("icon")?;
+        let _icon_emoji: Option<String> = call.get_flag("icon")?;
 
         // Get client
         let client = plugin.client().map_err(|e| {
@@ -167,14 +167,10 @@ impl PluginCommand for SpaceCreate {
                 .with_label("Authentication required", span)
         })?;
 
-        // Build icon if provided
-        let icon = icon_emoji.map(|emoji| anytype_rs::Icon::Emoji { emoji });
-
-        // Create space request
+        // Create space request (icon field removed as requested)
         let request = anytype_rs::CreateSpaceRequest {
             name: name.clone(),
             description,
-            icon,
         };
 
         // Create space
@@ -190,6 +186,6 @@ impl PluginCommand for SpaceCreate {
 
         // Convert to AnytypeValue::Space
         let anytype_value: AnytypeValue = response.space.into();
-        Ok(Value::custom(Box::new(anytype_value), span))
+        Ok(PipelineData::Value(Value::custom(Box::new(anytype_value), span), None))
     }
 }

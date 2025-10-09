@@ -1,6 +1,6 @@
 use crate::{commands::common::get_space_id, value::AnytypeValue, AnytypePlugin};
 use nu_plugin::{EngineInterface, EvaluatedCall, PluginCommand};
-use nu_protocol::{Category, LabeledError, Signature, Span, SyntaxShape, Value};
+use nu_protocol::{Category, LabeledError, PipelineData, Signature, SyntaxShape, Value};
 
 /// Command: anytype member list
 pub struct MemberList;
@@ -12,7 +12,7 @@ impl PluginCommand for MemberList {
         "anytype member list"
     }
 
-    fn usage(&self) -> &str {
+    fn description(&self) -> &str {
         "List all members in a space"
     }
 
@@ -32,10 +32,11 @@ impl PluginCommand for MemberList {
         plugin: &Self::Plugin,
         _engine: &EngineInterface,
         call: &EvaluatedCall,
-        input: &Value,
-    ) -> Result<Value, LabeledError> {
+        input: PipelineData,
+    ) -> Result<PipelineData, LabeledError> {
         let span = call.head;
-        let space_id = get_space_id(plugin, call, input, span)?;
+        let input = input.into_value(span)?;
+        let space_id = get_space_id(plugin, call, &input, span)?;
 
         let client = plugin.client().map_err(|e| {
             LabeledError::new(format!("Failed to get client: {}", e))
@@ -53,6 +54,6 @@ impl PluginCommand for MemberList {
             })
             .collect();
 
-        Ok(Value::list(values, span))
+        Ok(PipelineData::Value(Value::list(values, span), None))
     }
 }

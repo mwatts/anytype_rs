@@ -4,11 +4,15 @@ use nu_protocol::{ShellError, Span};
 /// Convert AnytypeError to ShellError with helpful messages
 pub fn convert_anytype_error(err: AnytypeError) -> ShellError {
     match err {
-        AnytypeError::Auth { message } => ShellError::IOError {
+        AnytypeError::Auth { message } => ShellError::GenericError {
+            error: "Authentication error".to_string(),
             msg: format!(
                 "Authentication failed: {}. Run `anytype auth create` to authenticate",
                 message
             ),
+            span: None,
+            help: Some("Run 'anytype auth create' to authenticate".to_string()),
+            inner: vec![],
         },
         AnytypeError::Http { source } => ShellError::NetworkFailure {
             msg: format!("HTTP request failed: {}", source),
@@ -49,11 +53,11 @@ mod tests {
         };
         let shell_err = convert_anytype_error(err);
         match shell_err {
-            ShellError::IOError { msg } => {
+            ShellError::GenericError { msg, .. } => {
                 assert!(msg.contains("Authentication failed"));
                 assert!(msg.contains("anytype auth create"));
             }
-            _ => panic!("Expected IOError"),
+            _ => panic!("Expected GenericError"),
         }
     }
 
