@@ -193,6 +193,8 @@ impl Plugin for AnytypePlugin {
             Box::new(crate::commands::SpaceCreate),
             Box::new(crate::commands::TypeList),
             Box::new(crate::commands::TypeGet),
+            Box::new(crate::commands::ObjectList),
+            Box::new(crate::commands::ObjectGet),
         ]
     }
 }

@@ -1,10 +1,10 @@
 // Command modules
 pub mod auth;
+pub mod object;
 pub mod space;
 pub mod types;
 
 // Future phases:
-// Phase 6: object.rs
 // Phase 7: property.rs
 // Phase 8: tag.rs
 // Phase 9: list.rs
@@ -14,5 +14,6 @@ pub mod types;
 // Phase 13: resolve.rs
 
 pub use auth::{AuthCreate, AuthDelete, AuthStatus};
+pub use object::{ObjectGet, ObjectList};
 pub use space::{SpaceCreate, SpaceGet, SpaceList};
 pub use types::{TypeGet, TypeList};
