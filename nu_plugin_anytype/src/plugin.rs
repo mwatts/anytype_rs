@@ -191,6 +191,8 @@ impl Plugin for AnytypePlugin {
             Box::new(crate::commands::SpaceList),
             Box::new(crate::commands::SpaceGet),
             Box::new(crate::commands::SpaceCreate),
+            Box::new(crate::commands::TypeList),
+            Box::new(crate::commands::TypeGet),
         ]
     }
 }

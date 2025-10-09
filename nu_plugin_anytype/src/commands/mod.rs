@@ -1,9 +1,9 @@
 // Command modules
 pub mod auth;
 pub mod space;
+pub mod types;
 
 // Future phases:
-// Phase 5: types.rs
 // Phase 6: object.rs
 // Phase 7: property.rs
 // Phase 8: tag.rs
@@ -15,3 +15,4 @@ pub mod space;
 
 pub use auth::{AuthCreate, AuthDelete, AuthStatus};
 pub use space::{SpaceCreate, SpaceGet, SpaceList};
+pub use types::{TypeGet, TypeList};
