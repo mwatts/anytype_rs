@@ -161,18 +161,18 @@ async fn search(client: &AnytypeClient, args: SearchArgs) -> Result<()> {
             let mut shown_props = 0;
 
             for prop_name in &relevant_props {
-                if let Some(value) = properties.get(*prop_name) {
-                    if let Some(text) = value.as_str() {
-                        if !text.is_empty() && shown_props < 2 {
-                            let display_text = if text.len() > 100 {
-                                format!("{}...", &text[..97])
-                            } else {
-                                text.to_string()
-                            };
-                            println!("   📝 {prop_name}: {display_text}");
-                            shown_props += 1;
-                        }
-                    }
+                if let Some(value) = properties.get(*prop_name)
+                    && let Some(text) = value.as_str()
+                    && !text.is_empty()
+                    && shown_props < 2
+                {
+                    let display_text = if text.len() > 100 {
+                        format!("{}...", &text[..97])
+                    } else {
+                        text.to_string()
+                    };
+                    println!("   📝 {prop_name}: {display_text}");
+                    shown_props += 1;
                 }
             }
 

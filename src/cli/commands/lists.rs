@@ -227,10 +227,10 @@ async fn get_list_objects(
             }
         }
 
-        if let Some(snippet) = &object.snippet {
-            if !snippet.is_empty() {
-                println!("      📝 Snippet: {snippet}");
-            }
+        if let Some(snippet) = &object.snippet
+            && !snippet.is_empty()
+        {
+            println!("      📝 Snippet: {snippet}");
         }
 
         if object.archived {

@@ -85,6 +85,9 @@ The ⚠️ means it's been vibe coded. I still need to go through and verify eac
 - ⚠️ List templates
 - ⚠️ Get template
 
+### Import
+- ⚠️ Import markdown files with frontmatter support
+
 ## Installation
 
 ### Prerequisites
@@ -116,6 +119,58 @@ This will install the `anytype` binary to your Cargo bin directory.
 The CLI provides a way to interact with the available Anytype API endpoints directly from the terminal.
 
 Use the `--help` flag to see the available commands and how to use them.
+
+#### Importing Markdown Files
+
+The CLI supports importing markdown files with frontmatter into Anytype. This is useful for:
+- Migrating notes from other markdown-based tools
+- Bulk importing documentation
+- Automating object creation from markdown files
+
+**Basic Import:**
+```bash
+anytype import markdown note.md --space sp_abc123 --type ot_note
+```
+
+**Dry-Run (Preview without creating):**
+```bash
+anytype import markdown note.md --space sp_abc123 --type ot_note --dry-run --verbose
+```
+
+**Example Markdown File with Frontmatter:**
+```markdown
+---
+title: My Project Notes
+date: 2025-01-15
+status: active
+tags: [rust, cli, anytype]
+priority: 3
+published: true
+---
+
+# Project Overview
+
+This is my project documentation.
+
+## Features
+- Markdown import
+- Frontmatter parsing
+```
+
+**Features:**
+- **YAML Frontmatter Support**: Parses YAML frontmatter blocks
+- **Automatic Property Mapping**: Maps frontmatter fields to type properties (case-insensitive)
+- **Type Conversion**: Automatically converts values based on property format:
+  - `text`, `url`, `email`, `phone` → String values
+  - `number` → Numeric values (with string parsing)
+  - `checkbox` → Boolean values (supports true/yes/1, false/no/0)
+  - `date` → ISO date strings
+  - `select` → Single string values
+  - `multiselect` → Arrays of strings
+- **Title Handling**: Uses `title` field from frontmatter or falls back to filename
+- **Markdown Body**: Content after frontmatter is added as markdown to the object
+- **Dry-Run Mode**: Preview property mapping without creating the object
+- **Verbose Output**: Shows detailed mapping information
 
 ### Library Usage
 

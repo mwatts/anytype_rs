@@ -182,10 +182,10 @@ async fn list_types(client: &AnytypeClient, space_id: &str, limit: u32) -> Resul
             println!("     📚 Plural: {plural_name}");
         }
 
-        if let Some(archived) = type_obj.archived {
-            if archived {
-                println!("     📦 Archived: Yes");
-            }
+        if let Some(archived) = type_obj.archived
+            && archived
+        {
+            println!("     📦 Archived: Yes");
         }
 
         match &type_obj.icon {
@@ -371,10 +371,10 @@ async fn get_type(client: &AnytypeClient, space_id: &str, type_id: &str) -> Resu
         println!("  📚 Plural: {plural_name}");
     }
 
-    if let Some(archived) = type_obj.archived {
-        if archived {
-            println!("  📦 Archived: Yes");
-        }
+    if let Some(archived) = type_obj.archived
+        && archived
+    {
+        println!("  📦 Archived: Yes");
     }
 
     match &type_obj.icon {
@@ -543,10 +543,10 @@ async fn delete_type(client: &AnytypeClient, space_id: &str, type_id: &str) -> R
     println!("  🆔 ID: {}", response.type_data.id);
     println!("  🔑 Key: {}", response.type_data.key);
 
-    if let Some(archived) = response.type_data.archived {
-        if archived {
-            println!("  📦 Archived: Yes");
-        }
+    if let Some(archived) = response.type_data.archived
+        && archived
+    {
+        println!("  📦 Archived: Yes");
     }
 
     if let Some(layout) = &response.type_data.layout {
