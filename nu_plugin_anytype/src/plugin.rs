@@ -198,6 +198,11 @@ impl Plugin for AnytypePlugin {
             Box::new(crate::commands::MemberList),
             Box::new(crate::commands::TemplateList),
             Box::new(crate::commands::Search),
+            Box::new(crate::commands::ResolveSpace),
+            Box::new(crate::commands::ResolveType),
+            Box::new(crate::commands::ResolveObject),
+            Box::new(crate::commands::CacheClear),
+            Box::new(crate::commands::CacheStats),
         ]
     }
 }
