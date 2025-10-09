@@ -85,15 +85,50 @@ impl AnytypePlugin {
 
     /// Load authentication token from existing CLI config
     fn load_auth_token(&self) -> Result<String, ShellError> {
-        // TODO: Load from ~/.config/anytype-cli/config.toml
-        // For now, return an error that guides the user
-        Err(ShellError::GenericError {
-            error: "Authentication required".to_string(),
-            msg: "No API key found".to_string(),
-            span: None,
-            help: Some("Run `anytype auth create` to authenticate".to_string()),
-            inner: vec![],
-        })
+        let config_dir = dirs::config_dir()
+            .ok_or_else(|| ShellError::GenericError {
+                error: "Configuration error".to_string(),
+                msg: "Could not determine config directory".to_string(),
+                span: None,
+                help: None,
+                inner: vec![],
+            })?
+            .join("anytype-cli");
+
+        let key_file = config_dir.join("api_key");
+
+        if key_file.exists() {
+            let api_key = std::fs::read_to_string(&key_file)
+                .map_err(|e| ShellError::GenericError {
+                    error: "Failed to read API key".to_string(),
+                    msg: e.to_string(),
+                    span: None,
+                    help: Some("Check file permissions".to_string()),
+                    inner: vec![],
+                })?
+                .trim()
+                .to_string();
+
+            if api_key.is_empty() {
+                return Err(ShellError::GenericError {
+                    error: "Authentication required".to_string(),
+                    msg: "API key file is empty".to_string(),
+                    span: None,
+                    help: Some("Run `anytype auth create` to authenticate".to_string()),
+                    inner: vec![],
+                });
+            }
+
+            Ok(api_key)
+        } else {
+            Err(ShellError::GenericError {
+                error: "Authentication required".to_string(),
+                msg: "No API key found".to_string(),
+                span: None,
+                help: Some("Run `anytype auth create` to authenticate".to_string()),
+                inner: vec![],
+            })
+        }
     }
 
     /// Execute async operation in sync context
@@ -149,8 +184,11 @@ impl Plugin for AnytypePlugin {
     }
 
     fn commands(&self) -> Vec<Box<dyn nu_plugin::PluginCommand<Plugin = Self>>> {
-        // Phase 3+ will add actual commands here
-        vec![]
+        vec![
+            Box::new(crate::commands::AuthCreate),
+            Box::new(crate::commands::AuthDelete),
+            Box::new(crate::commands::AuthStatus),
+        ]
     }
 }
 

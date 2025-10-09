@@ -21,6 +21,7 @@ tokio = { version = "1.47", features = ["full"] }
 dashmap = "6.1"
 anyhow = "1.0"
 thiserror = "2.0"
+dirs = "6.0"
 
 [lib]
 name = "nu_plugin_anytype"

@@ -1,5 +1,7 @@
-// Command modules will be implemented in future phases
-// Phase 3: auth.rs
+// Command modules
+pub mod auth;
+
+// Future phases:
 // Phase 4: space.rs
 // Phase 5: types.rs
 // Phase 6: object.rs
@@ -10,3 +12,5 @@
 // Phase 11: member.rs
 // Phase 12: search.rs
 // Phase 13: resolve.rs
+
+pub use auth::{AuthCreate, AuthDelete, AuthStatus};
