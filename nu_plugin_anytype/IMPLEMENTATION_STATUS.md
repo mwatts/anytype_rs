@@ -72,9 +72,10 @@
 
 ### Code Metrics
 - Total lines: ~3,000
-- Test coverage: 37/37 tests passing
-- Build status: ✅ Clean build with no warnings
+- Test coverage: 10/10 plugin tests + 37 API tests passing
+- Build status: ✅ Clean release build with no warnings
 - Files created: 15
+- Nu-plugin version: **0.106.1** ✅
 
 ### Key Features
 1. **Context Propagation**: Full support for space_id, type_id, type_key flow

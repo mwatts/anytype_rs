@@ -4,7 +4,7 @@ A Nushell plugin that brings Anytype data into your shell workflows with powerfu
 
 ## Status: 87% Complete (13/15 Phases)
 
-**⚠️ Version Requirement:** Currently compatible with **Nushell/nu-plugin 0.99**. Migration to 0.106+ is pending (see [MIGRATION_0.106.md](MIGRATION_0.106.md)).
+**✅ Compatible with Nushell/nu-plugin 0.106.1**
 
 ### Implemented Commands (21)
 
@@ -57,12 +57,12 @@ A Nushell plugin that brings Anytype data into your shell workflows with powerfu
 ### Installation
 
 **Prerequisites:**
-- Nushell 0.99 (current compatible version)
+- Nushell 0.106.1 or later
 - Anytype app running locally
 
 ```bash
-# Install Nushell 0.99 (if needed)
-cargo install nu --version 0.99
+# Install Nushell (if needed)
+cargo install nu --version 0.106.1
 
 # Build the plugin
 cd nu_plugin_anytype
