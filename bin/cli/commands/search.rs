@@ -26,7 +26,7 @@ pub struct SearchArgs {
     pub sort: Option<String>,
 
     /// Sort direction (asc, desc)
-    #[arg(short = 'd', long)]
+    #[arg(long)]
     pub direction: Option<String>,
 }
 
