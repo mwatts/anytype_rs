@@ -181,3 +181,94 @@ impl PluginCommand for SpaceCreate {
         Ok(PipelineData::Value(Value::custom(Box::new(anytype_value), span), None))
     }
 }
+
+/// Command: anytype space update
+pub struct SpaceUpdate;
+
+impl PluginCommand for SpaceUpdate {
+    type Plugin = AnytypePlugin;
+
+    fn name(&self) -> &str {
+        "anytype space update"
+    }
+
+    fn description(&self) -> &str {
+        "Update an existing space"
+    }
+
+    fn signature(&self) -> Signature {
+        Signature::build(self.name())
+            .required("name", SyntaxShape::String, "Current name of the space")
+            .named(
+                "new-name",
+                SyntaxShape::String,
+                "New name for the space",
+                Some('n'),
+            )
+            .named(
+                "description",
+                SyntaxShape::String,
+                "New description for the space",
+                Some('d'),
+            )
+            .category(Category::Custom("anytype".into()))
+    }
+
+    fn run(
+        &self,
+        plugin: &Self::Plugin,
+        _engine: &EngineInterface,
+        call: &EvaluatedCall,
+        _input: PipelineData,
+    ) -> Result<PipelineData, LabeledError> {
+        let span = call.head;
+
+        // Get arguments
+        let name: String = call.req(0)?;
+        let new_name: Option<String> = call.get_flag("new-name")?;
+        let description: Option<String> = call.get_flag("description")?;
+
+        // Check if at least one update field is provided
+        if new_name.is_none() && description.is_none() {
+            return Err(LabeledError::new(
+                "At least one field (new-name or description) must be provided to update",
+            )
+            .with_label("No update fields provided", span));
+        }
+
+        // Get resolver and client
+        let resolver = plugin.resolver().map_err(|e| {
+            LabeledError::new(format!("Failed to get resolver: {}", e))
+                .with_label("Authentication required", span)
+        })?;
+
+        // Resolve space name to ID
+        let space_id = plugin
+            .run_async(resolver.resolve_space(&name))
+            .map_err(|e| {
+                LabeledError::new(format!("Failed to resolve space '{}': {}", name, e))
+            })?;
+
+        let client = plugin.client().map_err(|e| {
+            LabeledError::new(format!("Failed to get client: {}", e))
+                .with_label("Authentication required", span)
+        })?;
+
+        // Update space
+        let request = anytype_rs::UpdateSpaceRequest {
+            name: new_name,
+            description,
+        };
+
+        let response = plugin
+            .run_async(client.update_space(&space_id, request))
+            .map_err(|e| LabeledError::new(format!("Failed to update space: {}", e)))?;
+
+        // Invalidate space cache
+        resolver.clear_cache();
+
+        // Convert to AnytypeValue::Space
+        let anytype_value: AnytypeValue = response.space.into();
+        Ok(PipelineData::Value(Value::custom(Box::new(anytype_value), span), None))
+    }
+}
