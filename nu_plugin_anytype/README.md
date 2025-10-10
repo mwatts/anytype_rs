@@ -69,7 +69,7 @@ cd nu_plugin_anytype
 cargo build --release
 
 # Register with Nushell
-nu -c "register target/release/nu_plugin_anytype"
+nu -c "plugin add target/release/nu_plugin_anytype"
 ```
 
 ### Basic Usage

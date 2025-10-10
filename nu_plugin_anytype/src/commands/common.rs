@@ -25,12 +25,11 @@ pub fn get_space_id(
     }
 
     // Priority 2: Check for AnytypeValue from pipeline
-    if let Ok(custom_value) = input.as_custom_value() {
-        if let Some(anytype_value) = custom_value.as_any().downcast_ref::<AnytypeValue>() {
-            if let Some(space_id) = anytype_value.space_id() {
-                return Ok(space_id.to_string());
-            }
-        }
+    if let Ok(custom_value) = input.as_custom_value()
+        && let Some(anytype_value) = custom_value.as_any().downcast_ref::<AnytypeValue>()
+        && let Some(space_id) = anytype_value.space_id()
+    {
+        return Ok(space_id.to_string());
     }
 
     // Priority 3: Check for default_space in config

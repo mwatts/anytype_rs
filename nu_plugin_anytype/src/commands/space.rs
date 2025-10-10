@@ -85,29 +85,21 @@ impl PluginCommand for SpaceGet {
         // Get space name from arguments
         let name: String = call.req(0)?;
 
-        // Get resolver
-        let resolver = plugin.resolver().map_err(|e| {
-            LabeledError::new(format!("Failed to get resolver: {}", e))
-                .with_label("Authentication required", span)
-        })?;
-
-        // Resolve space name to ID
-        let space_id = plugin
-            .run_async(resolver.resolve_space(&name))
-            .map_err(|e| {
-                LabeledError::new(format!("Failed to resolve space '{}': {}", name, e))
-            })?;
-
         // Get client
         let client = plugin.client().map_err(|e| {
             LabeledError::new(format!("Failed to get client: {}", e))
                 .with_label("Authentication required", span)
         })?;
 
-        // Fetch space details
-        let space = plugin
-            .run_async(client.get_space(&space_id))
-            .map_err(|e| LabeledError::new(format!("Failed to get space: {}", e)))?;
+        // List all spaces and find the one matching the name
+        let spaces = plugin
+            .run_async(client.list_spaces())
+            .map_err(|e| LabeledError::new(format!("Failed to list spaces: {}", e)))?;
+
+        let space = spaces
+            .into_iter()
+            .find(|s| s.name == name)
+            .ok_or_else(|| LabeledError::new(format!("No space found with name '{}'", name)))?;
 
         // Convert to AnytypeValue::Space
         let anytype_value: AnytypeValue = space.into();

@@ -51,6 +51,7 @@ pub struct AnytypePlugin {
     pub config: PluginConfig,
 }
 
+#[allow(clippy::result_large_err)]
 impl AnytypePlugin {
     pub fn new() -> Self {
         Self {

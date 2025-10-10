@@ -8,7 +8,6 @@ use serde::{Deserialize, Serialize};
 /// separate structs for each entity type, while maintaining type safety
 /// through Rust's pattern matching.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-#[serde(tag = "type", rename_all = "lowercase")]
 pub enum AnytypeValue {
     Space {
         id: String,
@@ -170,6 +169,7 @@ impl AnytypeValue {
     }
 }
 
+#[typetag::serde(name = "AnytypeValue")]
 impl CustomValue for AnytypeValue {
     fn clone_value(&self, span: Span) -> Value {
         Value::custom(Box::new(self.clone()), span)
@@ -185,15 +185,6 @@ impl CustomValue for AnytypeValue {
 
     fn as_mut_any(&mut self) -> &mut dyn std::any::Any {
         self
-    }
-
-    fn typetag_name(&self) -> &'static str {
-        "AnytypeValue"
-    }
-
-    fn typetag_deserialize(&self) {
-        // This is used by the typetag system for deserialization
-        // We don't need custom deserialization logic here
     }
 
     fn to_base_value(&self, span: Span) -> Result<Value, ShellError> {
