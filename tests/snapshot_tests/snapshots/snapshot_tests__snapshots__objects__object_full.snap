@@ -1,0 +1,18 @@
+---
+source: tests/snapshot_tests/objects.rs
+expression: object
+---
+{
+  "id": "obj123",
+  "name": "My Object",
+  "space_id": "space456",
+  "object": "page",
+  "properties": {
+    "description": "A test page",
+    "tags": [
+      "test",
+      "example"
+    ],
+    "title": "Test Page"
+  }
+}

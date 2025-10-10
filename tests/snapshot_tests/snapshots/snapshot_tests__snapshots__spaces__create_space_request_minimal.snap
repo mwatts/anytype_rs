@@ -1,0 +1,8 @@
+---
+source: tests/snapshot_tests/spaces.rs
+expression: request_minimal
+---
+{
+  "name": "Minimal Space",
+  "description": null
+}

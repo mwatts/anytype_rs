@@ -29,7 +29,7 @@ pub struct Member {
 
 /// Member role enum
 /// Possible values: [viewer, editor, owner, no_permission]
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 #[serde(rename_all = "snake_case")]
 pub enum MemberRole {
     Viewer,
@@ -41,7 +41,7 @@ pub enum MemberRole {
 
 /// Member status enum  
 /// Possible values: [joining, active, removed, declined, removing, canceled]
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 #[serde(rename_all = "snake_case")]
 pub enum MemberStatus {
     Joining,

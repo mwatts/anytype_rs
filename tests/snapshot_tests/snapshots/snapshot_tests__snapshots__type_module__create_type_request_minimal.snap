@@ -1,0 +1,16 @@
+---
+source: tests/snapshot_tests/type_module.rs
+expression: request_minimal
+---
+{
+  "icon": {
+    "format": "icon",
+    "color": "blue",
+    "name": "page"
+  },
+  "key": "page",
+  "layout": "basic",
+  "name": "Page",
+  "plural_name": "Pages",
+  "properties": []
+}

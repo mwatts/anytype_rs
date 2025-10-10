@@ -1,0 +1,5 @@
+---
+source: tests/snapshot_tests/search.rs
+expression: "SortDirection::Asc"
+---
+"asc"

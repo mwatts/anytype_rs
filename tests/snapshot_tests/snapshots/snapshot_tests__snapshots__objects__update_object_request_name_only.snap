@@ -1,0 +1,7 @@
+---
+source: tests/snapshot_tests/objects.rs
+expression: request_name_only
+---
+{
+  "name": "Name Only"
+}

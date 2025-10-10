@@ -1,0 +1,11 @@
+---
+source: tests/snapshot_tests/properties.rs
+expression: property_date
+---
+{
+  "format": "date",
+  "id": "prop456",
+  "key": "created_at",
+  "name": "Created At",
+  "object": "property"
+}

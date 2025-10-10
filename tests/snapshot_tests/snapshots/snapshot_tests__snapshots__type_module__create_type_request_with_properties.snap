@@ -1,0 +1,26 @@
+---
+source: tests/snapshot_tests/type_module.rs
+expression: request
+---
+{
+  "icon": {
+    "format": "emoji",
+    "emoji": "📝"
+  },
+  "key": "note",
+  "layout": "note",
+  "name": "Note",
+  "plural_name": "Notes",
+  "properties": [
+    {
+      "format": "text",
+      "key": "title",
+      "name": "Title"
+    },
+    {
+      "format": "date",
+      "key": "created",
+      "name": "Created"
+    }
+  ]
+}

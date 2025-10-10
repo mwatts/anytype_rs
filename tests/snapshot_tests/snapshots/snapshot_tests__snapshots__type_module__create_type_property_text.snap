@@ -1,0 +1,9 @@
+---
+source: tests/snapshot_tests/type_module.rs
+expression: property
+---
+{
+  "format": "text",
+  "key": "title",
+  "name": "Title"
+}

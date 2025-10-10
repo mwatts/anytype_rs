@@ -1,0 +1,10 @@
+---
+source: tests/snapshot_tests/lists.rs
+expression: sort
+---
+{
+  "format": "date",
+  "id": "sort1",
+  "property_key": "created_at",
+  "sort_type": "desc"
+}

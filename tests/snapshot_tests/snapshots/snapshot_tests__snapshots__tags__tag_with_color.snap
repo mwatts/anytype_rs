@@ -1,0 +1,11 @@
+---
+source: tests/snapshot_tests/tags.rs
+expression: tag
+---
+{
+  "color": "blue",
+  "id": "tag123",
+  "key": "important",
+  "name": "Important",
+  "object": "tag"
+}

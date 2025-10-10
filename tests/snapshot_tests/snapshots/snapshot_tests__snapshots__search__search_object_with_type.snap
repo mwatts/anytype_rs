@@ -1,0 +1,31 @@
+---
+source: tests/snapshot_tests/search.rs
+expression: search_object
+---
+{
+  "archived": false,
+  "icon": {
+    "format": "emoji",
+    "emoji": "📄"
+  },
+  "id": "obj123",
+  "name": "Test Object",
+  "object": "page",
+  "properties": {
+    "description": "A test object",
+    "title": "Test"
+  },
+  "snippet": "This is a snippet...",
+  "space_id": "space456",
+  "type": {
+    "archived": false,
+    "icon": null,
+    "id": "type789",
+    "key": "page",
+    "layout": "basic",
+    "name": "Page",
+    "object": "type",
+    "plural_name": "Pages",
+    "properties": []
+  }
+}

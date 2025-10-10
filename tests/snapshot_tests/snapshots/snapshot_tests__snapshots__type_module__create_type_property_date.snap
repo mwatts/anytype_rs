@@ -1,0 +1,9 @@
+---
+source: tests/snapshot_tests/type_module.rs
+expression: property_date
+---
+{
+  "format": "date",
+  "key": "created_at",
+  "name": "Created At"
+}

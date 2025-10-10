@@ -1,0 +1,5 @@
+---
+source: tests/snapshot_tests/type_module.rs
+expression: "Layout::Action"
+---
+"action"

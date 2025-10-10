@@ -1,0 +1,11 @@
+---
+source: tests/snapshot_tests/search.rs
+expression: request_minimal
+---
+{
+  "offset": null,
+  "limit": null,
+  "query": null,
+  "space_id": null,
+  "sort": null
+}

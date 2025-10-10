@@ -1,0 +1,8 @@
+---
+source: tests/snapshot_tests/properties.rs
+expression: request_select
+---
+{
+  "name": "Status",
+  "format": "select"
+}

@@ -1,0 +1,11 @@
+---
+source: tests/snapshot_tests/lists.rs
+expression: view_minimal
+---
+{
+  "filters": [],
+  "id": "view456",
+  "layout": "list",
+  "name": "Simple View",
+  "sorts": []
+}

@@ -1,0 +1,8 @@
+---
+source: tests/snapshot_tests/tags.rs
+expression: request
+---
+{
+  "name": "Updated Tag",
+  "color": "teal"
+}

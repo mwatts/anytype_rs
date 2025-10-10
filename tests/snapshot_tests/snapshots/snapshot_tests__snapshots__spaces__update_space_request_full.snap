@@ -1,0 +1,8 @@
+---
+source: tests/snapshot_tests/spaces.rs
+expression: request
+---
+{
+  "name": "Updated Space",
+  "description": "Updated description"
+}

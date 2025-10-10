@@ -1,0 +1,7 @@
+---
+source: tests/snapshot_tests/spaces.rs
+expression: request_name_only
+---
+{
+  "name": "Name Only Update"
+}

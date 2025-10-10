@@ -1,0 +1,5 @@
+---
+source: tests/snapshot_tests/errors.rs
+expression: "format!(\"{:?}\", api_error)"
+---
+Api { message: "Rate limit exceeded" }

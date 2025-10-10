@@ -1,0 +1,16 @@
+---
+source: tests/snapshot_tests/members.rs
+expression: member
+---
+{
+  "id": "member123",
+  "name": "John Doe",
+  "global_name": "john.any",
+  "identity": "identity456",
+  "object": "member",
+  "role": "editor",
+  "status": "active",
+  "icon": {
+    "emoji": "👤"
+  }
+}

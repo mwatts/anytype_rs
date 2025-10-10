@@ -1,0 +1,33 @@
+---
+source: tests/snapshot_tests/types.rs
+expression: type_obj
+---
+{
+  "archived": false,
+  "icon": {
+    "format": "emoji",
+    "emoji": "📝"
+  },
+  "id": "type123",
+  "key": "note",
+  "layout": "note",
+  "name": "Note",
+  "object": "type",
+  "plural_name": "Notes",
+  "properties": [
+    {
+      "format": "text",
+      "id": "prop1",
+      "key": "title",
+      "name": "Title",
+      "object": "property"
+    },
+    {
+      "format": "date",
+      "id": "prop2",
+      "key": "created",
+      "name": "Created",
+      "object": "property"
+    }
+  ]
+}

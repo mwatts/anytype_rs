@@ -1,0 +1,14 @@
+---
+source: tests/snapshot_tests/search.rs
+expression: request
+---
+{
+  "offset": 0,
+  "limit": 50,
+  "query": "test query",
+  "space_id": "space123",
+  "sort": {
+    "direction": "desc",
+    "property_key": "last_modified_date"
+  }
+}

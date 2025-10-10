@@ -1,0 +1,5 @@
+---
+source: tests/snapshot_tests/errors.rs
+expression: "format!(\"{}\", api_error)"
+---
+API error: Object not found

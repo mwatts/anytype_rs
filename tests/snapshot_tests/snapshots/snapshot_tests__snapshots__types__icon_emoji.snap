@@ -1,0 +1,8 @@
+---
+source: tests/snapshot_tests/types.rs
+expression: emoji_icon
+---
+{
+  "format": "emoji",
+  "emoji": "😀"
+}

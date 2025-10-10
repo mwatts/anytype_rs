@@ -1,0 +1,11 @@
+---
+source: tests/snapshot_tests/properties.rs
+expression: property
+---
+{
+  "format": "text",
+  "id": "prop123",
+  "key": "title",
+  "name": "Title",
+  "object": "property"
+}

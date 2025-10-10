@@ -1,0 +1,13 @@
+---
+source: tests/snapshot_tests/spaces.rs
+expression: space_minimal
+---
+{
+  "id": "space789",
+  "name": "Simple Space",
+  "object": null,
+  "description": null,
+  "icon": null,
+  "gateway_url": null,
+  "network_id": null
+}

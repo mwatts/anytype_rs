@@ -1,0 +1,25 @@
+---
+source: tests/snapshot_tests/templates.rs
+expression: object_type
+---
+{
+  "archived": false,
+  "icon": {
+    "format": "emoji",
+    "emoji": "📝"
+  },
+  "id": "type123",
+  "key": "note",
+  "layout": "note",
+  "name": "Note",
+  "object": "type",
+  "plural_name": "Notes",
+  "properties": [
+    {
+      "format": "text",
+      "id": "prop1",
+      "key": "title",
+      "name": "Title"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+---
+source: tests/snapshot_tests/members.rs
+expression: member_minimal
+---
+{
+  "id": "member789",
+  "name": null,
+  "global_name": null,
+  "identity": null,
+  "object": null,
+  "role": "viewer",
+  "status": "joining",
+  "icon": null
+}
