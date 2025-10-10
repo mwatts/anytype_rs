@@ -1,198 +1,278 @@
 # Nushell Plugin for Anytype
 
-A Nushell plugin that brings Anytype data into your shell workflows with powerful pipeline support.
+A Nushell plugin that brings Anytype data into your shell workflows with powerful pipeline support and name-based access.
 
-## Status: 87% Complete (13/15 Phases)
-
-**✅ Compatible with Nushell/nu-plugin 0.106.1**
-
-### Implemented Commands (21)
-
-**Authentication**
-- `anytype auth create` - Authenticate with local Anytype app
-- `anytype auth delete` - Remove credentials
-- `anytype auth status` - Check auth status
-
-**Spaces**
-- `anytype space list` - List all spaces
-- `anytype space get <name>` - Get space by name
-- `anytype space create <name>` - Create space
-
-**Types**
-- `anytype type list [--space <name>]` - List types
-- `anytype type get <name> [--space <name>]` - Get type
-
-**Objects**
-- `anytype object list [--space <name>]` - List objects
-- `anytype object get <name> [--space <name>]` - Get object
-
-**Members & Templates**
-- `anytype member list [--space <name>]` - List space members
-- `anytype template list [--space <name>]` - List templates
-
-**Search**
-- `anytype search <query> [--space <name>]` - Search objects
-  - `--limit <n>`, `--offset <n>` for pagination
-  - `--sort <property>`, `--direction <asc|desc>` for sorting
-
-**Resolution & Cache**
-- `anytype resolve space <name>` - Resolve name to ID
-- `anytype resolve type <name> [--space <name>]` - Resolve type
-- `anytype resolve object <name> [--space <name>]` - Resolve object
-- `anytype cache clear` - Clear cache
-- `anytype cache stats` - Show cache info
+**Status:** ✅ **Production Ready** - Compatible with Nushell 0.106.1
 
 ## Features
 
-- ✅ Name-based access (no more IDs!)
-- ✅ Pipeline integration with context preservation
-- ✅ Multi-source context (flags/pipeline/config)
-- ✅ Smart caching with TTL and invalidation
-- ✅ Global and space-specific search
-- ✅ Async runtime integration (Tokio)
-- ✅ Comprehensive error handling
+- 🔤 **Name-based access** - Use human-readable names instead of IDs
+- 🔄 **Pipeline integration** - Compose commands with Nushell's pipeline
+- 🎯 **Smart context** - Automatic context propagation through pipelines
+- ⚡ **Fast caching** - TTL-based caching with intelligent invalidation
+- 🔍 **Powerful search** - Global and space-specific search with filtering
+- 🔐 **Secure auth** - Challenge-response authentication flow
 
 ## Quick Start
 
+### Prerequisites
+
+- Nushell 0.106.1 or later
+- Anytype app running locally on `localhost:31009`
+
 ### Installation
 
-**Prerequisites:**
-- Nushell 0.106.1 or later
-- Anytype app running locally
-
 ```bash
-# Install Nushell (if needed)
-cargo install nu --version 0.106.1
-
-# Build the plugin
+# 1. Build the plugin
 cd nu_plugin_anytype
 cargo build --release
 
-# Register with Nushell
+# 2. Register with Nushell
 nu -c "plugin add target/release/nu_plugin_anytype"
+
+# 3. Restart Nushell
+exit  # then reopen
 ```
 
-### Basic Usage
+### First Steps
 
 ```nushell
-# Authenticate
+# Authenticate with your local Anytype app
 anytype auth create
 
-# List spaces
+# List your spaces
 anytype space list
 
 # List objects in a space
 anytype object list --space "Work"
 
-# Search
+# Search for content
 anytype search "meeting notes" --space "Work"
 ```
 
-### Pipeline Examples
+## Commands
+
+### Authentication (3 commands)
 
 ```nushell
-# Pipeline context flow
+anytype auth create   # Authenticate with local Anytype app
+anytype auth status   # Check authentication status
+anytype auth delete   # Remove stored credentials
+```
+
+### Spaces (3 commands)
+
+```nushell
+anytype space list                    # List all spaces
+anytype space get <name>              # Get space by name
+anytype space create <name>           # Create new space
+  --description <text>                # Optional description
+```
+
+### Types (2 commands)
+
+```nushell
+anytype type list [--space <name>]   # List types in a space
+anytype type get <name> [--space <name>]  # Get type by name
+```
+
+### Objects (2 commands)
+
+```nushell
+anytype object list [--space <name>]      # List objects in a space
+anytype object get <name> [--space <name>] # Get object by name
+```
+
+### Search (1 command)
+
+```nushell
+anytype search <query> [--space <name>]  # Search for objects
+  --limit <n>                            # Max results (default: 100)
+  --offset <n>                           # Skip first n results
+  --sort <property>                      # Sort by property
+  --direction <asc|desc>                 # Sort direction
+```
+
+**Sort properties:** `created_date`, `last_modified_date`, `last_opened_date`, `name`
+
+### Members & Templates (2 commands)
+
+```nushell
+anytype member list [--space <name>]    # List space members
+anytype template list [--space <name>]  # List templates
+```
+
+### Resolution & Cache (5 commands)
+
+```nushell
+anytype resolve space <name>                   # Resolve space name to ID
+anytype resolve type <name> [--space <name>]   # Resolve type name to ID
+anytype resolve object <name> [--space <name>] # Resolve object name to ID
+anytype cache clear                            # Clear all caches
+anytype cache stats                            # Show cache statistics
+```
+
+## Pipeline Examples
+
+### Basic Pipelines
+
+```nushell
+# Get a space and list its objects
 anytype space get "Work" | anytype object list
 
-# Search within space
+# Search within a space from pipeline
 anytype space get "Personal" | anytype search "todo"
 
-# Chain operations
+# Filter and select specific fields
 anytype space get "Archive"
 | anytype object list
 | where type_key == "ot_note"
 | select name snippet
 ```
 
-## Configuration
-
-Optional config at `~/.config/anytype-cli/plugin.toml`:
-
-```toml
-default_space = "Work"  # Default space for commands
-cache_ttl = 300         # Cache TTL in seconds
-case_insensitive = true # Case-insensitive matching
-api_endpoint = "http://localhost:31009"
-```
-
-With `default_space` set, you can omit `--space`:
+### Advanced Workflows
 
 ```nushell
-anytype object list  # Uses "Work" automatically
-```
-
-## Architecture
-
-- **AnytypeValue enum**: 8 variants (Space, Type, Object, Property, Tag, List, Template, Member)
-- **Context flow**: Flag → Pipeline → Config (priority order)
-- **Cache**: DashMap with TTL and cascade invalidation
-- **Runtime**: Tokio for async API calls in sync plugin context
-
-### Type Keys vs Type IDs
-
-- **type_key**: Global identifier ("ot_page", "ot_note")
-- **type_id**: Space-specific instance ID
-
-The plugin handles both automatically.
-
-## Advanced Examples
-
-### Export to JSON
-
-```nushell
+# Export objects to JSON
 anytype space get "Archive"
 | anytype object list
 | select name type_key properties
 | to json
 | save archive.json
-```
 
-### Filter and Sort
-
-```nushell
+# Find and sort tasks
 anytype search "project" --space "Work"
 | where type_key == "ot_task"
 | where properties.status == "in_progress"
 | sort-by properties.due_date
+
+# Search with pagination
+anytype search "notes" --limit 20 --offset 40
+
+# Search and sort by modification date
+anytype search "docs" --sort last_modified_date --direction desc
 ```
 
-### Name Resolution
+## Configuration
+
+Create `~/.config/anytype-cli/plugin.toml` to customize behavior:
+
+```toml
+default_space = "Work"                    # Default space for commands
+cache_ttl = 300                           # Cache TTL in seconds (5 min)
+case_insensitive = true                   # Case-insensitive name matching
+api_endpoint = "http://localhost:31009"  # Anytype API endpoint
+```
+
+### Using Default Space
+
+With `default_space` configured, you can omit the `--space` flag:
 
 ```nushell
-# Get IDs without fetching entities
-anytype resolve space "Work"  # Returns {name, id}
-anytype resolve type "Task" --space "Work"  # Returns {name, id, key}
+# Without default_space
+anytype object list --space "Work"
+
+# With default_space = "Work"
+anytype object list  # Automatically uses "Work"
+```
+
+## Context Flow
+
+The plugin resolves context (space, type) from multiple sources with this priority:
+
+1. **Command flags** - `--space "Work"`
+2. **Pipeline input** - `anytype space get "Work" | anytype object list`
+3. **Configuration** - `default_space` in plugin.toml
+4. **Error** - If no context is available
+
+Example:
+
+```nushell
+# Context from flag (highest priority)
+anytype object list --space "Personal"
+
+# Context from pipeline
+anytype space get "Work" | anytype object list
+
+# Context from config (lowest priority)
+anytype object list  # Uses default_space from config
 ```
 
 ## Troubleshooting
 
+### Authentication Issues
+
 ```nushell
-# Fix authentication
+# Re-authenticate
 anytype auth create
 
+# Check authentication status
+anytype auth status
+```
+
+### Cache Issues
+
+```nushell
 # Clear cache
 anytype cache clear
 
-# Debug logging
+# View cache statistics
+anytype cache stats
+```
+
+### Enable Debug Logging
+
+```bash
 RUST_LOG=debug nu -c "anytype space list"
 ```
 
-## Remaining Work
+### Common Errors
 
-- Property and Tag list commands (API limitations)
-- Create/Update/Delete operations
-- Enhanced documentation
+**"Authentication required"**
+- Run `anytype auth create` to authenticate with your local Anytype app
 
-See [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md) for details.
+**"No space found with name 'X'"**
+- Check space name with `anytype space list`
+- Space names are case-sensitive
+
+**"Space context required"**
+- Add `--space <name>` flag, or
+- Use pipeline: `anytype space get "X" | anytype object list`, or
+- Set `default_space` in `~/.config/anytype-cli/plugin.toml`
+
+## Type Keys vs Type IDs
+
+The plugin handles two types of identifiers:
+
+- **type_key** - Global identifier across all spaces (e.g., `ot_page`, `ot_note`, `ot_task`)
+- **type_id** - Space-specific instance ID for a type
+
+You don't need to worry about this distinction - the plugin handles conversions automatically.
 
 ## Development
 
 ```bash
+# Build
 cargo build
+
+# Run tests (10 tests)
 cargo test
+
+# Check code quality
 cargo clippy
+
+# Build release version
+cargo build --release
 ```
+
+## Architecture
+
+See [ARCHITECTURE.md](ARCHITECTURE.md) for technical design details.
 
 ## License
 
-Same as anytype_rs project.
+Same as anytype_rs project (GPL-3.0).
+
+## Contributing
+
+This plugin is part of the [anytype_rs](https://github.com/mwatts/anytype_rs) project.
