@@ -57,17 +57,21 @@ Located in `test_all_commands.nu` - comprehensive integration testing against a 
 
 **Coverage:**
 - Authentication (2 tests) - Status and connectivity validation
-- Spaces (5 tests) - List, get, error handling
-- Types (6 tests) - List, get, pipeline, errors
-- Objects (6 tests) - List, get, structure validation
-- Search (8 tests) - All search options, pagination, sorting
-- Members (3 tests) - List and structure
-- Templates (2 tests) - List functionality
-- Resolve (5 tests) - Name-to-ID resolution (includes error cases)
-- Cache (3 tests) - Stats and clear operations
-- Pipelines (4 tests) - Context propagation
-- Context Resolution (2 tests) - Priority testing
+- Spaces (4 tests) - List, get, custom value verification, error handling
+- Types (4 tests) - List, pipeline, custom value verification, error handling
+- Objects (4 tests) - List, pipeline, structure validation, error handling
+- Search (8 tests) - All search options, pagination, sorting, pipeline
+- Members (3 tests) - List, pipeline, structure validation
+- Templates (2 tests) - List, pipeline
+- Resolve (2 tests) - Name-to-ID resolution, error handling
+- Cache (3 tests) - Stats, clear, verification
+- Pipelines (4 tests) - Context propagation across command types
+- Context Resolution (2 tests) - Pipeline and flag priority
 - Error Handling (3 tests) - Runtime errors (parse-time errors tested in integration tests)
+
+**Note**: Tests focus on command execution success and custom value types rather than
+detailed field validation, as Nushell custom values don't support cell path access.
+Field-level validation is handled by integration tests in `tests/plugin_test.rs`.
 
 **Run:**
 ```bash
@@ -283,8 +287,8 @@ anytype space create dev-test
 |--------------|-------|----------------------------------|---------------|
 | Unit         | 10    | Core logic, helpers, cache       | None          |
 | Integration  | 32    | Command structure, parsing       | None          |
-| End-to-End   | 49    | Full workflow with live API      | Anytype app   |
-| **Total**    | **91**| **Complete plugin functionality**| **Optional**  |
+| End-to-End   | 41    | Full workflow with live API      | Anytype app   |
+| **Total**    | **83**| **Complete plugin functionality**| **Optional**  |
 
 ## Best Practices
 
