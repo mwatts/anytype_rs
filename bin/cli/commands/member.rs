@@ -15,9 +15,9 @@ pub struct MemberArgs {
 pub enum MemberCommand {
     /// List members in a space
     List {
-        /// Space ID to list members from
-        #[arg(short, long)]
-        space_id: String,
+        /// Space to list members from (name or ID)
+        #[arg(short = 's', long)]
+        space: String,
 
         /// Enable pagination (returns full response with pagination info)
         #[arg(short, long)]
@@ -25,9 +25,9 @@ pub enum MemberCommand {
     },
     /// Get a specific member by ID
     Get {
-        /// Space ID
-        #[arg(short, long)]
-        space_id: String,
+        /// Space (name or ID)
+        #[arg(short = 's', long)]
+        space: String,
 
         /// Member ID
         #[arg(short, long)]
@@ -46,9 +46,13 @@ pub async fn handle_member_command(args: MemberArgs) -> Result<()> {
 
     match args.command {
         MemberCommand::List {
-            space_id,
+            space,
             pagination,
         } => {
+            // Create resolver for space name resolution
+            let resolver = crate::resolver::Resolver::new(&client, 300);
+            let space_id = resolver.resolve_space(&space).await?;
+
             if pagination {
                 let response = client
                     .list_members_with_pagination(&space_id)
@@ -64,9 +68,13 @@ pub async fn handle_member_command(args: MemberArgs) -> Result<()> {
             }
         }
         MemberCommand::Get {
-            space_id,
+            space,
             member_id,
         } => {
+            // Create resolver for space name resolution
+            let resolver = crate::resolver::Resolver::new(&client, 300);
+            let space_id = resolver.resolve_space(&space).await?;
+
             let member = client
                 .get_member(&space_id, &member_id)
                 .await

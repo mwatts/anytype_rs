@@ -17,17 +17,17 @@ pub struct SearchArgs {
     #[arg(short, long, default_value = "0")]
     pub offset: usize,
 
-    /// Search within a specific space
-    #[arg(short, long)]
-    pub space_id: Option<String>,
+    /// Search within a specific space (name or ID)
+    #[arg(short = 's', long)]
+    pub space: Option<String>,
 
     /// Sort by property (created_date, last_modified_date, last_opened_date, name)
     #[arg(long)]
-    pub sort_by: Option<String>,
+    pub sort: Option<String>,
 
     /// Sort direction (asc, desc)
-    #[arg(long)]
-    pub sort_direction: Option<String>,
+    #[arg(short = 'd', long)]
+    pub direction: Option<String>,
 }
 
 pub async fn handle_search_command(args: SearchArgs) -> Result<()> {
@@ -83,18 +83,22 @@ fn parse_sort_options(sort_by: Option<&str>, sort_direction: Option<&str>) -> Re
 }
 
 async fn search(client: &AnytypeClient, args: SearchArgs) -> Result<()> {
-    let space_info = match &args.space_id {
-        Some(space_id) => format!(" in space '{space_id}'"),
+    let space_info = match &args.space {
+        Some(space) => format!(" in space '{space}'"),
         None => " globally".to_string(),
     };
 
     println!("🔍 Searching for '{}'{}...", args.query, space_info);
 
     // Parse sort options
-    let sort = parse_sort_options(args.sort_by.as_deref(), args.sort_direction.as_deref())?;
+    let sort = parse_sort_options(args.sort.as_deref(), args.direction.as_deref())?;
 
-    let response = match &args.space_id {
-        Some(space_id) => {
+    let response = match &args.space {
+        Some(space) => {
+            // Create resolver for space name resolution
+            let resolver = crate::resolver::Resolver::new(client, 300);
+            let space_id = resolver.resolve_space(space).await?;
+
             // Use space-specific search endpoint
             let request = SearchSpaceRequest {
                 query: Some(args.query.clone()),
@@ -103,7 +107,7 @@ async fn search(client: &AnytypeClient, args: SearchArgs) -> Result<()> {
                 sort,
             };
             client
-                .search_space(space_id, request)
+                .search_space(&space_id, request)
                 .await
                 .context("Failed to perform space search")?
         }

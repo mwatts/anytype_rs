@@ -12,8 +12,9 @@ pub struct TemplateArgs {
 pub enum TemplateCommand {
     /// List templates for a specific type in a space
     List {
-        /// Space ID
-        space_id: String,
+        /// Space (name or ID)
+        #[arg(short = 's', long)]
+        space: String,
         /// Type ID (the type for which to list templates)
         type_id: String,
         /// Limit the number of results
@@ -22,8 +23,9 @@ pub enum TemplateCommand {
     },
     /// Get details of a specific template
     Get {
-        /// Space ID
-        space_id: String,
+        /// Space (name or ID)
+        #[arg(short = 's', long)]
+        space: String,
         /// Type ID (the type that the template belongs to)
         type_id: String,
         /// Template ID
@@ -40,15 +42,23 @@ pub async fn handle_template_command(args: TemplateArgs) -> Result<()> {
 
     match args.command {
         TemplateCommand::List {
-            space_id,
+            space,
             type_id,
             limit,
-        } => list_templates(&client, &space_id, &type_id, limit).await,
+        } => {
+            let resolver = crate::resolver::Resolver::new(&client, 300);
+            let space_id = resolver.resolve_space(&space).await?;
+            list_templates(&client, &space_id, &type_id, limit).await
+        }
         TemplateCommand::Get {
-            space_id,
+            space,
             type_id,
             template_id,
-        } => get_template(&client, &space_id, &type_id, &template_id).await,
+        } => {
+            let resolver = crate::resolver::Resolver::new(&client, 300);
+            let space_id = resolver.resolve_space(&space).await?;
+            get_template(&client, &space_id, &type_id, &template_id).await
+        }
     }
 }
 

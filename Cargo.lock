@@ -119,6 +119,7 @@ dependencies = [
  "anyhow",
  "anytype_rs",
  "clap",
+ "dashmap",
  "dirs 6.0.0",
  "gray_matter",
  "serde",
