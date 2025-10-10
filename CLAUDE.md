@@ -4,8 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Anytype.rs is a Rust workspace providing a library, CLI tool, and Nushell plugin for interacting with the local Anytype application API at `http://localhost:31009`. The workspace contains two crates:
-- **anytype_rs**: Core library (`crates/anytype_rs/src/api/`) and CLI tool (`crates/anytype_rs/src/cli/`)
+Anytype.rs is a Rust workspace providing a library, CLI tool, and Nushell plugin for interacting with the local Anytype application API at `http://localhost:31009`. The workspace contains:
+- **CLI binary**: Command-line tool at workspace root (`bin/cli/`)
+- **anytype_rs**: Core library (`crates/anytype_rs/src/api/`)
 - **nu_plugin_anytype**: Nushell plugin (`crates/nu_plugin_anytype/src/`)
 
 ## Development Commands
@@ -19,11 +20,11 @@ cargo build --workspace
 cargo build --release --workspace
 
 # Build specific crates
-cargo build -p anytype_rs              # Library + CLI
+cargo build -p anytype_rs              # Library only
 cargo build -p nu_plugin_anytype       # Nushell plugin
 
 # Build just the CLI binary
-cargo build --bin anytype -p anytype_rs
+cargo build --bin anytype
 ```
 
 ### Testing
@@ -63,13 +64,13 @@ cargo clippy --fix
 ### Running the CLI
 ```bash
 # Run from source
-cargo run -p anytype_rs --bin anytype -- [args]
+cargo run --bin anytype -- [args]
 
 # Run with debug logging
-cargo run -p anytype_rs --bin anytype -- --debug [command]
+cargo run --bin anytype -- --debug [command]
 
 # Get help
-cargo run -p anytype_rs --bin anytype -- --help
+cargo run --bin anytype -- --help
 ```
 
 ### Running the Nushell Plugin
@@ -87,30 +88,38 @@ anytype space list
 
 ### Workspace Organization
 ```
-crates/
-├── anytype_rs/              # Core library + CLI
-│   ├── src/
-│   │   ├── api/             # API client
-│   │   ├── cli/             # CLI tool
-│   │   └── lib.rs
-│   └── tests/
-└── nu_plugin_anytype/       # Nushell plugin
-    ├── src/
-    │   ├── commands/        # Plugin commands
-    │   ├── cache/           # Name resolution cache
-    │   ├── value.rs         # Custom value types
-    │   └── plugin.rs
-    └── tests/
+anytype_rs/
+├── bin/
+│   └── cli/                 # CLI binary (Rust standard layout)
+│       ├── main.rs          # CLI entry point
+│       ├── config.rs        # Configuration management
+│       └── commands/        # CLI command implementations
+└── crates/
+    ├── anytype_rs/          # Core library
+    │   ├── src/
+    │   │   ├── api/         # API client
+    │   │   └── lib.rs
+    │   └── tests/
+    └── nu_plugin_anytype/   # Nushell plugin
+        ├── src/
+        │   ├── commands/    # Plugin commands
+        │   ├── cache/       # Name resolution cache
+        │   ├── value.rs     # Custom value types
+        │   └── plugin.rs
+        └── tests/
 ```
 
-### Module Organization (anytype_rs crate)
+### Module Organization
+
+**Library (anytype_rs crate):**
 - **`crates/anytype_rs/src/api/`**: Core API client implementation
   - `mod.rs`: Main client with authentication and HTTP handling
   - `types.rs`: API request/response type definitions
   - `error.rs`: Custom error types
   - `client/`: Endpoint-specific implementations (spaces, types, lists, etc.)
 
-- **`crates/anytype_rs/src/cli/`**: Command-line interface
+**CLI (workspace root binary):**
+- **`bin/cli/`**: Command-line interface
   - `main.rs`: CLI entry point with clap argument parsing
   - `config.rs`: Configuration and API key management
   - `commands/`: Individual command implementations for each API endpoint

@@ -18,17 +18,22 @@ You can download the library crate from [crates.io](https://crates.io/crates/any
 
 ```
 anytype_rs/
-├── Cargo.toml              # Workspace root
+├── Cargo.toml              # Workspace root + CLI binary config
+├── bin/
+│   └── cli/                # CLI binary (Rust standard layout)
+│       ├── main.rs         # CLI entry point
+│       ├── config.rs       # Configuration management
+│       └── commands/       # CLI command implementations
 ├── docs/                   # Consolidated documentation
 │   ├── development.md      # Development guide
 │   ├── examples.md         # Usage examples
 │   ├── nushell-plugin.md   # Plugin guide
 │   └── testing.md          # Testing guide
 └── crates/
-    ├── anytype_rs/         # Core library + CLI
+    ├── anytype_rs/         # Core library
     │   ├── src/
     │   │   ├── api/        # API client implementation
-    │   │   └── cli/        # CLI tool
+    │   │   └── lib.rs      # Library exports
     │   └── tests/          # Integration tests
     └── nu_plugin_anytype/  # Nushell plugin
         ├── src/            # Plugin implementation
