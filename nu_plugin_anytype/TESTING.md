@@ -25,7 +25,7 @@ cargo test
 Located in `tests/plugin_test.rs` using `nu-plugin-test-support`.
 
 **Coverage:**
-- All 21 plugin commands
+- All 28 plugin commands (including import)
 - Command parsing and validation
 - Authentication requirements
 - Context resolution logic
@@ -38,7 +38,7 @@ Located in `tests/plugin_test.rs` using `nu-plugin-test-support`.
 cargo test --test plugin_test
 ```
 
-**Results:** 43 tests validating command structure and behavior
+**Results:** 56 tests validating command structure and behavior
 
 **Features:**
 - No external dependencies required
