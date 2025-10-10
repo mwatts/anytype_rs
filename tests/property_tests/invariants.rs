@@ -17,7 +17,7 @@ proptest! {
         total in offset_strategy(),
     ) {
         // Create pagination where has_more is false
-        let offset = if total > limit { total - limit } else { 0 };
+        let offset = total.saturating_sub(limit);
         let pagination = Pagination {
             has_more: false,
             limit,
