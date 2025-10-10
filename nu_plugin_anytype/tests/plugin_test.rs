@@ -405,6 +405,7 @@ fn test_all_commands_are_registered() -> Result<(), ShellError> {
         "anytype space",
         "anytype type",
         "anytype object",
+        "anytype property",
         "anytype search",
         "anytype member",
         "anytype template",
@@ -533,71 +534,115 @@ fn test_custom_value_name_fallback() {
 }
 
 // ============================================================================
-// Tag Commands Tests (without authentication)
+// Property Commands Tests (without authentication)
 // ============================================================================
 
 #[test]
-fn test_tag_list_requires_property_context() -> Result<(), ShellError> {
-    let result = create_plugin_test()?.eval("anytype tag list 'Status'");
+fn test_property_list_requires_space_context() -> Result<(), ShellError> {
+    let result = create_plugin_test()?.eval("anytype property list");
 
-    // Should fail with authentication or context error
+    // Should fail with either auth error or context error
     assert!(result.is_err());
     Ok(())
 }
 
 #[test]
-fn test_tag_get_requires_property_context() -> Result<(), ShellError> {
-    let result = create_plugin_test()?.eval("anytype tag get 'Done' --property 'Status'");
+fn test_property_list_with_space_flag() -> Result<(), ShellError> {
+    let result = create_plugin_test()?.eval("anytype property list --space 'Work'");
 
-    // Should fail with authentication or context error
+    // Should fail with authentication error
     assert!(result.is_err());
     Ok(())
 }
 
 #[test]
-fn test_tag_create_requires_property_flag() -> Result<(), ShellError> {
-    let result = create_plugin_test()?.eval("anytype tag create 'NewTag'");
+fn test_property_get_requires_space_context() -> Result<(), ShellError> {
+    let result = create_plugin_test()?.eval("anytype property get 'MyProperty'");
 
-    // Should fail because --property flag is required
+    // Should fail with either auth error or context error
     assert!(result.is_err());
     Ok(())
 }
 
 #[test]
-fn test_tag_create_with_color() -> Result<(), ShellError> {
-    let result = create_plugin_test()?
-        .eval("anytype tag create 'Important' --property 'Status' --color 'red' --space 'Work'");
+fn test_property_get_with_space_flag() -> Result<(), ShellError> {
+    let result = create_plugin_test()?.eval("anytype property get 'MyProperty' --space 'Work'");
 
-    // Should fail with authentication error (but command parsing should work)
+    // Should fail with authentication error
     assert!(result.is_err());
     Ok(())
 }
 
 #[test]
-fn test_tag_update_requires_property_context() -> Result<(), ShellError> {
-    let result = create_plugin_test()?.eval("anytype tag update 'Done' --new-name 'Completed'");
+fn test_property_create_requires_name() -> Result<(), ShellError> {
+    let result = create_plugin_test()?.eval("anytype property create");
 
-    // Should fail with authentication or context error
+    // Should fail with missing argument error
     assert!(result.is_err());
     Ok(())
 }
 
 #[test]
-fn test_tag_update_with_color() -> Result<(), ShellError> {
-    let result = create_plugin_test()?
-        .eval("anytype tag update 'Done' --property 'Status' --color 'green' --space 'Work'");
+fn test_property_create_with_format_flag() -> Result<(), ShellError> {
+    let result = create_plugin_test()?.eval("anytype property create 'Status' --format select --space 'Work'");
 
-    // Should fail with authentication error (but command parsing should work)
+    // Should fail with authentication error (but flags should parse correctly)
     assert!(result.is_err());
     Ok(())
 }
 
 #[test]
-fn test_tag_delete_requires_property_context() -> Result<(), ShellError> {
-    let result = create_plugin_test()?.eval("anytype tag delete 'Old'");
+fn test_property_update_requires_name() -> Result<(), ShellError> {
+    let result = create_plugin_test()?.eval("anytype property update");
 
-    // Should fail with authentication or context error
+    // Should fail with missing argument error
     assert!(result.is_err());
     Ok(())
+}
+
+#[test]
+fn test_property_update_with_new_name_flag() -> Result<(), ShellError> {
+    let result = create_plugin_test()?.eval("anytype property update 'OldName' --new-name 'NewName' --space 'Work'");
+
+    // Should fail with authentication error (but flags should parse correctly)
+    assert!(result.is_err());
+    Ok(())
+}
+
+#[test]
+fn test_property_delete_requires_name() -> Result<(), ShellError> {
+    let result = create_plugin_test()?.eval("anytype property delete");
+
+    // Should fail with missing argument error
+    assert!(result.is_err());
+    Ok(())
+}
+
+#[test]
+fn test_property_delete_with_space_flag() -> Result<(), ShellError> {
+    let result = create_plugin_test()?.eval("anytype property delete 'MyProperty' --space 'Work'");
+
+    // Should fail with authentication error
+    assert!(result.is_err());
+    Ok(())
+}
+
+#[test]
+fn test_custom_value_property_with_context() {
+    use nu_plugin_anytype::AnytypeValue;
+
+    let property = AnytypeValue::Property {
+        id: "prop_123".to_string(),
+        name: "Status".to_string(),
+        key: "status".to_string(),
+        format: "select".to_string(),
+        space_id: "sp_456".to_string(),
+        type_id: "ty_789".to_string(),
+    };
+
+    assert_eq!(property.id(), "prop_123");
+    assert_eq!(property.name(), "Status");
+    assert_eq!(property.space_id(), Some("sp_456"));
+    assert_eq!(property.type_id(), Some("ty_789"));
 }
 

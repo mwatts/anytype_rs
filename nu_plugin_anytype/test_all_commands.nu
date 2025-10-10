@@ -246,6 +246,39 @@ run_test "object list - verify structure" {
 # }
 
 # ============================================================================
+# Property Tests
+# ============================================================================
+print ""
+print "## Property Tests"
+print ""
+
+run_test "property list - with space flag" {
+    let properties = (anytype property list --space $TEST_SPACE)
+    # Properties list can be empty, that's OK
+    $properties
+}
+
+run_test "property list - via pipeline" {
+    anytype space get $TEST_SPACE | anytype property list
+}
+
+run_test "property list - verify structure" {
+    let properties = (anytype property list --space $TEST_SPACE)
+    if not ($properties | is-empty) {
+        let first_prop = ($properties | first)
+        let type_name = ($first_prop | describe)
+        if ($type_name != "AnytypeValue") {
+            error make {msg: $"Expected AnytypeValue, got ($type_name)"}
+        }
+    }
+    {status: "OK"}
+}
+
+# run_test "property get - nonexistent property" --expect_error {
+#     anytype property get "nonexistent-property-12345" --space $TEST_SPACE
+# }
+
+# ============================================================================
 # Search Tests
 # ============================================================================
 print ""

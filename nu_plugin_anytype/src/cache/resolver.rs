@@ -122,19 +122,29 @@ impl Resolver {
         })
     }
 
-    /// Resolve property name to ID within a type
-    pub async fn resolve_property(&self, type_id: &str, name: &str) -> Result<String> {
-        // Check cache first
-        if let Some(id) = self.cache.get_property(type_id, name) {
+    /// Resolve property name to ID within a space
+    pub async fn resolve_property(&self, space_id: &str, name: &str) -> Result<String> {
+        // Check cache first - use space_id as the parent context
+        if let Some(id) = self.cache.get_property(space_id, name) {
             return Ok(id);
         }
 
         // Cache miss - fetch from API
-        // TODO: Implement list_properties API call when available
-        // For now, return an error
-        Err(AnytypeError::Api {
-            message: format!("Property resolution not yet implemented. Cannot find '{}'", name),
-        })
+        let properties = self.client.list_properties(space_id).await?;
+
+        // Find property by name (case-insensitive)
+        let property = properties
+            .iter()
+            .find(|p| p.name.eq_ignore_ascii_case(name))
+            .ok_or_else(|| AnytypeError::Api {
+                message: format!("No Property found with name '{}' in space '{}'", name, space_id),
+            })?;
+
+        // Cache the result
+        self.cache
+            .insert_property(space_id.to_string(), name.to_string(), property.id.clone());
+
+        Ok(property.id.clone())
     }
 
     /// Resolve tag name to ID within a property
