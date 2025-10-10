@@ -1,10 +1,10 @@
 pub mod auth;
 pub mod import;
-pub mod lists;
-pub mod members;
-pub mod properties;
+pub mod list;
+pub mod member;
+pub mod property;
 pub mod search;
-pub mod spaces;
-pub mod tags;
-pub mod templates;
-pub mod types;
+pub mod space;
+pub mod tag;
+pub mod template;
+pub mod r#type;

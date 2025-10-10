@@ -3,13 +3,13 @@ use anytype_rs::api::{AnytypeClient, Color, CreateTagRequest, UpdateTagRequest};
 use clap::{Args, Subcommand};
 
 #[derive(Debug, Args)]
-pub struct TagsArgs {
+pub struct TagArgs {
     #[command(subcommand)]
-    pub command: TagsCommand,
+    pub command: TagCommand,
 }
 
 #[derive(Debug, Subcommand)]
-pub enum TagsCommand {
+pub enum TagCommand {
     /// List tags for a specific property in a space
     List {
         /// Space ID
@@ -68,7 +68,7 @@ pub enum TagsCommand {
     },
 }
 
-pub async fn handle_tags_command(args: TagsArgs) -> Result<()> {
+pub async fn handle_tag_command(args: TagArgs) -> Result<()> {
     let api_key = crate::config::load_api_key()?
         .ok_or_else(|| anyhow::anyhow!("Not authenticated. Run 'anytype auth login' first."))?;
 
@@ -76,30 +76,30 @@ pub async fn handle_tags_command(args: TagsArgs) -> Result<()> {
     client.set_api_key(api_key);
 
     match args.command {
-        TagsCommand::List {
+        TagCommand::List {
             space_id,
             property_id,
             limit,
         } => list_tags(&client, &space_id, &property_id, limit).await,
-        TagsCommand::Create {
+        TagCommand::Create {
             space_id,
             property_id,
             name,
             color,
         } => create_tag(&client, &space_id, &property_id, &name, &color).await,
-        TagsCommand::Get {
+        TagCommand::Get {
             space_id,
             property_id,
             tag_id,
         } => get_tag(&client, &space_id, &property_id, &tag_id).await,
-        TagsCommand::Update {
+        TagCommand::Update {
             space_id,
             property_id,
             tag_id,
             name,
             color,
         } => update_tag(&client, &space_id, &property_id, &tag_id, &name, &color).await,
-        TagsCommand::Delete {
+        TagCommand::Delete {
             space_id,
             property_id,
             tag_id,

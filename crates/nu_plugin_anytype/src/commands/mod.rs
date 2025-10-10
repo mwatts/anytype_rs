@@ -11,7 +11,7 @@ pub mod search;
 pub mod space;
 pub mod tag;
 pub mod template;
-pub mod types;
+pub mod r#type;
 
 // Future phases:
 // Phase 8: tag.rs
@@ -28,4 +28,4 @@ pub use search::Search;
 pub use space::{SpaceCreate, SpaceGet, SpaceList};
 pub use tag::{TagCreate, TagDelete, TagGet, TagList, TagUpdate};
 pub use template::TemplateList;
-pub use types::{TypeGet, TypeList};
+pub use r#type::{TypeGet, TypeList};

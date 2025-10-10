@@ -6,13 +6,13 @@ use clap::{Args, Subcommand};
 use tracing::debug;
 
 #[derive(Debug, Args)]
-pub struct MembersArgs {
+pub struct MemberArgs {
     #[command(subcommand)]
-    pub command: MembersCommand,
+    pub command: MemberCommand,
 }
 
 #[derive(Debug, Subcommand)]
-pub enum MembersCommand {
+pub enum MemberCommand {
     /// List members in a space
     List {
         /// Space ID to list members from
@@ -35,7 +35,7 @@ pub enum MembersCommand {
     },
 }
 
-pub async fn handle_members_command(args: MembersArgs) -> Result<()> {
+pub async fn handle_member_command(args: MemberArgs) -> Result<()> {
     debug!("Handling members command: {:?}", args.command);
 
     let api_key = crate::config::load_api_key()?
@@ -45,7 +45,7 @@ pub async fn handle_members_command(args: MembersArgs) -> Result<()> {
     client.set_api_key(api_key);
 
     match args.command {
-        MembersCommand::List {
+        MemberCommand::List {
             space_id,
             pagination,
         } => {
@@ -63,7 +63,7 @@ pub async fn handle_members_command(args: MembersArgs) -> Result<()> {
                 println!("{}", serde_json::to_string_pretty(&members)?);
             }
         }
-        MembersCommand::Get {
+        MemberCommand::Get {
             space_id,
             member_id,
         } => {

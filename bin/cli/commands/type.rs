@@ -6,9 +6,9 @@ use anytype_rs::api::{
 use clap::{Args, Subcommand};
 
 #[derive(Debug, Args)]
-pub struct TypesArgs {
+pub struct TypeArgs {
     #[command(subcommand)]
-    pub command: TypesCommand,
+    pub command: TypeCommand,
 }
 
 #[derive(Debug)]
@@ -23,7 +23,7 @@ struct CreateTypeParams {
 }
 
 #[derive(Debug, Subcommand)]
-pub enum TypesCommand {
+pub enum TypeCommand {
     /// List types in a space
     List {
         /// Space ID
@@ -96,7 +96,7 @@ pub enum TypesCommand {
     },
 }
 
-pub async fn handle_types_command(args: TypesArgs) -> Result<()> {
+pub async fn handle_type_command(args: TypeArgs) -> Result<()> {
     let api_key = crate::config::load_api_key()?
         .ok_or_else(|| anyhow::anyhow!("Not authenticated. Run 'anytype auth login' first."))?;
 
@@ -104,9 +104,9 @@ pub async fn handle_types_command(args: TypesArgs) -> Result<()> {
     client.set_api_key(api_key);
 
     match args.command {
-        TypesCommand::List { space_id, limit } => list_types(&client, &space_id, limit).await,
-        TypesCommand::Get { space_id, type_id } => get_type(&client, &space_id, &type_id).await,
-        TypesCommand::Create {
+        TypeCommand::List { space_id, limit } => list_types(&client, &space_id, limit).await,
+        TypeCommand::Get { space_id, type_id } => get_type(&client, &space_id, &type_id).await,
+        TypeCommand::Create {
             space_id,
             key,
             name,
@@ -126,7 +126,7 @@ pub async fn handle_types_command(args: TypesArgs) -> Result<()> {
             };
             create_type(&client, create_params).await
         }
-        TypesCommand::Update {
+        TypeCommand::Update {
             space_id,
             type_id,
             key,
@@ -147,7 +147,7 @@ pub async fn handle_types_command(args: TypesArgs) -> Result<()> {
             };
             update_type(&client, &type_id, update_params).await
         }
-        TypesCommand::Delete { space_id, type_id } => {
+        TypeCommand::Delete { space_id, type_id } => {
             delete_type(&client, &space_id, &type_id).await
         }
     }
