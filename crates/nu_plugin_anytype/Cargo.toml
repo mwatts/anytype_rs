@@ -1,8 +1,8 @@
 [package]
 name = "nu_plugin_anytype"
-version = "0.0.1"
+version = "0.0.2"
 authors = ["Mark Watts <18381+mwatts@users.noreply.github.com>"]
-description = "A Nushell plugin for interacting with Anytype via anytype_rs"
+description = "A Nushell plugin for interacting with Anytype"
 repository.workspace = true
 edition.workspace = true
 license.workspace = true

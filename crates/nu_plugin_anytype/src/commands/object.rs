@@ -1,4 +1,4 @@
-use crate::{commands::common::get_space_id, value::AnytypeValue, AnytypePlugin};
+use crate::{AnytypePlugin, commands::common::get_space_id, value::AnytypeValue};
 use nu_plugin::{EngineInterface, EvaluatedCall, PluginCommand};
 use nu_protocol::{Category, LabeledError, PipelineData, Signature, SyntaxShape, Value};
 
@@ -27,11 +27,15 @@ impl PluginCommand for ObjectList {
             .input_output_types(vec![
                 (
                     nu_protocol::Type::Nothing,
-                    nu_protocol::Type::List(Box::new(nu_protocol::Type::Custom("AnytypeValue".into()))),
+                    nu_protocol::Type::List(Box::new(nu_protocol::Type::Custom(
+                        "AnytypeValue".into(),
+                    ))),
                 ),
                 (
                     nu_protocol::Type::Custom("AnytypeValue".into()),
-                    nu_protocol::Type::List(Box::new(nu_protocol::Type::Custom("AnytypeValue".into()))),
+                    nu_protocol::Type::List(Box::new(nu_protocol::Type::Custom(
+                        "AnytypeValue".into(),
+                    ))),
                 ),
             ])
             .category(Category::Custom("anytype".into()))
@@ -173,9 +177,11 @@ impl PluginCommand for ObjectGet {
             .map_err(|e| LabeledError::new(format!("Failed to get object: {}", e)))?;
 
         // Extract type_key from object.object field
-        let type_key = obj.object.as_ref().ok_or_else(|| {
-            LabeledError::new(format!("Object {} missing type key", obj.id))
-        })?.clone();
+        let type_key = obj
+            .object
+            .as_ref()
+            .ok_or_else(|| LabeledError::new(format!("Object {} missing type key", obj.id)))?
+            .clone();
 
         // Resolve type_key to space-specific type_id
         // If resolution fails (e.g., for system types), use the type_key as fallback
@@ -185,6 +191,9 @@ impl PluginCommand for ObjectGet {
 
         // Convert to AnytypeValue::Object with full context
         let anytype_value: AnytypeValue = (obj, space_id, type_id, type_key).into();
-        Ok(PipelineData::Value(Value::custom(Box::new(anytype_value), span), None))
+        Ok(PipelineData::Value(
+            Value::custom(Box::new(anytype_value), span),
+            None,
+        ))
     }
 }

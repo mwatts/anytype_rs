@@ -62,20 +62,16 @@ impl ResolveCache {
     }
 
     pub fn insert_space(&self, name: String, id: String) {
-        self.spaces
-            .insert(name, CacheEntry::new(id, self.ttl));
+        self.spaces.insert(name, CacheEntry::new(id, self.ttl));
     }
 
     pub fn invalidate_space(&self, space_id: &str) {
         // Remove space
         self.spaces.retain(|_, entry| entry.value != space_id);
         // Cascade: remove all types, objects, lists in this space
-        self.types
-            .retain(|k, _| k.0 != space_id);
-        self.objects
-            .retain(|k, _| k.0 != space_id);
-        self.lists
-            .retain(|k, _| k.0 != space_id);
+        self.types.retain(|k, _| k.0 != space_id);
+        self.objects.retain(|k, _| k.0 != space_id);
+        self.lists.retain(|k, _| k.0 != space_id);
     }
 
     // Type operations
@@ -101,8 +97,7 @@ impl ResolveCache {
         self.types
             .retain(|k, entry| !(k.0 == space_id && entry.value == type_id));
         // Cascade: remove all properties for this type
-        self.properties
-            .retain(|k, _| k.0 != type_id);
+        self.properties.retain(|k, _| k.0 != type_id);
         // Cascade: remove all tags for those properties
         for prop_id in property_ids {
             self.tags.retain(|k, _| k.0 != prop_id);
@@ -135,8 +130,7 @@ impl ResolveCache {
     }
 
     pub fn invalidate_list(&self, space_id: &str, name: &str) {
-        self.lists
-            .remove(&(space_id.to_string(), name.to_string()));
+        self.lists.remove(&(space_id.to_string(), name.to_string()));
     }
 
     // Property operations
@@ -154,8 +148,7 @@ impl ResolveCache {
         self.properties
             .retain(|k, entry| !(k.0 == type_id && entry.value == property_id));
         // Cascade: remove all tags for this property
-        self.tags
-            .retain(|k, _| k.0 != property_id);
+        self.tags.retain(|k, _| k.0 != property_id);
     }
 
     // Tag operations
@@ -232,7 +225,11 @@ mod tests {
 
         // Insert space, type, and property
         cache.insert_space("Work".to_string(), "sp_123".to_string());
-        cache.insert_type("sp_123".to_string(), "Task".to_string(), "ot_456".to_string());
+        cache.insert_type(
+            "sp_123".to_string(),
+            "Task".to_string(),
+            "ot_456".to_string(),
+        );
         cache.insert_property(
             "ot_456".to_string(),
             "Status".to_string(),

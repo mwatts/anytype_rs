@@ -1,4 +1,4 @@
-use crate::{commands::common::get_space_id, value::AnytypeValue, AnytypePlugin};
+use crate::{AnytypePlugin, commands::common::get_space_id, value::AnytypeValue};
 use nu_plugin::{EngineInterface, EvaluatedCall, PluginCommand};
 use nu_protocol::{Category, LabeledError, PipelineData, Signature, SyntaxShape, Value};
 
@@ -18,12 +18,7 @@ impl PluginCommand for MemberList {
 
     fn signature(&self) -> Signature {
         Signature::build(self.name())
-            .named(
-                "space",
-                SyntaxShape::String,
-                "Name of the space",
-                Some('s'),
-            )
+            .named("space", SyntaxShape::String, "Name of the space", Some('s'))
             .category(Category::Custom("anytype".into()))
     }
 
@@ -38,9 +33,9 @@ impl PluginCommand for MemberList {
         let input = input.into_value(span)?;
         let space_id = get_space_id(plugin, call, &input, span)?;
 
-        let client = plugin.client().map_err(|e| {
-            LabeledError::new(format!("Failed to get client: {}", e))
-        })?;
+        let client = plugin
+            .client()
+            .map_err(|e| LabeledError::new(format!("Failed to get client: {}", e)))?;
 
         let members = plugin
             .run_async(client.list_members(&space_id))

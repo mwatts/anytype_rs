@@ -229,10 +229,7 @@ impl CustomValue for AnytypeValue {
                     record.push("description", Value::string(desc, span));
                 }
                 if let Some(icon_val) = icon {
-                    record.push(
-                        "icon",
-                        Value::string(icon_val.to_string(), span),
-                    );
+                    record.push("icon", Value::string(icon_val.to_string(), span));
                 }
                 record.push("_type", Value::string("space", span));
             }
@@ -255,10 +252,7 @@ impl CustomValue for AnytypeValue {
                 if let Some(icon_val) = icon {
                     record.push("icon", Value::string(format!("{:?}", icon_val), span));
                 }
-                record.push(
-                    "properties",
-                    Value::string(properties.to_string(), span),
-                );
+                record.push("properties", Value::string(properties.to_string(), span));
                 record.push("_type", Value::string("type", span));
             }
             Self::Object {
@@ -284,10 +278,7 @@ impl CustomValue for AnytypeValue {
                 record.push("space_id", Value::string(space_id, span));
                 record.push("type_id", Value::string(type_id, span));
                 record.push("type_key", Value::string(type_key, span));
-                record.push(
-                    "properties",
-                    Value::string(properties.to_string(), span),
-                );
+                record.push("properties", Value::string(properties.to_string(), span));
                 record.push("_type", Value::string("object", span));
             }
             Self::Property {
@@ -396,7 +387,8 @@ impl From<(AnytypeType, String)> for AnytypeValue {
             key: type_data.key,
             icon: Some(type_data.icon),
             layout: type_data.layout,
-            properties: serde_json::to_value(&type_data.properties).unwrap_or(serde_json::json!([])),
+            properties: serde_json::to_value(&type_data.properties)
+                .unwrap_or(serde_json::json!([])),
             space_id,
         }
     }
@@ -405,13 +397,15 @@ impl From<(AnytypeType, String)> for AnytypeValue {
 /// CRITICAL: Object conversion requires explicit context
 /// Takes (object, space_id, type_id, type_key)
 impl From<(anytype_rs::Object, String, String, String)> for AnytypeValue {
-    fn from((obj, space_id, type_id, type_key): (anytype_rs::Object, String, String, String)) -> Self {
+    fn from(
+        (obj, space_id, type_id, type_key): (anytype_rs::Object, String, String, String),
+    ) -> Self {
         Self::Object {
             id: obj.id,
             name: obj.name,
             properties: obj.properties,
-            markdown: None,        // May be populated from separate API call
-            snippet: None,         // May be populated from API response
+            markdown: None, // May be populated from separate API call
+            snippet: None,  // May be populated from API response
             space_id,
             type_id,
             type_key,

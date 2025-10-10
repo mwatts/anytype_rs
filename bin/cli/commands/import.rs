@@ -195,7 +195,7 @@ async fn import_markdown(
 fn parse_frontmatter(content: &str) -> Result<(HashMap<String, JsonValue>, String)> {
     let matter = Matter::<YAML>::new();
 
-    let result = matter.parse(content);
+    let result: gray_matter::ParsedEntity = matter.parse(content)?;
 
     let frontmatter = if let Some(data) = result.data {
         // Convert gray_matter Pod data to HashMap<String, JsonValue>

@@ -1,5 +1,5 @@
 /// Common helper functions for commands
-use crate::{value::AnytypeValue, AnytypePlugin};
+use crate::{AnytypePlugin, value::AnytypeValue};
 use nu_plugin::EvaluatedCall;
 use nu_protocol::{LabeledError, Span, Value};
 
@@ -90,8 +90,8 @@ pub fn get_type_id(
     }
 
     // No type context found
-    Err(LabeledError::new(
-        "Type context required. Use --type <name> or pipe a Type",
+    Err(
+        LabeledError::new("Type context required. Use --type <name> or pipe a Type")
+            .with_label("Missing type context", span),
     )
-    .with_label("Missing type context", span))
 }

@@ -3,8 +3,8 @@
 //! These tests verify that serialization and deserialization work correctly
 //! for all types: deserialize(serialize(x)) == x
 
-use anytype_rs::api::types::{Color, Format, Icon, Pagination};
 use anytype_rs::api::Sort;
+use anytype_rs::api::types::{Color, Format, Icon, Pagination};
 use proptest::prelude::*;
 
 use super::strategies::*;

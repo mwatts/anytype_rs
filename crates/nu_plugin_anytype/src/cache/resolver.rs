@@ -35,8 +35,7 @@ impl Resolver {
             })?;
 
         // Cache the result
-        self.cache
-            .insert_space(name.to_string(), space.id.clone());
+        self.cache.insert_space(name.to_string(), space.id.clone());
 
         Ok(space.id.clone())
     }
@@ -71,12 +70,16 @@ impl Resolver {
         // In the future, this could use a separate cache
         let types = self.client.list_types(space_id).await?;
 
-        let type_data = types
-            .iter()
-            .find(|t| t.key == type_key)
-            .ok_or_else(|| AnytypeError::Api {
-                message: format!("No Type found with key '{}' in space '{}'", type_key, space_id),
-            })?;
+        let type_data =
+            types
+                .iter()
+                .find(|t| t.key == type_key)
+                .ok_or_else(|| AnytypeError::Api {
+                    message: format!(
+                        "No Type found with key '{}' in space '{}'",
+                        type_key, space_id
+                    ),
+                })?;
 
         Ok(type_data.id.clone())
     }
@@ -97,7 +100,10 @@ impl Resolver {
             .iter()
             .find(|o| o.name.as_deref() == Some(name))
             .ok_or_else(|| AnytypeError::Api {
-                message: format!("No Object found with name '{}' in space '{}'", name, space_id),
+                message: format!(
+                    "No Object found with name '{}' in space '{}'",
+                    name, space_id
+                ),
             })?;
 
         // Cache the result
@@ -118,7 +124,10 @@ impl Resolver {
         // TODO: Implement list_lists API call when available
         // For now, return an error
         Err(AnytypeError::Api {
-            message: format!("List resolution not yet implemented. Cannot find '{}'", name),
+            message: format!(
+                "List resolution not yet implemented. Cannot find '{}'",
+                name
+            ),
         })
     }
 
@@ -137,7 +146,10 @@ impl Resolver {
             .iter()
             .find(|p| p.name.eq_ignore_ascii_case(name))
             .ok_or_else(|| AnytypeError::Api {
-                message: format!("No Property found with name '{}' in space '{}'", name, space_id),
+                message: format!(
+                    "No Property found with name '{}' in space '{}'",
+                    name, space_id
+                ),
             })?;
 
         // Cache the result
@@ -148,7 +160,12 @@ impl Resolver {
     }
 
     /// Resolve tag name to ID within a property
-    pub async fn resolve_tag(&self, space_id: &str, property_id: &str, name: &str) -> Result<String> {
+    pub async fn resolve_tag(
+        &self,
+        space_id: &str,
+        property_id: &str,
+        name: &str,
+    ) -> Result<String> {
         // Check cache first
         if let Some(id) = self.cache.get_tag(property_id, name) {
             return Ok(id);
@@ -161,7 +178,10 @@ impl Resolver {
             .iter()
             .find(|t| t.name == name)
             .ok_or_else(|| AnytypeError::Api {
-                message: format!("No Tag found with name '{}' in property '{}'", name, property_id),
+                message: format!(
+                    "No Tag found with name '{}' in property '{}'",
+                    name, property_id
+                ),
             })?;
 
         // Cache the result
