@@ -1,5 +1,5 @@
 use super::cache::ResolveCache;
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
 use anytype_rs::AnytypeClient;
 
 /// Resolver that wraps API client and caching layer
@@ -60,20 +60,20 @@ impl<'a> Resolver<'a> {
         let types = self.client.list_types(space_id).await?;
 
         // Find type by name
-        let type_obj = types
-            .iter()
-            .find(|t| t.name == name_or_id)
-            .ok_or_else(|| {
-                anyhow!(
-                    "No type found with name '{}' in space '{}'",
-                    name_or_id,
-                    space_id
-                )
-            })?;
+        let type_obj = types.iter().find(|t| t.name == name_or_id).ok_or_else(|| {
+            anyhow!(
+                "No type found with name '{}' in space '{}'",
+                name_or_id,
+                space_id
+            )
+        })?;
 
         // Cache the result
-        self.cache
-            .insert_type(space_id.to_string(), name_or_id.to_string(), type_obj.id.clone());
+        self.cache.insert_type(
+            space_id.to_string(),
+            name_or_id.to_string(),
+            type_obj.id.clone(),
+        );
 
         Ok(type_obj.id.clone())
     }
@@ -98,7 +98,9 @@ fn is_uuid_like(s: &str) -> bool {
         && parts[2].len() == 4
         && parts[3].len() == 4
         && parts[4].len() == 12
-        && parts.iter().all(|p| p.chars().all(|c| c.is_ascii_hexdigit()))
+        && parts
+            .iter()
+            .all(|p| p.chars().all(|c| c.is_ascii_hexdigit()))
 }
 
 #[cfg(test)]

@@ -155,9 +155,7 @@ pub async fn handle_type_command(args: TypeArgs) -> Result<()> {
             };
             update_type(&client, &type_name, update_params).await
         }
-        TypeCommand::Delete { space, type_name } => {
-            delete_type(&client, &space, &type_name).await
-        }
+        TypeCommand::Delete { space, type_name } => delete_type(&client, &space, &type_name).await,
     }
 }
 

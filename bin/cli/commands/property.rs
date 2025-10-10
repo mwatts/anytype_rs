@@ -78,10 +78,7 @@ pub async fn handle_property_command(args: PropertyArgs) -> Result<()> {
             let space_id = resolver.resolve_space(&space).await?;
             list_properties(&client, &space_id, limit).await
         }
-        PropertyCommand::Get {
-            space,
-            property_id,
-        } => {
+        PropertyCommand::Get { space, property_id } => {
             let resolver = crate::resolver::Resolver::new(&client, 300);
             let space_id = resolver.resolve_space(&space).await?;
             get_property(&client, &space_id, &property_id).await
@@ -105,10 +102,7 @@ pub async fn handle_property_command(args: PropertyArgs) -> Result<()> {
             let space_id = resolver.resolve_space(&space).await?;
             update_property(&client, &space_id, &property_id, &name, &format).await
         }
-        PropertyCommand::Delete {
-            space,
-            property_id,
-        } => {
+        PropertyCommand::Delete { space, property_id } => {
             let resolver = crate::resolver::Resolver::new(&client, 300);
             let space_id = resolver.resolve_space(&space).await?;
             delete_property(&client, &space_id, &property_id).await

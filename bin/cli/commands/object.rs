@@ -87,10 +87,7 @@ pub async fn handle_object_command(args: ObjectArgs) -> Result<()> {
             let space_id = resolver.resolve_space(&space).await?;
             update_object(&client, &space_id, &object_id, name, markdown).await
         }
-        ObjectCommand::Delete {
-            space,
-            object_id,
-        } => {
+        ObjectCommand::Delete { space, object_id } => {
             let resolver = crate::resolver::Resolver::new(&client, 300);
             let space_id = resolver.resolve_space(&space).await?;
             delete_object(&client, &space_id, &object_id).await

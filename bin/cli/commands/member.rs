@@ -45,10 +45,7 @@ pub async fn handle_member_command(args: MemberArgs) -> Result<()> {
     client.set_api_key(api_key);
 
     match args.command {
-        MemberCommand::List {
-            space,
-            pagination,
-        } => {
+        MemberCommand::List { space, pagination } => {
             // Create resolver for space name resolution
             let resolver = crate::resolver::Resolver::new(&client, 300);
             let space_id = resolver.resolve_space(&space).await?;
@@ -67,10 +64,7 @@ pub async fn handle_member_command(args: MemberArgs) -> Result<()> {
                 println!("{}", serde_json::to_string_pretty(&members)?);
             }
         }
-        MemberCommand::Get {
-            space,
-            member_id,
-        } => {
+        MemberCommand::Get { space, member_id } => {
             // Create resolver for space name resolution
             let resolver = crate::resolver::Resolver::new(&client, 300);
             let space_id = resolver.resolve_space(&space).await?;
