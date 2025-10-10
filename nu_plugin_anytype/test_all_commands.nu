@@ -368,15 +368,44 @@ print ""
 print "## Template Tests"
 print ""
 
-# Template tests disabled - implementation requires --type parameter (not yet implemented)
-# run_test "template list - with space flag" {
-#     # Templates can be empty
-#     anytype template list --space $TEST_SPACE
-# }
-#
-# run_test "template list - via pipeline" {
-#     anytype space get $TEST_SPACE | anytype template list
-# }
+run_test "template list - with type and space flags" {
+    # First get a type to use for template listing
+    let types = (anytype type list --space $TEST_SPACE)
+    if ($types | is-empty) {
+        error make {msg: "No types found in space for template test"}
+    }
+    # Get the first type's name from the custom value by converting to record
+    let first_type = ($types | first | into record)
+    let type_name = $first_type.name
+    
+    # List templates for this type (can be empty, that's OK)
+    anytype template list --type $type_name --space $TEST_SPACE
+}
+
+run_test "template list - via type pipeline" {
+    # Get types first
+    let types = (anytype type list --space $TEST_SPACE)
+    if ($types | is-empty) {
+        error make {msg: "No types found in space for template test"}
+    }
+    let first_type = ($types | first)
+    
+    # Pipe the type to template list (space context from pipeline)
+    $first_type | anytype template list
+}
+
+run_test "template list - via space pipeline with type flag" {
+    # Get types first to get a type name
+    let types = (anytype type list --space $TEST_SPACE)
+    if ($types | is-empty) {
+        error make {msg: "No types found in space for template test"}
+    }
+    let first_type = ($types | first | into record)
+    let type_name = $first_type.name
+    
+    # Pipe space, provide type via flag
+    anytype space get $TEST_SPACE | anytype template list --type $type_name
+}
 
 # ============================================================================
 # Resolve Tests
