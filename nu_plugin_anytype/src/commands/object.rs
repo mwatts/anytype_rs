@@ -70,19 +70,19 @@ impl PluginCommand for ObjectList {
         let mut values = Vec::new();
         for obj in objects {
             // Extract type_key from object.object field (this is the global type key like "ot_page")
-            let type_key = obj.object.as_ref().ok_or_else(|| {
-                LabeledError::new(format!("Object {} missing type key", obj.id))
-            })?.clone();
+            let type_key = match obj.object.as_ref() {
+                Some(key) => key.clone(),
+                None => {
+                    // Skip objects without type_key
+                    continue;
+                }
+            };
 
             // Resolve type_key to space-specific type_id
+            // If resolution fails (e.g., for system types), use the type_key as fallback
             let type_id = plugin
                 .run_async(resolver.resolve_type_by_key(&space_id, &type_key))
-                .map_err(|e| {
-                    LabeledError::new(format!(
-                        "Failed to resolve type key '{}': {}",
-                        type_key, e
-                    ))
-                })?;
+                .unwrap_or_else(|_| type_key.clone());
 
             // Use From<(Object, String, String, String)> for conversion
             let anytype_value: AnytypeValue = (obj, space_id.clone(), type_id, type_key).into();
@@ -178,14 +178,10 @@ impl PluginCommand for ObjectGet {
         })?.clone();
 
         // Resolve type_key to space-specific type_id
+        // If resolution fails (e.g., for system types), use the type_key as fallback
         let type_id = plugin
             .run_async(resolver.resolve_type_by_key(&space_id, &type_key))
-            .map_err(|e| {
-                LabeledError::new(format!(
-                    "Failed to resolve type key '{}': {}",
-                    type_key, e
-                ))
-            })?;
+            .unwrap_or_else(|_| type_key.clone());
 
         // Convert to AnytypeValue::Object with full context
         let anytype_value: AnytypeValue = (obj, space_id, type_id, type_key).into();

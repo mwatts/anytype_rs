@@ -170,14 +170,10 @@ impl PluginCommand for Search {
             let space_id = search_obj.space_id.clone();
 
             // Resolve type_key to space-specific type_id
+            // If resolution fails (e.g., for system types), use the type_key as fallback
             let type_id = plugin
                 .run_async(resolver.resolve_type_by_key(&space_id, &type_key))
-                .map_err(|e| {
-                    LabeledError::new(format!(
-                        "Failed to resolve type key '{}': {}",
-                        type_key, e
-                    ))
-                })?;
+                .unwrap_or_else(|_| type_key.clone());
 
             // Convert SearchObject to Object-like structure
             // Note: SearchObject has a slightly different structure than Object

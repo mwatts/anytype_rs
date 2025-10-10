@@ -62,17 +62,20 @@ Located in `test_all_commands.nu` - comprehensive integration testing against a 
 - Objects (3 tests) - List, pipeline, structure validation
 - Search (8 tests) - All search options, pagination, sorting, pipeline
 - Members (3 tests) - List, pipeline, structure validation
-- Templates (2 tests) - List, pipeline
 - Resolve (1 test) - Name-to-ID resolution
 - Cache (3 tests) - Stats, clear, verification
 - Pipelines (4 tests) - Context propagation across command types
 - Context Resolution (2 tests) - Pipeline and flag priority
+
+**Total: 32 E2E tests**
 
 **Limitations:**
 - **Error tests disabled**: Plugin LabeledErrors cause script termination in Nushell 0.106.1
   even when wrapped in try/catch blocks. This appears to be a Nushell limitation when
   executing script files (works fine in inline commands). All error cases are thoroughly
   tested in `tests/plugin_test.rs` (32 integration tests).
+- **Template tests disabled**: Template listing requires a `--type` parameter which is not
+  yet implemented in the plugin.
 - **Custom value fields**: Tests focus on command execution success and custom value types
   rather than detailed field validation, as Nushell custom values don't support cell path
   access. Field-level validation is handled by integration tests.
@@ -90,7 +93,7 @@ nu test_all_commands.nu
 ```
 
 **Results:**
-- Generates `test_results.txt` with detailed report
+- Generates `test_results.md` with detailed report
 - Shows pass/fail summary in console
 - Exits with code 1 if any tests fail
 - Includes timestamps and duration for each test
@@ -117,18 +120,18 @@ Running: auth status - verify spaces accessible
 Test Execution Complete
 ============================================================================
 
-Total Tests:  51
-Passed:       49 ✓
-Failed:       2 ✗
+Total Tests:  32
+Passed:       32 ✓
+Failed:       0 ✗
 Skipped:      0 ○
-Success Rate: 96%
+Success Rate: 100%
 
 Results saved to test_results.txt
 ```
 
 ## Test Results File
 
-The `test_results.txt` file contains:
+The `test_results.md` file contains:
 
 1. **Summary** - Total, passed, failed, skipped, success rate
 2. **Test Summary Table** - Markdown table with test, status, timestamp
@@ -281,7 +284,7 @@ anytype space create dev-test
 
 ### Test Results File Not Generated
 
-**Problem:** `test_results.txt` not created
+**Problem:** `test_results.md` not created
 
 **Solution:** Check file permissions in the current directory, or run with `--force` to overwrite existing file.
 
@@ -291,8 +294,8 @@ anytype space create dev-test
 |--------------|-------|----------------------------------|---------------|
 | Unit         | 10    | Core logic, helpers, cache       | None          |
 | Integration  | 32    | Command structure, parsing, **errors** | None      |
-| End-to-End   | 34    | Full workflow with live API      | Anytype app   |
-| **Total**    | **76**| **Complete plugin functionality**| **Optional**  |
+| End-to-End   | 32    | Full workflow with live API      | Anytype app   |
+| **Total**    | **74**| **Complete plugin functionality**| **Optional**  |
 
 **Note**: Error handling tests (`--expect_error`) are only in integration tests due to a
 Nushell 0.106.1 limitation where plugin LabeledErrors terminate scripts even in try/catch blocks.

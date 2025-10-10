@@ -1,7 +1,12 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "WebFetch(domain:docs.rs)",
+      "Bash(git checkout:*)",
+      "Bash(./test_all_commands.nu)",
+      "Bash(nu:*)",
+      "Bash(anytype spaces:*)"
     ],
     "deny": [],
     "ask": []
