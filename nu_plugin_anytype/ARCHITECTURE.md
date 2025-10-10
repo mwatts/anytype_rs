@@ -6,7 +6,7 @@ Technical design documentation for the Nushell Anytype plugin.
 
 The plugin provides a bridge between Nushell and the local Anytype application, enabling name-based access to Anytype entities through Nushell's pipeline system.
 
-**Status:** Production Ready (21 commands, 10 tests passing)
+**Status:** Production Ready (25 commands, 43 tests passing)
 **Nu-plugin version:** 0.106.1
 
 ## Design Principles
@@ -198,6 +198,7 @@ impl PluginCommand for CommandName {
 - **Space** (3) - Space CRUD operations
 - **Type** (2) - Type listing and retrieval
 - **Object** (2) - Object listing and retrieval
+- **List** (4) - List/collection operations
 - **Member** (1) - Member listing
 - **Template** (1) - Template listing
 - **Search** (1) - Full-text search
