@@ -34,28 +34,28 @@ pub enum Commands {
     Import(commands::import::ImportArgs),
 
     /// List management commands
-    Lists(commands::lists::ListsArgs),
+    List(commands::list::ListsArgs),
 
     /// Member management commands
-    Members(commands::members::MembersArgs),
+    Member(commands::member::MembersArgs),
 
     /// Property management commands
-    Properties(commands::properties::PropertiesArgs),
+    Property(commands::property::PropertiesArgs),
 
     /// Space management commands
-    Spaces(commands::spaces::SpacesArgs),
+    Space(commands::space::SpacesArgs),
 
     /// Search for objects
     Search(commands::search::SearchArgs),
 
     /// Tag management commands
-    Tags(commands::tags::TagsArgs),
+    Tag(commands::tag::TagsArgs),
 
     /// Template management commands
-    Templates(commands::templates::TemplatesArgs),
+    Template(commands::template::TemplatesArgs),
 
     /// Type management commands
-    Types(commands::types::TypesArgs),
+    Type(commands::r#type::TypesArgs),
 }
 
 #[tokio::main]
@@ -69,14 +69,14 @@ async fn main() -> Result<()> {
     let result = match cli.command {
         Commands::Auth(args) => commands::auth::handle_auth_command(args).await,
         Commands::Import(args) => commands::import::handle_import_command(args).await,
-        Commands::Lists(args) => commands::lists::handle_lists_command(args).await,
-        Commands::Members(args) => commands::members::handle_members_command(args).await,
-        Commands::Properties(args) => commands::properties::handle_properties_command(args).await,
-        Commands::Spaces(args) => commands::spaces::handle_spaces_command(args).await,
+        Commands::List(args) => commands::list::handle_lists_command(args).await,
+        Commands::Member(args) => commands::member::handle_members_command(args).await,
+        Commands::Property(args) => commands::property::handle_properties_command(args).await,
+        Commands::Space(args) => commands::space::handle_spaces_command(args).await,
         Commands::Search(args) => commands::search::handle_search_command(args).await,
-        Commands::Tags(args) => commands::tags::handle_tags_command(args).await,
-        Commands::Templates(args) => commands::templates::handle_templates_command(args).await,
-        Commands::Types(args) => commands::types::handle_types_command(args).await,
+        Commands::Tag(args) => commands::tag::handle_tags_command(args).await,
+        Commands::Template(args) => commands::template::handle_templates_command(args).await,
+        Commands::Type(args) => commands::r#type::handle_types_command(args).await,
     };
 
     if let Err(ref error) = result {
