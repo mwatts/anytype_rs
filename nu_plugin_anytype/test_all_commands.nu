@@ -325,6 +325,43 @@ run_test "member list - verify structure" {
 }
 
 # ============================================================================
+# List Tests (Collections)
+# ============================================================================
+print ""
+print "## List Tests (Collections)"
+print ""
+
+# Note: These tests assume at least one collection/list exists in the test space
+# If no collections exist, tests will be skipped or fail gracefully
+
+run_test "list objects - basic usage" {
+    # Try to list objects from first available collection
+    # Note: This requires a collection to exist in the space
+    anytype list objects "Tasks" --space $TEST_SPACE
+} --skip
+
+run_test "list objects - with limit" {
+    anytype list objects "Tasks" --space $TEST_SPACE --limit 5
+} --skip
+
+run_test "list views - basic usage" {
+    # Get views for a collection
+    anytype list views "Tasks" --space $TEST_SPACE
+} --skip
+
+run_test "list add - add objects to list" {
+    # This test requires valid object IDs
+    # Skipped because we don't have object IDs in the test environment
+    anytype list add "Tasks" --objects ["obj1", "obj2"] --space $TEST_SPACE
+} --skip
+
+run_test "list remove - remove object from list" {
+    # This test requires valid object ID
+    # Skipped because we don't have object IDs in the test environment
+    anytype list remove "Tasks" --object "obj1" --space $TEST_SPACE
+} --skip
+
+# ============================================================================
 # Template Tests
 # ============================================================================
 print ""

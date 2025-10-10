@@ -288,6 +288,109 @@ fn test_template_list_with_space_flag() -> Result<(), ShellError> {
 }
 
 // ============================================================================
+// List Commands Tests (without authentication)
+// ============================================================================
+
+#[test]
+fn test_list_add_requires_space_context() -> Result<(), ShellError> {
+    let result = create_plugin_test()?.eval("anytype list add 'MyList' --objects ['obj1', 'obj2']");
+
+    // Should fail with either auth error or context error
+    assert!(result.is_err());
+    Ok(())
+}
+
+#[test]
+fn test_list_add_with_space_flag() -> Result<(), ShellError> {
+    let result = create_plugin_test()?.eval("anytype list add 'MyList' --objects ['obj1', 'obj2'] --space 'Work'");
+
+    // Should fail with authentication error
+    assert!(result.is_err());
+    Ok(())
+}
+
+#[test]
+fn test_list_add_requires_objects_flag() -> Result<(), ShellError> {
+    let result = create_plugin_test()?.eval("anytype list add 'MyList' --space 'Work'");
+
+    // Should fail because --objects flag is missing
+    assert!(result.is_err());
+    Ok(())
+}
+
+#[test]
+fn test_list_views_requires_space_context() -> Result<(), ShellError> {
+    let result = create_plugin_test()?.eval("anytype list views 'MyList'");
+
+    // Should fail with either auth error or context error
+    assert!(result.is_err());
+    Ok(())
+}
+
+#[test]
+fn test_list_views_with_space_flag() -> Result<(), ShellError> {
+    let result = create_plugin_test()?.eval("anytype list views 'MyList' --space 'Work'");
+
+    // Should fail with authentication error
+    assert!(result.is_err());
+    Ok(())
+}
+
+#[test]
+fn test_list_objects_requires_space_context() -> Result<(), ShellError> {
+    let result = create_plugin_test()?.eval("anytype list objects 'MyList'");
+
+    // Should fail with either auth error or context error
+    assert!(result.is_err());
+    Ok(())
+}
+
+#[test]
+fn test_list_objects_with_space_flag() -> Result<(), ShellError> {
+    let result = create_plugin_test()?.eval("anytype list objects 'MyList' --space 'Work'");
+
+    // Should fail with authentication error
+    assert!(result.is_err());
+    Ok(())
+}
+
+#[test]
+fn test_list_objects_with_limit() -> Result<(), ShellError> {
+    let result = create_plugin_test()?.eval("anytype list objects 'MyList' --space 'Work' --limit 10");
+
+    // Should fail with authentication error (but limit flag should parse correctly)
+    assert!(result.is_err());
+    Ok(())
+}
+
+#[test]
+fn test_list_remove_requires_space_context() -> Result<(), ShellError> {
+    let result = create_plugin_test()?.eval("anytype list remove 'MyList' --object 'obj1'");
+
+    // Should fail with either auth error or context error
+    assert!(result.is_err());
+    Ok(())
+}
+
+#[test]
+fn test_list_remove_with_space_flag() -> Result<(), ShellError> {
+    let result = create_plugin_test()?.eval("anytype list remove 'MyList' --object 'obj1' --space 'Work'");
+
+    // Should fail with authentication error
+    assert!(result.is_err());
+    Ok(())
+}
+
+#[test]
+fn test_list_remove_requires_object_flag() -> Result<(), ShellError> {
+    let result = create_plugin_test()?.eval("anytype list remove 'MyList' --space 'Work'");
+
+    // Should fail because --object flag is missing
+    assert!(result.is_err());
+    Ok(())
+}
+
+// ============================================================================
 // Command Signature Tests
 // ============================================================================
 
@@ -305,6 +408,7 @@ fn test_all_commands_are_registered() -> Result<(), ShellError> {
         "anytype search",
         "anytype member",
         "anytype template",
+        "anytype list",
         "anytype resolve",
         "anytype cache",
     ];
