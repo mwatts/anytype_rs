@@ -24,6 +24,9 @@ thiserror = "2.0"
 dirs = "6.0"
 typetag = "0.2"
 
+[dev-dependencies]
+nu-plugin-test-support = "0.106.1"
+
 [lib]
 name = "nu_plugin_anytype"
 path = "src/lib.rs"
