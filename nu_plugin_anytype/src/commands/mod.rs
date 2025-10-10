@@ -15,10 +15,10 @@ pub mod types;
 // Phase 9: list.rs
 
 pub use auth::{AuthCreate, AuthDelete, AuthStatus};
-pub use member::MemberList;
-pub use object::{ObjectGet, ObjectList};
+pub use member::{MemberGet, MemberList};
+pub use object::{ObjectCreate, ObjectDelete, ObjectGet, ObjectList, ObjectUpdate};
 pub use resolve::{CacheClear, CacheStats, ResolveObject, ResolveSpace, ResolveType};
 pub use search::Search;
-pub use space::{SpaceCreate, SpaceGet, SpaceList};
+pub use space::{SpaceCreate, SpaceGet, SpaceList, SpaceUpdate};
 pub use template::TemplateList;
-pub use types::{TypeGet, TypeList};
+pub use types::{TypeCreate, TypeDelete, TypeGet, TypeList, TypeUpdate};
