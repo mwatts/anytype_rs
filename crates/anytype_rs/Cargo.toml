@@ -1,0 +1,37 @@
+[package]
+name = "anytype_rs"
+version.workspace = true
+authors.workspace = true
+description = "A Rust client library and CLI for the Anytype API"
+repository.workspace = true
+edition.workspace = true
+license.workspace = true
+keywords = ["anytype", "api", "client", "cli"]
+categories = ["api-bindings", "command-line-interface"]
+readme = "../../README.md"
+
+[[bin]]
+name = "anytype"
+path = "src/cli/main.rs"
+
+[dependencies]
+anyhow.workspace = true
+clap.workspace = true
+dirs.workspace = true
+gray_matter.workspace = true
+reqwest.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+strum.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+
+[dev-dependencies]
+insta.workspace = true
+proptest.workspace = true
+
+[lib]
+name = "anytype_rs"
+path = "src/lib.rs"

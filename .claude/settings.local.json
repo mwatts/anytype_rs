@@ -6,7 +6,15 @@
       "Bash(git checkout:*)",
       "Bash(./test_all_commands.nu)",
       "Bash(nu:*)",
-      "Bash(anytype spaces:*)"
+      "Bash(anytype spaces:*)",
+      "Bash(gh:*)",
+      "Bash(The API requires a type_id parameter, but the command needs to be )",
+      "Bash(cargo build:*)",
+      "Bash(cargo doc:*)",
+      "Bash(git add:*)",
+      "Bash(cargo test:*)",
+      "Bash(git log:*)",
+      "Bash(git cherry-pick:*)"
     ],
     "deny": [],
     "ask": []

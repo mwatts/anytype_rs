@@ -1,0 +1,33 @@
+[package]
+name = "nu_plugin_anytype"
+version = "0.0.1"
+authors = ["Mark Watts <18381+mwatts@users.noreply.github.com>"]
+description = "A Nushell plugin for interacting with Anytype via anytype_rs"
+repository.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "nu_plugin_anytype"
+path = "src/main.rs"
+
+[dependencies]
+nu-plugin.workspace = true
+nu-protocol.workspace = true
+anytype_rs.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+dashmap.workspace = true
+anyhow.workspace = true
+thiserror.workspace = true
+dirs.workspace = true
+typetag.workspace = true
+gray_matter.workspace = true
+
+[dev-dependencies]
+nu-plugin-test-support.workspace = true
+
+[lib]
+name = "nu_plugin_anytype"
+path = "src/lib.rs"

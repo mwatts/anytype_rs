@@ -1,23 +1,39 @@
 # Anytype.rs - Rust API Client and CLI for Interacting with Anytype
 
-A Rust library and CLI tool for interacting with your local Anytype application via its API.
+A Rust workspace providing a library, CLI tool, and Nushell plugin for interacting with your local Anytype application via its API.
 
-**THIS IS CURRENTLY ALL VIBE CODED AND SHOULD NOT BE TRUSTED.** It is not comprehensive and I wouldn't run it on any spaces you care about. It will be improved over time, but for now, it is just a starting point. Created with Claud Sonnet 4 (Preview) in GitHub Copilot.
+**THIS IS CURRENTLY ALL VIBE CODED AND SHOULD NOT BE TRUSTED.** It is not comprehensive and I wouldn't run it on any spaces you care about. It will be improved over time, but for now, it is just a starting point. Created with Claude Sonnet 4 (Preview) in GitHub Copilot.
 
 ## Overview
 
-This project provides a Rust interface to interact with Anytype's local API server, which runs in your Anytype app at `http://localhost:31009`. It's a single crate that provides both a library for programmatic access and a command-line interface for direct usage.
+This workspace provides Rust interfaces to interact with Anytype's local API server, which runs in your Anytype app at `http://localhost:31009`.
 
-You can download the crate from [crates.io](https://crates.io/crates/anytype_rs).
+**Workspace Members:**
+- **`anytype_rs`**: Core library + CLI tool for programmatic access
+- **`nu_plugin_anytype`**: Nushell plugin for shell integration
 
-## Project Structure
+You can download the library crate from [crates.io](https://crates.io/crates/anytype_rs).
 
-This is a single crate with two main modules:
+## Workspace Structure
 
-- **`src/api/`**: Core library for interacting with the Anytype API
-- **`src/cli/`**: Command-line interface that uses the API module
-
-There is also a `tests` directory for integration tests that cover both the library and CLI functionality, but they're all vibe coded right now and probably useless.
+```
+anytype_rs/
+├── Cargo.toml              # Workspace root
+├── docs/                   # Consolidated documentation
+│   ├── development.md      # Development guide
+│   ├── examples.md         # Usage examples
+│   ├── nushell-plugin.md   # Plugin guide
+│   └── testing.md          # Testing guide
+└── crates/
+    ├── anytype_rs/         # Core library + CLI
+    │   ├── src/
+    │   │   ├── api/        # API client implementation
+    │   │   └── cli/        # CLI tool
+    │   └── tests/          # Integration tests
+    └── nu_plugin_anytype/  # Nushell plugin
+        ├── src/            # Plugin implementation
+        └── tests/          # Plugin tests
+```
 
 ## Features
 
@@ -93,24 +109,49 @@ The ⚠️ means it's been vibe coded. I still need to go through and verify eac
 ### Prerequisites
 - Rust 1.87.0 or later (may work on earlier versions, but not tested)
 - Anytype application running locally
+- For Nushell plugin: Nushell 0.106.1 or later
 
 ### Build from Source
 
 ```bash
 git clone <repository-url>
 cd anytype_rs
-cargo build --release
+
+# Build the entire workspace
+cargo build --release --workspace
+
+# Or build specific crates
+cargo build --release -p anytype_rs       # Library + CLI
+cargo build --release -p nu_plugin_anytype  # Nushell plugin
 ```
 
-The CLI binary will be available at `target/release/anytype`.
+**Binaries will be available at:**
+- CLI: `target/release/anytype`
+- Plugin: `target/release/nu_plugin_anytype`
 
 ### Install from Cargo
 
 ```bash
+# Install the CLI
 cargo install anytype_rs
 ```
 
 This will install the `anytype` binary to your Cargo bin directory.
+
+### Install Nushell Plugin
+
+```bash
+# After building the plugin
+nu -c "plugin add target/release/nu_plugin_anytype"
+
+# Restart Nushell
+exit  # then reopen
+
+# Verify installation
+anytype auth status
+```
+
+For complete plugin documentation, see [docs/nushell-plugin.md](docs/nushell-plugin.md).
 
 ## Usage
 
@@ -202,12 +243,29 @@ The CLI stores configuration in your system's standard config directory:
 
 API keys are stored securely in this directory.
 
+## Documentation
+
+For more detailed information:
+
+- **[Development Guide](docs/development.md)** - Project structure, development setup, contributing
+- **[Examples](docs/examples.md)** - Rust library usage examples
+- **[Testing Guide](docs/testing.md)** - Testing infrastructure (insta, proptest)
+- **[Nushell Plugin Guide](docs/nushell-plugin.md)** - Complete plugin documentation
+
 ## Development
 
 ### Running Tests
 
 ```bash
-cargo test
+# Test the entire workspace
+cargo test --workspace
+
+# Test specific crates
+cargo test -p anytype_rs
+cargo test -p nu_plugin_anytype
+
+# Run Nushell plugin E2E tests
+nu crates/nu_plugin_anytype/test_all_commands.nu
 ```
 
 ### Enable Debug Logging
@@ -217,5 +275,8 @@ cargo test
 anytype --debug auth status
 
 # For library development
-RUST_LOG=debug cargo run
+RUST_LOG=debug cargo run -p anytype_rs
+
+# For plugin development
+RUST_LOG=debug nu -c "anytype space list"
 ```

@@ -13,24 +13,24 @@ A Nushell plugin that brings Anytype data into your shell workflows with powerfu
 - 🔍 **Powerful search** - Global and space-specific search with filtering
 - 🔐 **Secure auth** - Challenge-response authentication flow
 
-## Quick Start
+## Installation
 
 ### Prerequisites
 
 - Nushell 0.106.1 or later
 - Anytype app running locally on `localhost:31009`
+- Rust toolchain for building from source
 
-### Installation
+### Building and Installing
 
 ```bash
-# 1. Build the plugin
-cd nu_plugin_anytype
-cargo build --release
+# From workspace root
+cargo build --release -p nu_plugin_anytype
 
-# 2. Register with Nushell
+# Register with Nushell
 nu -c "plugin add target/release/nu_plugin_anytype"
 
-# 3. Restart Nushell
+# Restart Nushell
 exit  # then reopen
 ```
 
@@ -50,9 +50,26 @@ anytype object list --space "Work"
 anytype search "meeting notes" --space "Work"
 ```
 
-## Commands
+## Commands Overview
 
-### Authentication (3 commands)
+The plugin provides 40+ commands organized by domain:
+
+- **Authentication** (3 commands): `auth create`, `auth status`, `auth delete`
+- **Spaces** (3 commands): `space list`, `space get`, `space create`
+- **Types** (2 commands): `type list`, `type get`
+- **Objects** (2 commands): `object list`, `object get`
+- **Properties** (5 commands): `property list/get/create/update/delete`
+- **Search** (1 command): `search`
+- **Lists/Collections** (4 commands): `list add/views/objects/remove`
+- **Tags** (5 commands): `tag list/get/create/update/delete`
+- **Members** (1 command): `member list`
+- **Templates** (1 command): `template list`
+- **Utilities** (5 commands): `resolve space/type/object`, `cache clear/stats`
+- **Import** (1 command): `import markdown`
+
+For detailed command documentation, see the sections below.
+
+## Authentication Commands
 
 ```nushell
 anytype auth create   # Authenticate with local Anytype app
@@ -60,7 +77,7 @@ anytype auth status   # Check authentication status
 anytype auth delete   # Remove stored credentials
 ```
 
-### Spaces (3 commands)
+## Space Commands
 
 ```nushell
 anytype space list                    # List all spaces
@@ -69,21 +86,21 @@ anytype space create <name>           # Create new space
   --description <text>                # Optional description
 ```
 
-### Types (2 commands)
+## Type Commands
 
 ```nushell
 anytype type list [--space <name>]   # List types in a space
 anytype type get <name> [--space <name>]  # Get type by name
 ```
 
-### Objects (2 commands)
+## Object Commands
 
 ```nushell
 anytype object list [--space <name>]      # List objects in a space
 anytype object get <name> [--space <name>] # Get object by name
 ```
 
-### Properties (5 commands)
+## Property Commands
 
 ```nushell
 anytype property list [--space <name>]              # List properties in a space
@@ -98,7 +115,7 @@ anytype property delete <name> [--space <name>]     # Delete (archive) property
 
 **Property formats:** `text`, `number`, `select`, `multi_select`, `date`, `files`, `checkbox`, `url`, `email`, `phone`, `objects`
 
-### Search (1 command)
+## Search Commands
 
 ```nushell
 anytype search <query> [--space <name>]  # Search for objects
@@ -110,14 +127,14 @@ anytype search <query> [--space <name>]  # Search for objects
 
 **Sort properties:** `created_date`, `last_modified_date`, `last_opened_date`, `name`
 
-### Lists/Collections (4 commands)
+## List/Collection Commands
 
 ```nushell
 anytype list add <list> [--space <name>]     # Add objects to a list
   --objects <ids>                             # Object IDs to add (comma-separated)
 
 anytype list views <list> [--space <name>]   # Get views for a list
-  
+
 anytype list objects <list> [--space <name>] # Get objects in a list
   --limit <n>                                 # Max objects to return
 
@@ -125,14 +142,7 @@ anytype list remove <list> [--space <name>]  # Remove object from list
   --object <id>                               # Object ID to remove
 ```
 
-### Members & Templates (2 commands)
-
-```nushell
-anytype member list [--space <name>]    # List space members
-anytype template list [--space <name>]  # List templates
-```
-
-### Tags (5 commands)
+## Tag Commands
 
 ```nushell
 anytype tag list <property> [--space <name>]   # List tags for a property
@@ -147,7 +157,14 @@ anytype tag delete <name> --property <name> [--space <name>]  # Delete tag
 
 **Colors:** `grey`, `yellow`, `orange`, `red`, `pink`, `purple`, `blue`, `ice`, `teal`, `lime`
 
-### Import (1 command)
+## Member & Template Commands
+
+```nushell
+anytype member list [--space <name>]    # List space members
+anytype template list [--type <name>] [--space <name>]  # List templates for a type
+```
+
+## Import Commands
 
 ```nushell
 anytype import markdown <file> --space <name> --type <type>  # Import markdown file
@@ -178,7 +195,7 @@ tags:
 # Content here
 ```
 
-### Resolution & Cache (5 commands)
+## Resolution & Cache Commands
 
 ```nushell
 anytype resolve space <name>                   # Resolve space name to ID
@@ -222,9 +239,6 @@ anytype space get "Archive"
 # Create a property with specific format
 anytype property create "Priority" --format select --space "Work"
 
-# Update a property's format
-anytype property update "Status" --format multi_select --space "Work"
-
 # List and filter properties
 anytype property list --space "Work"
 | where format == "select"
@@ -242,12 +256,6 @@ anytype search "notes" --limit 20 --offset 40
 # Search and sort by modification date
 anytype search "docs" --sort last_modified_date --direction desc
 
-# Work with tags (requires property context)
-anytype tag list "Status" --property "Task Status" --space "Work"
-
-# Pipeline tag operations from property context
-# (Note: property commands not yet implemented - placeholder example)
-# anytype property get "Status" --space "Work" | anytype tag list
 # Get objects from a list/collection
 anytype list objects "My Tasks" --space "Work" --limit 10
 
@@ -255,10 +263,6 @@ anytype list objects "My Tasks" --space "Work" --limit 10
 anytype search "urgent" --space "Work"
 | get id
 | anytype list add "Priority Items" --objects $in --space "Work"
-
-# Get list views and filter
-anytype list views "Projects" --space "Work"
-| where layout == "table"
 ```
 
 ## Configuration
@@ -348,37 +352,35 @@ RUST_LOG=debug nu -c "anytype space list"
 - Use pipeline: `anytype space get "X" | anytype object list`, or
 - Set `default_space` in `~/.config/anytype-cli/plugin.toml`
 
-## Type Keys vs Type IDs
-
-The plugin handles two types of identifiers:
-
-- **type_key** - Global identifier across all spaces (e.g., `ot_page`, `ot_note`, `ot_task`)
-- **type_id** - Space-specific instance ID for a type
-
-You don't need to worry about this distinction - the plugin handles conversions automatically.
-
 ## Development
 
 ```bash
-# Build
-cargo build
+# Build from workspace root
+cargo build -p nu_plugin_anytype
 
 # Run tests (43 integration tests)
-cargo test
+cargo test -p nu_plugin_anytype
 
 # Run E2E tests (35 tests with live API)
-nu test_all_commands.nu
+nu crates/nu_plugin_anytype/test_all_commands.nu
 
 # Check code quality
-cargo clippy
+cargo clippy -p nu_plugin_anytype
 
 # Build release version
-cargo build --release
+cargo build --release -p nu_plugin_anytype
 ```
 
 ## Architecture
 
-See [ARCHITECTURE.md](ARCHITECTURE.md) for technical design details.
+The plugin uses an enum-based Custom Value approach for representing all Anytype entities (Space, Type, Object, Property, Tag, List, Template, Member) with automatic context propagation through pipelines.
+
+Key features:
+- Single `AnytypeValue` enum with 8 variants
+- Tokio runtime for async operations in sync context
+- TTL-based caching with intelligent invalidation
+- Name-to-ID resolution with fuzzy matching
+- Comprehensive error handling
 
 ## License
 
@@ -386,4 +388,4 @@ Same as anytype_rs project (GPL-3.0).
 
 ## Contributing
 
-This plugin is part of the [anytype_rs](https://github.com/mwatts/anytype_rs) project.
+This plugin is part of the [anytype_rs](https://github.com/mwatts/anytype_rs) workspace. See the main repository for contribution guidelines.
