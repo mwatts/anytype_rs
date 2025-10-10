@@ -14,23 +14,26 @@ pub struct PropertyArgs {
 pub enum PropertyCommand {
     /// List properties in a space
     List {
-        /// Space ID
-        space_id: String,
+        /// Space (name or ID)
+        #[arg(short = 's', long)]
+        space: String,
         /// Limit the number of results
         #[arg(short, long, default_value = "20")]
         limit: u32,
     },
     /// Get details of a specific property
     Get {
-        /// Space ID
-        space_id: String,
+        /// Space (name or ID)
+        #[arg(short = 's', long)]
+        space: String,
         /// Property ID to retrieve
         property_id: String,
     },
     /// Create a new property in a space
     Create {
-        /// Space ID
-        space_id: String,
+        /// Space (name or ID)
+        #[arg(short = 's', long)]
+        space: String,
         /// Property name
         #[arg(short, long)]
         name: String,
@@ -40,8 +43,9 @@ pub enum PropertyCommand {
     },
     /// Update an existing property in a space
     Update {
-        /// Space ID
-        space_id: String,
+        /// Space (name or ID)
+        #[arg(short = 's', long)]
+        space: String,
         /// Property ID to update
         property_id: String,
         /// Property name
@@ -53,8 +57,9 @@ pub enum PropertyCommand {
     },
     /// Delete a property in a space
     Delete {
-        /// Space ID
-        space_id: String,
+        /// Space (name or ID)
+        #[arg(short = 's', long)]
+        space: String,
         /// Property ID to delete
         property_id: String,
     },
@@ -68,28 +73,40 @@ pub async fn handle_property_command(args: PropertyArgs) -> Result<()> {
     client.set_api_key(api_key);
 
     match args.command {
-        PropertyCommand::List { space_id, limit } => {
+        PropertyCommand::List { space, limit } => {
+            let resolver = crate::resolver::Resolver::new(&client, 300);
+            let space_id = resolver.resolve_space(&space).await?;
             list_properties(&client, &space_id, limit).await
         }
-        PropertyCommand::Get {
-            space_id,
-            property_id,
-        } => get_property(&client, &space_id, &property_id).await,
+        PropertyCommand::Get { space, property_id } => {
+            let resolver = crate::resolver::Resolver::new(&client, 300);
+            let space_id = resolver.resolve_space(&space).await?;
+            get_property(&client, &space_id, &property_id).await
+        }
         PropertyCommand::Create {
-            space_id,
+            space,
             name,
             format,
-        } => create_property(&client, &space_id, &name, &format).await,
+        } => {
+            let resolver = crate::resolver::Resolver::new(&client, 300);
+            let space_id = resolver.resolve_space(&space).await?;
+            create_property(&client, &space_id, &name, &format).await
+        }
         PropertyCommand::Update {
-            space_id,
+            space,
             property_id,
             name,
             format,
-        } => update_property(&client, &space_id, &property_id, &name, &format).await,
-        PropertyCommand::Delete {
-            space_id,
-            property_id,
-        } => delete_property(&client, &space_id, &property_id).await,
+        } => {
+            let resolver = crate::resolver::Resolver::new(&client, 300);
+            let space_id = resolver.resolve_space(&space).await?;
+            update_property(&client, &space_id, &property_id, &name, &format).await
+        }
+        PropertyCommand::Delete { space, property_id } => {
+            let resolver = crate::resolver::Resolver::new(&client, 300);
+            let space_id = resolver.resolve_space(&space).await?;
+            delete_property(&client, &space_id, &property_id).await
+        }
     }
 }
 

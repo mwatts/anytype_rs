@@ -15,9 +15,9 @@ pub struct MemberArgs {
 pub enum MemberCommand {
     /// List members in a space
     List {
-        /// Space ID to list members from
-        #[arg(short, long)]
-        space_id: String,
+        /// Space to list members from (name or ID)
+        #[arg(short = 's', long)]
+        space: String,
 
         /// Enable pagination (returns full response with pagination info)
         #[arg(short, long)]
@@ -25,9 +25,9 @@ pub enum MemberCommand {
     },
     /// Get a specific member by ID
     Get {
-        /// Space ID
-        #[arg(short, long)]
-        space_id: String,
+        /// Space (name or ID)
+        #[arg(short = 's', long)]
+        space: String,
 
         /// Member ID
         #[arg(short, long)]
@@ -45,10 +45,11 @@ pub async fn handle_member_command(args: MemberArgs) -> Result<()> {
     client.set_api_key(api_key);
 
     match args.command {
-        MemberCommand::List {
-            space_id,
-            pagination,
-        } => {
+        MemberCommand::List { space, pagination } => {
+            // Create resolver for space name resolution
+            let resolver = crate::resolver::Resolver::new(&client, 300);
+            let space_id = resolver.resolve_space(&space).await?;
+
             if pagination {
                 let response = client
                     .list_members_with_pagination(&space_id)
@@ -63,10 +64,11 @@ pub async fn handle_member_command(args: MemberArgs) -> Result<()> {
                 println!("{}", serde_json::to_string_pretty(&members)?);
             }
         }
-        MemberCommand::Get {
-            space_id,
-            member_id,
-        } => {
+        MemberCommand::Get { space, member_id } => {
+            // Create resolver for space name resolution
+            let resolver = crate::resolver::Resolver::new(&client, 300);
+            let space_id = resolver.resolve_space(&space).await?;
+
             let member = client
                 .get_member(&space_id, &member_id)
                 .await

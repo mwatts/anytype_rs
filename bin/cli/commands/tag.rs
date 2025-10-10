@@ -12,8 +12,9 @@ pub struct TagArgs {
 pub enum TagCommand {
     /// List tags for a specific property in a space
     List {
-        /// Space ID
-        space_id: String,
+        /// Space (name or ID)
+        #[arg(short = 's', long)]
+        space: String,
         /// Property ID (the property for which to list tags)
         property_id: String,
         /// Limit the number of results
@@ -22,8 +23,9 @@ pub enum TagCommand {
     },
     /// Create a new tag for a property in a space
     Create {
-        /// Space ID
-        space_id: String,
+        /// Space (name or ID)
+        #[arg(short = 's', long)]
+        space: String,
         /// Property ID (the property for which to create the tag)
         property_id: String,
         /// Tag name
@@ -35,8 +37,9 @@ pub enum TagCommand {
     },
     /// Get details of a specific tag
     Get {
-        /// Space ID
-        space_id: String,
+        /// Space (name or ID)
+        #[arg(short = 's', long)]
+        space: String,
         /// Property ID (the property that contains the tag)
         property_id: String,
         /// Tag ID to retrieve
@@ -44,8 +47,9 @@ pub enum TagCommand {
     },
     /// Update an existing tag in a space
     Update {
-        /// Space ID
-        space_id: String,
+        /// Space (name or ID)
+        #[arg(short = 's', long)]
+        space: String,
         /// Property ID (the property that contains the tag)
         property_id: String,
         /// Tag ID to update
@@ -59,8 +63,9 @@ pub enum TagCommand {
     },
     /// Delete a tag from a property in a space
     Delete {
-        /// Space ID
-        space_id: String,
+        /// Space (name or ID)
+        #[arg(short = 's', long)]
+        space: String,
         /// Property ID (the property that contains the tag)
         property_id: String,
         /// Tag ID to delete
@@ -77,33 +82,53 @@ pub async fn handle_tag_command(args: TagArgs) -> Result<()> {
 
     match args.command {
         TagCommand::List {
-            space_id,
+            space,
             property_id,
             limit,
-        } => list_tags(&client, &space_id, &property_id, limit).await,
+        } => {
+            let resolver = crate::resolver::Resolver::new(&client, 300);
+            let space_id = resolver.resolve_space(&space).await?;
+            list_tags(&client, &space_id, &property_id, limit).await
+        }
         TagCommand::Create {
-            space_id,
+            space,
             property_id,
             name,
             color,
-        } => create_tag(&client, &space_id, &property_id, &name, &color).await,
+        } => {
+            let resolver = crate::resolver::Resolver::new(&client, 300);
+            let space_id = resolver.resolve_space(&space).await?;
+            create_tag(&client, &space_id, &property_id, &name, &color).await
+        }
         TagCommand::Get {
-            space_id,
+            space,
             property_id,
             tag_id,
-        } => get_tag(&client, &space_id, &property_id, &tag_id).await,
+        } => {
+            let resolver = crate::resolver::Resolver::new(&client, 300);
+            let space_id = resolver.resolve_space(&space).await?;
+            get_tag(&client, &space_id, &property_id, &tag_id).await
+        }
         TagCommand::Update {
-            space_id,
+            space,
             property_id,
             tag_id,
             name,
             color,
-        } => update_tag(&client, &space_id, &property_id, &tag_id, &name, &color).await,
+        } => {
+            let resolver = crate::resolver::Resolver::new(&client, 300);
+            let space_id = resolver.resolve_space(&space).await?;
+            update_tag(&client, &space_id, &property_id, &tag_id, &name, &color).await
+        }
         TagCommand::Delete {
-            space_id,
+            space,
             property_id,
             tag_id,
-        } => delete_tag(&client, &space_id, &property_id, &tag_id).await,
+        } => {
+            let resolver = crate::resolver::Resolver::new(&client, 300);
+            let space_id = resolver.resolve_space(&space).await?;
+            delete_tag(&client, &space_id, &property_id, &tag_id).await
+        }
     }
 }
 

@@ -12,9 +12,9 @@ pub struct ListArgs {
 pub enum ListCommand {
     /// Add objects to a list (collection)
     Add {
-        /// Space ID where the list exists
-        #[arg(short, long)]
-        space_id: String,
+        /// Space where the list exists (name or ID)
+        #[arg(short = 's', long)]
+        space: String,
 
         /// List ID to add objects to
         #[arg(short, long)]
@@ -26,9 +26,9 @@ pub enum ListCommand {
     },
     /// Get views for a list
     Views {
-        /// Space ID where the list exists
-        #[arg(short, long)]
-        space_id: String,
+        /// Space where the list exists (name or ID)
+        #[arg(short = 's', long)]
+        space: String,
 
         /// List ID to get views for
         #[arg(short, long)]
@@ -36,9 +36,9 @@ pub enum ListCommand {
     },
     /// Get objects in a list
     Objects {
-        /// Space ID where the list exists
-        #[arg(short, long)]
-        space_id: String,
+        /// Space where the list exists (name or ID)
+        #[arg(short = 's', long)]
+        space: String,
 
         /// List ID to get objects from
         #[arg(short, long)]
@@ -50,9 +50,9 @@ pub enum ListCommand {
     },
     /// Remove objects from a list (collection)
     Remove {
-        /// Space ID where the list exists
-        #[arg(short, long)]
-        space_id: String,
+        /// Space where the list exists (name or ID)
+        #[arg(short = 's', long)]
+        space: String,
 
         /// List ID to remove objects from
         #[arg(short, long)]
@@ -73,23 +73,37 @@ pub async fn handle_list_command(args: ListArgs) -> Result<()> {
 
     match args.command {
         ListCommand::Add {
-            space_id,
+            space,
             list_id,
             object_ids,
-        } => add_objects_to_list(&client, &space_id, &list_id, object_ids).await,
-        ListCommand::Views { space_id, list_id } => {
+        } => {
+            let resolver = crate::resolver::Resolver::new(&client, 300);
+            let space_id = resolver.resolve_space(&space).await?;
+            add_objects_to_list(&client, &space_id, &list_id, object_ids).await
+        }
+        ListCommand::Views { space, list_id } => {
+            let resolver = crate::resolver::Resolver::new(&client, 300);
+            let space_id = resolver.resolve_space(&space).await?;
             get_list_views(&client, &space_id, &list_id).await
         }
         ListCommand::Objects {
-            space_id,
+            space,
             list_id,
             limit,
-        } => get_list_objects(&client, &space_id, &list_id, limit).await,
+        } => {
+            let resolver = crate::resolver::Resolver::new(&client, 300);
+            let space_id = resolver.resolve_space(&space).await?;
+            get_list_objects(&client, &space_id, &list_id, limit).await
+        }
         ListCommand::Remove {
-            space_id,
+            space,
             list_id,
             object_id,
-        } => remove_object_from_list(&client, &space_id, &list_id, &object_id).await,
+        } => {
+            let resolver = crate::resolver::Resolver::new(&client, 300);
+            let space_id = resolver.resolve_space(&space).await?;
+            remove_object_from_list(&client, &space_id, &list_id, &object_id).await
+        }
     }
 }
 

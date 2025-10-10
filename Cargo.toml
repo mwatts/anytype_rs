@@ -52,6 +52,7 @@ path = "bin/cli/main.rs"
 anytype_rs.workspace = true
 anyhow.workspace = true
 clap.workspace = true
+dashmap.workspace = true
 dirs.workspace = true
 gray_matter.workspace = true
 serde.workspace = true

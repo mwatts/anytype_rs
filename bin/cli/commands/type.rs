@@ -13,7 +13,7 @@ pub struct TypeArgs {
 
 #[derive(Debug)]
 struct CreateTypeParams {
-    space_id: String,
+    space: String,
     key: String,
     name: String,
     plural_name: String,
@@ -26,23 +26,27 @@ struct CreateTypeParams {
 pub enum TypeCommand {
     /// List types in a space
     List {
-        /// Space ID
-        space_id: String,
+        /// Space (name or ID)
+        #[arg(short = 's', long)]
+        space: String,
         /// Limit the number of results
         #[arg(short, long, default_value = "20")]
         limit: u32,
     },
     /// Get details of a specific type
     Get {
-        /// Space ID where the type exists
-        space_id: String,
-        /// Type ID to retrieve
-        type_id: String,
+        /// Space where the type exists (name or ID)
+        #[arg(short = 's', long)]
+        space: String,
+        /// Type to retrieve (name or ID)
+        #[arg(short = 't', long)]
+        type_name: String,
     },
     /// Create a new type in a space
     Create {
-        /// Space ID where the type will be created
-        space_id: String,
+        /// Space where the type will be created (name or ID)
+        #[arg(short = 's', long)]
+        space: String,
         /// Type key (unique identifier)
         #[arg(short, long)]
         key: String,
@@ -64,10 +68,12 @@ pub enum TypeCommand {
     },
     /// Update an existing type in a space
     Update {
-        /// Space ID where the type exists
-        space_id: String,
-        /// Type ID to update
-        type_id: String,
+        /// Space where the type exists (name or ID)
+        #[arg(short = 's', long)]
+        space: String,
+        /// Type to update (name or ID)
+        #[arg(short = 't', long)]
+        type_name: String,
         /// Type key (unique identifier)
         #[arg(short, long)]
         key: String,
@@ -89,10 +95,12 @@ pub enum TypeCommand {
     },
     /// Delete (archive) a type in a space
     Delete {
-        /// Space ID where the type exists
-        space_id: String,
-        /// Type ID to delete
-        type_id: String,
+        /// Space where the type exists (name or ID)
+        #[arg(short = 's', long)]
+        space: String,
+        /// Type to delete (name or ID)
+        #[arg(short = 't', long)]
+        type_name: String,
     },
 }
 
@@ -104,10 +112,10 @@ pub async fn handle_type_command(args: TypeArgs) -> Result<()> {
     client.set_api_key(api_key);
 
     match args.command {
-        TypeCommand::List { space_id, limit } => list_types(&client, &space_id, limit).await,
-        TypeCommand::Get { space_id, type_id } => get_type(&client, &space_id, &type_id).await,
+        TypeCommand::List { space, limit } => list_types(&client, &space, limit).await,
+        TypeCommand::Get { space, type_name } => get_type(&client, &space, &type_name).await,
         TypeCommand::Create {
-            space_id,
+            space,
             key,
             name,
             plural_name,
@@ -116,7 +124,7 @@ pub async fn handle_type_command(args: TypeArgs) -> Result<()> {
             properties,
         } => {
             let create_params = CreateTypeParams {
-                space_id,
+                space,
                 key,
                 name,
                 plural_name,
@@ -127,8 +135,8 @@ pub async fn handle_type_command(args: TypeArgs) -> Result<()> {
             create_type(&client, create_params).await
         }
         TypeCommand::Update {
-            space_id,
-            type_id,
+            space,
+            type_name,
             key,
             name,
             plural_name,
@@ -137,7 +145,7 @@ pub async fn handle_type_command(args: TypeArgs) -> Result<()> {
             properties,
         } => {
             let update_params = CreateTypeParams {
-                space_id,
+                space,
                 key,
                 name,
                 plural_name,
@@ -145,19 +153,21 @@ pub async fn handle_type_command(args: TypeArgs) -> Result<()> {
                 icon_emoji,
                 properties,
             };
-            update_type(&client, &type_id, update_params).await
+            update_type(&client, &type_name, update_params).await
         }
-        TypeCommand::Delete { space_id, type_id } => {
-            delete_type(&client, &space_id, &type_id).await
-        }
+        TypeCommand::Delete { space, type_name } => delete_type(&client, &space, &type_name).await,
     }
 }
 
-async fn list_types(client: &AnytypeClient, space_id: &str, limit: u32) -> Result<()> {
-    println!("🏷️  Fetching types from space '{space_id}'...");
+async fn list_types(client: &AnytypeClient, space: &str, limit: u32) -> Result<()> {
+    // Create resolver for space name resolution
+    let resolver = crate::resolver::Resolver::new(client, 300);
+    let space_id = resolver.resolve_space(space).await?;
+
+    println!("🏷️  Fetching types from space '{space}'...");
 
     let types = client
-        .list_types(space_id)
+        .list_types(&space_id)
         .await
         .context("Failed to fetch types")?;
 
@@ -227,9 +237,13 @@ async fn list_types(client: &AnytypeClient, space_id: &str, limit: u32) -> Resul
 }
 
 async fn create_type(client: &AnytypeClient, params: CreateTypeParams) -> Result<()> {
+    // Create resolver for space name resolution
+    let resolver = crate::resolver::Resolver::new(client, 300);
+    let space_id = resolver.resolve_space(&params.space).await?;
+
     println!(
         "🏗️  Creating type '{}' in space '{}'...",
-        params.name, params.space_id
+        params.name, params.space
     );
 
     // Parse layout
@@ -308,7 +322,7 @@ async fn create_type(client: &AnytypeClient, params: CreateTypeParams) -> Result
     };
 
     let response = client
-        .create_type(&params.space_id, request)
+        .create_type(&space_id, request)
         .await
         .context("Failed to create type")?;
 
@@ -350,11 +364,16 @@ async fn create_type(client: &AnytypeClient, params: CreateTypeParams) -> Result
     Ok(())
 }
 
-async fn get_type(client: &AnytypeClient, space_id: &str, type_id: &str) -> Result<()> {
-    println!("🔍 Fetching type '{type_id}' from space '{space_id}'...");
+async fn get_type(client: &AnytypeClient, space: &str, type_name: &str) -> Result<()> {
+    // Create resolver for space and type name resolution
+    let resolver = crate::resolver::Resolver::new(client, 300);
+    let space_id = resolver.resolve_space(space).await?;
+    let type_id = resolver.resolve_type(&space_id, type_name).await?;
+
+    println!("🔍 Fetching type '{type_name}' from space '{space}'...");
 
     let type_obj = client
-        .get_type(space_id, type_id)
+        .get_type(&space_id, &type_id)
         .await
         .context("Failed to fetch type")?;
 
@@ -403,12 +422,17 @@ async fn get_type(client: &AnytypeClient, space_id: &str, type_id: &str) -> Resu
 
 async fn update_type(
     client: &AnytypeClient,
-    type_id: &str,
+    type_name: &str,
     params: CreateTypeParams,
 ) -> Result<()> {
+    // Create resolver for space and type name resolution
+    let resolver = crate::resolver::Resolver::new(client, 300);
+    let space_id = resolver.resolve_space(&params.space).await?;
+    let type_id = resolver.resolve_type(&space_id, type_name).await?;
+
     println!(
         "🔄 Updating type '{}' in space '{}'...",
-        type_id, params.space_id
+        type_name, params.space
     );
 
     // Parse layout
@@ -487,7 +511,7 @@ async fn update_type(
     };
 
     let response = client
-        .update_type(&params.space_id, type_id, request)
+        .update_type(&space_id, &type_id, request)
         .await
         .context("Failed to update type")?;
 
@@ -529,12 +553,17 @@ async fn update_type(
     Ok(())
 }
 
-async fn delete_type(client: &AnytypeClient, space_id: &str, type_id: &str) -> Result<()> {
-    println!("⚠️  Deleting (archiving) type '{type_id}' in space '{space_id}'...");
+async fn delete_type(client: &AnytypeClient, space: &str, type_name: &str) -> Result<()> {
+    // Create resolver for space and type name resolution
+    let resolver = crate::resolver::Resolver::new(client, 300);
+    let space_id = resolver.resolve_space(space).await?;
+    let type_id = resolver.resolve_type(&space_id, type_name).await?;
+
+    println!("⚠️  Deleting (archiving) type '{type_name}' in space '{space}'...");
     println!("📝 Note: This will mark the type as archived, not permanently delete it.");
 
     let response = client
-        .delete_type(space_id, type_id)
+        .delete_type(&space_id, &type_id)
         .await
         .context("Failed to delete type")?;
 
