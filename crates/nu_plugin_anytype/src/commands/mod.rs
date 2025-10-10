@@ -23,6 +23,7 @@ pub use list::{ListAdd, ListObjects, ListRemove, ListViews};
 pub use member::MemberList;
 pub use object::{ObjectGet, ObjectList};
 pub use property::{PropertyCreate, PropertyDelete, PropertyGet, PropertyList, PropertyUpdate};
+pub use r#type::{TypeGet, TypeList};
 pub use resolve::{CacheClear, CacheStats, ResolveObject, ResolveSpace, ResolveType};
 pub use search::Search;
 pub use space::{SpaceCreate, SpaceGet, SpaceList};
