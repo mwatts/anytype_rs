@@ -83,6 +83,21 @@ anytype object list [--space <name>]      # List objects in a space
 anytype object get <name> [--space <name>] # Get object by name
 ```
 
+### Properties (5 commands)
+
+```nushell
+anytype property list [--space <name>]              # List properties in a space
+anytype property get <name> [--space <name>]        # Get property by name
+anytype property create <name> [--space <name>]     # Create new property
+  --format <type>                                    # Property format (default: text)
+anytype property update <name> [--space <name>]     # Update existing property
+  --new-name <name>                                  # New name for the property
+  --format <type>                                    # New property format
+anytype property delete <name> [--space <name>]     # Delete (archive) property
+```
+
+**Property formats:** `text`, `number`, `select`, `multi_select`, `date`, `files`, `checkbox`, `url`, `email`, `phone`, `objects`
+
 ### Search (1 command)
 
 ```nushell
@@ -120,6 +135,9 @@ anytype cache stats                            # Show cache statistics
 # Get a space and list its objects
 anytype space get "Work" | anytype object list
 
+# List properties in a space
+anytype space get "Work" | anytype property list
+
 # Search within a space from pipeline
 anytype space get "Personal" | anytype search "todo"
 
@@ -139,6 +157,17 @@ anytype space get "Archive"
 | select name type_key properties
 | to json
 | save archive.json
+
+# Create a property with specific format
+anytype property create "Priority" --format select --space "Work"
+
+# Update a property's format
+anytype property update "Status" --format multi_select --space "Work"
+
+# List and filter properties
+anytype property list --space "Work"
+| where format == "select"
+| select name key format
 
 # Find and sort tasks
 anytype search "project" --space "Work"
@@ -255,8 +284,11 @@ You don't need to worry about this distinction - the plugin handles conversions 
 # Build
 cargo build
 
-# Run tests (10 tests)
+# Run tests (43 integration tests)
 cargo test
+
+# Run E2E tests (35 tests with live API)
+nu test_all_commands.nu
 
 # Check code quality
 cargo clippy
