@@ -374,11 +374,10 @@ run_test "template list - with type and space flags" {
     if ($types | is-empty) {
         error make {msg: "No types found in space for template test"}
     }
-    # Get the first type's name from the custom value by converting to record
-    let first_type = ($types | first | into record)
-    let type_name = $first_type.name
-    
-    # List templates for this type (can be empty, that's OK)
+    # Get the first type's name using cell path access
+    let type_name = ($types | first | get name)
+
+    # List templates for this type using --type flag (can be empty, that's OK)
     anytype template list --type $type_name --space $TEST_SPACE
 }
 
@@ -400,9 +399,8 @@ run_test "template list - via space pipeline with type flag" {
     if ($types | is-empty) {
         error make {msg: "No types found in space for template test"}
     }
-    let first_type = ($types | first | into record)
-    let type_name = $first_type.name
-    
+    let type_name = ($types | first | get name)
+
     # Pipe space, provide type via flag
     anytype space get $TEST_SPACE | anytype template list --type $type_name
 }

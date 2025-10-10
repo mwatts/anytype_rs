@@ -1094,17 +1094,17 @@ anytype space get "Research"
 - Uses: `anytype_rs::client::properties`
 - Uses: `AnytypeValue` enum (Type and Property variants)
 
-### Phase 8: Tag Commands (Agent: Feature/Tags)
+### Phase 8: Tag Commands (Agent: Feature/Tags) ✅ COMPLETED
 
 **Task 8.1: Tag Commands** (Custom value already implemented in Phase 1)
-- [ ] Implement `anytype tag list` command
+- [x] Implement `anytype tag list` command
   - Accept `AnytypeValue::Property` from pipeline (extract space_id and property_id)
   - Create `AnytypeValue::Tag` with full context
-- [ ] Implement `anytype tag get <name>` command
-- [ ] Implement `anytype tag create <name>` command
-- [ ] Implement `anytype tag update <name>` command
-- [ ] Implement `anytype tag delete <name>` command
-- [ ] Add tests
+- [x] Implement `anytype tag get <name>` command
+- [x] Implement `anytype tag create <name>` command
+- [x] Implement `anytype tag update <name>` command
+- [x] Implement `anytype tag delete <name>` command
+- [x] Add tests
 
 **Dependencies**:
 - Uses: `anytype_rs::client::tags`

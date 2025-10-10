@@ -117,6 +117,21 @@ anytype member list [--space <name>]    # List space members
 anytype template list [--space <name>]  # List templates
 ```
 
+### Tags (5 commands)
+
+```nushell
+anytype tag list <property> [--space <name>]   # List tags for a property
+anytype tag get <name> --property <name> [--space <name>]  # Get tag by name
+anytype tag create <name> --property <name> [--space <name>]  # Create new tag
+  --color <color>                              # Optional color
+anytype tag update <name> --property <name> [--space <name>]  # Update tag
+  --new-name <name>                            # Optional new name
+  --color <color>                              # Optional new color
+anytype tag delete <name> --property <name> [--space <name>]  # Delete tag
+```
+
+**Colors:** `grey`, `yellow`, `orange`, `red`, `pink`, `purple`, `blue`, `ice`, `teal`, `lime`
+
 ### Resolution & Cache (5 commands)
 
 ```nushell
@@ -167,6 +182,12 @@ anytype search "notes" --limit 20 --offset 40
 # Search and sort by modification date
 anytype search "docs" --sort last_modified_date --direction desc
 
+# Work with tags (requires property context)
+anytype tag list "Status" --property "Task Status" --space "Work"
+
+# Pipeline tag operations from property context
+# (Note: property commands not yet implemented - placeholder example)
+# anytype property get "Status" --space "Work" | anytype tag list
 # Get objects from a list/collection
 anytype list objects "My Tasks" --space "Work" --limit 10
 

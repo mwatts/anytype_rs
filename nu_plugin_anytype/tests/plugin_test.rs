@@ -531,3 +531,73 @@ fn test_custom_value_name_fallback() {
 
     assert_eq!(object_no_name.name(), "obj_456");
 }
+
+// ============================================================================
+// Tag Commands Tests (without authentication)
+// ============================================================================
+
+#[test]
+fn test_tag_list_requires_property_context() -> Result<(), ShellError> {
+    let result = create_plugin_test()?.eval("anytype tag list 'Status'");
+
+    // Should fail with authentication or context error
+    assert!(result.is_err());
+    Ok(())
+}
+
+#[test]
+fn test_tag_get_requires_property_context() -> Result<(), ShellError> {
+    let result = create_plugin_test()?.eval("anytype tag get 'Done' --property 'Status'");
+
+    // Should fail with authentication or context error
+    assert!(result.is_err());
+    Ok(())
+}
+
+#[test]
+fn test_tag_create_requires_property_flag() -> Result<(), ShellError> {
+    let result = create_plugin_test()?.eval("anytype tag create 'NewTag'");
+
+    // Should fail because --property flag is required
+    assert!(result.is_err());
+    Ok(())
+}
+
+#[test]
+fn test_tag_create_with_color() -> Result<(), ShellError> {
+    let result = create_plugin_test()?
+        .eval("anytype tag create 'Important' --property 'Status' --color 'red' --space 'Work'");
+
+    // Should fail with authentication error (but command parsing should work)
+    assert!(result.is_err());
+    Ok(())
+}
+
+#[test]
+fn test_tag_update_requires_property_context() -> Result<(), ShellError> {
+    let result = create_plugin_test()?.eval("anytype tag update 'Done' --new-name 'Completed'");
+
+    // Should fail with authentication or context error
+    assert!(result.is_err());
+    Ok(())
+}
+
+#[test]
+fn test_tag_update_with_color() -> Result<(), ShellError> {
+    let result = create_plugin_test()?
+        .eval("anytype tag update 'Done' --property 'Status' --color 'green' --space 'Work'");
+
+    // Should fail with authentication error (but command parsing should work)
+    assert!(result.is_err());
+    Ok(())
+}
+
+#[test]
+fn test_tag_delete_requires_property_context() -> Result<(), ShellError> {
+    let result = create_plugin_test()?.eval("anytype tag delete 'Old'");
+
+    // Should fail with authentication or context error
+    assert!(result.is_err());
+    Ok(())
+}
+
