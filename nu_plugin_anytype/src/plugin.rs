@@ -213,6 +213,7 @@ impl Plugin for AnytypePlugin {
             Box::new(crate::commands::ResolveObject),
             Box::new(crate::commands::CacheClear),
             Box::new(crate::commands::CacheStats),
+            Box::new(crate::commands::ImportMarkdown),
         ]
     }
 }

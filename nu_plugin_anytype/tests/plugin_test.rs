@@ -601,3 +601,62 @@ fn test_tag_delete_requires_property_context() -> Result<(), ShellError> {
     Ok(())
 }
 
+// ============================================================================
+// Import Commands Tests
+// ============================================================================
+
+#[test]
+fn test_import_markdown_requires_file_arg() -> Result<(), ShellError> {
+    let result = create_plugin_test()?.eval("anytype import markdown");
+
+    // Should fail - missing required file argument
+    assert!(result.is_err());
+    Ok(())
+}
+
+#[test]
+fn test_import_markdown_requires_space_flag() -> Result<(), ShellError> {
+    let result = create_plugin_test()?.eval("anytype import markdown 'test.md' --type 'Page'");
+
+    // Should fail - missing space context
+    assert!(result.is_err());
+    Ok(())
+}
+
+#[test]
+fn test_import_markdown_requires_type_flag() -> Result<(), ShellError> {
+    let result = create_plugin_test()?.eval("anytype import markdown 'test.md' --space 'Work'");
+
+    // Should fail - missing type flag
+    assert!(result.is_err());
+    Ok(())
+}
+
+#[test]
+fn test_import_markdown_with_all_required_flags() -> Result<(), ShellError> {
+    let result = create_plugin_test()?.eval("anytype import markdown 'test.md' --space 'Work' --type 'Page'");
+
+    // Should fail with file not found or authentication error (but command parsing should work)
+    assert!(result.is_err());
+    Ok(())
+}
+
+#[test]
+fn test_import_markdown_with_dry_run_flag() -> Result<(), ShellError> {
+    let result = create_plugin_test()?.eval("anytype import markdown 'test.md' --space 'Work' --type 'Page' --dry-run");
+
+    // Should fail with file not found or authentication error (but command parsing should work)
+    assert!(result.is_err());
+    Ok(())
+}
+
+#[test]
+fn test_import_markdown_with_verbose_flag() -> Result<(), ShellError> {
+    let result = create_plugin_test()?.eval("anytype import markdown 'test.md' --space 'Work' --type 'Page' --verbose");
+
+    // Should fail with file not found or authentication error (but command parsing should work)
+    assert!(result.is_err());
+    Ok(())
+}
+
+
