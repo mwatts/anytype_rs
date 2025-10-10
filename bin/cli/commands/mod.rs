@@ -2,6 +2,7 @@ pub mod auth;
 pub mod import;
 pub mod list;
 pub mod member;
+pub mod object;
 pub mod property;
 pub mod search;
 pub mod space;
