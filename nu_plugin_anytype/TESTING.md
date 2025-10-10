@@ -63,11 +63,11 @@ Located in `test_all_commands.nu` - comprehensive integration testing against a 
 - Search (8 tests) - All search options, pagination, sorting
 - Members (3 tests) - List and structure
 - Templates (2 tests) - List functionality
-- Resolve (5 tests) - Name-to-ID resolution
+- Resolve (5 tests) - Name-to-ID resolution (includes error cases)
 - Cache (3 tests) - Stats and clear operations
 - Pipelines (4 tests) - Context propagation
 - Context Resolution (2 tests) - Priority testing
-- Error Handling (5 tests) - Invalid inputs
+- Error Handling (3 tests) - Runtime errors (parse-time errors tested in integration tests)
 
 **Run:**
 ```bash
@@ -267,6 +267,10 @@ anytype space create dev-test
 
 **Solution:** Ensure Anytype app is running on `localhost:31009`
 
+**Problem:** `./test_all_commands.nu` fails with parse errors for error handling tests
+
+**Solution:** Parse-time errors (missing arguments, invalid flag values) cannot be tested in Nushell closures as they fail during parsing. These are tested in the integration test suite (`tests/plugin_test.rs`) instead.
+
 ### Test Results File Not Generated
 
 **Problem:** `test_results.txt` not created
@@ -279,8 +283,8 @@ anytype space create dev-test
 |--------------|-------|----------------------------------|---------------|
 | Unit         | 10    | Core logic, helpers, cache       | None          |
 | Integration  | 32    | Command structure, parsing       | None          |
-| End-to-End   | ~51   | Full workflow with live API      | Anytype app   |
-| **Total**    | **93**| **Complete plugin functionality**| **Optional**  |
+| End-to-End   | 49    | Full workflow with live API      | Anytype app   |
+| **Total**    | **91**| **Complete plugin functionality**| **Optional**  |
 
 ## Best Practices
 

@@ -576,20 +576,16 @@ run_test "error - invalid space name" --expect_error {
     anytype object list --space "invalid-space-name-12345"
 }
 
-run_test "error - missing required argument" --expect_error {
-    anytype space get
-}
-
-run_test "error - invalid flag value" --expect_error {
-    anytype search "test" --limit "not-a-number"
-}
+# Note: Tests for parse-time errors (missing positional args, invalid flag values)
+# cannot be tested within closures as Nushell parses them before execution.
+# These are validated by the integration tests in tests/plugin_test.rs instead.
 
 run_test "error - unknown sort property" --expect_error {
-    anytype search "test" --sort invalid_property
+    anytype search "test" --space $TEST_SPACE --sort invalid_property
 }
 
 run_test "error - invalid sort direction" --expect_error {
-    anytype search "test" --direction invalid
+    anytype search "test" --space $TEST_SPACE --direction invalid
 }
 
 # ============================================================================
@@ -643,15 +639,18 @@ $report_header | save --force $RESULTS_FILE
 # Write detailed results
 "\n## Detailed Results\n" | save --append $RESULTS_FILE
 for test in $env.test_results {
-    let detail = $"
-### ($test.test)
-- **Status**: ($test.status)
-- **Time**: ($test.timestamp)
-(if ($test.duration? != null) { $"- **Duration**: ($test.duration)\n" } else { "" })
-(if ($test.message? != null) { $"- **Message**: ($test.message)\n" } else { "" })
-(if ($test.error? != null) { $"- **Error**: ```\n($test.error)\n```\n" } else { "" })
-"
-    $detail | save --append $RESULTS_FILE
+    let header = $"\n### ($test.test)\n- **Status**: ($test.status)\n- **Time**: ($test.timestamp)\n"
+    $header | save --append $RESULTS_FILE
+
+    if ($test.duration? != null) {
+        $"- **Duration**: ($test.duration)\n" | save --append $RESULTS_FILE
+    }
+    if ($test.message? != null) {
+        $"- **Message**: ($test.message)\n" | save --append $RESULTS_FILE
+    }
+    if ($test.error? != null) {
+        $"- **Error**: ```\n($test.error)\n```\n" | save --append $RESULTS_FILE
+    }
 }
 
 print $"Results saved to ($RESULTS_FILE)"
