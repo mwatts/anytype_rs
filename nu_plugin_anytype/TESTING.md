@@ -38,7 +38,7 @@ Located in `tests/plugin_test.rs` using `nu-plugin-test-support`.
 cargo test --test plugin_test
 ```
 
-**Results:** 32 tests validating command structure and behavior
+**Results:** 43 tests validating command structure and behavior
 
 **Features:**
 - No external dependencies required
@@ -61,21 +61,23 @@ Located in `test_all_commands.nu` - comprehensive integration testing against a 
 - Types (3 tests) - List, pipeline, custom value verification
 - Objects (3 tests) - List, pipeline, structure validation
 - Search (8 tests) - All search options, pagination, sorting, pipeline
+- Lists (5 tests) - Add, views, objects, remove operations
 - Members (3 tests) - List, pipeline, structure validation
 - Resolve (1 test) - Name-to-ID resolution
 - Cache (3 tests) - Stats, clear, verification
 - Pipelines (4 tests) - Context propagation across command types
 - Context Resolution (2 tests) - Pipeline and flag priority
 
-**Total: 32 E2E tests**
+**Total: 37 E2E tests**
 
 **Limitations:**
 - **Error tests disabled**: Plugin LabeledErrors cause script termination in Nushell 0.106.1
   even when wrapped in try/catch blocks. This appears to be a Nushell limitation when
   executing script files (works fine in inline commands). All error cases are thoroughly
-  tested in `tests/plugin_test.rs` (32 integration tests).
+  tested in `tests/plugin_test.rs` (43 integration tests).
 - **Template tests disabled**: Template listing requires a `--type` parameter which is not
   yet implemented in the plugin.
+- **List tests skipped by default**: Require existing collections in the test space.
 - **Custom value fields**: Tests focus on command execution success and custom value types
   rather than detailed field validation, as Nushell custom values don't support cell path
   access. Field-level validation is handled by integration tests.

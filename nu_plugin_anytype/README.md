@@ -110,12 +110,42 @@ anytype search <query> [--space <name>]  # Search for objects
 
 **Sort properties:** `created_date`, `last_modified_date`, `last_opened_date`, `name`
 
+### Lists/Collections (4 commands)
+
+```nushell
+anytype list add <list> [--space <name>]     # Add objects to a list
+  --objects <ids>                             # Object IDs to add (comma-separated)
+
+anytype list views <list> [--space <name>]   # Get views for a list
+  
+anytype list objects <list> [--space <name>] # Get objects in a list
+  --limit <n>                                 # Max objects to return
+
+anytype list remove <list> [--space <name>]  # Remove object from list
+  --object <id>                               # Object ID to remove
+```
+
 ### Members & Templates (2 commands)
 
 ```nushell
 anytype member list [--space <name>]    # List space members
 anytype template list [--space <name>]  # List templates
 ```
+
+### Tags (5 commands)
+
+```nushell
+anytype tag list <property> [--space <name>]   # List tags for a property
+anytype tag get <name> --property <name> [--space <name>]  # Get tag by name
+anytype tag create <name> --property <name> [--space <name>]  # Create new tag
+  --color <color>                              # Optional color
+anytype tag update <name> --property <name> [--space <name>]  # Update tag
+  --new-name <name>                            # Optional new name
+  --color <color>                              # Optional new color
+anytype tag delete <name> --property <name> [--space <name>]  # Delete tag
+```
+
+**Colors:** `grey`, `yellow`, `orange`, `red`, `pink`, `purple`, `blue`, `ice`, `teal`, `lime`
 
 ### Resolution & Cache (5 commands)
 
@@ -180,6 +210,24 @@ anytype search "notes" --limit 20 --offset 40
 
 # Search and sort by modification date
 anytype search "docs" --sort last_modified_date --direction desc
+
+# Work with tags (requires property context)
+anytype tag list "Status" --property "Task Status" --space "Work"
+
+# Pipeline tag operations from property context
+# (Note: property commands not yet implemented - placeholder example)
+# anytype property get "Status" --space "Work" | anytype tag list
+# Get objects from a list/collection
+anytype list objects "My Tasks" --space "Work" --limit 10
+
+# Add search results to a collection
+anytype search "urgent" --space "Work"
+| get id
+| anytype list add "Priority Items" --objects $in --space "Work"
+
+# Get list views and filter
+anytype list views "Projects" --space "Work"
+| where layout == "table"
 ```
 
 ## Configuration

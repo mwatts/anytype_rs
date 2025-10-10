@@ -55,3 +55,43 @@ pub fn get_space_id(
     )
     .with_label("Missing space context", span))
 }
+
+/// Extract type_id from multiple sources (flag, pipeline)
+pub fn get_type_id(
+    plugin: &AnytypePlugin,
+    call: &EvaluatedCall,
+    input: &Value,
+    space_id: &str,
+    span: Span,
+) -> Result<String, LabeledError> {
+    // Priority 1: Check for --type flag
+    if let Ok(Some(type_name)) = call.get_flag::<String>("type") {
+        let resolver = plugin.resolver().map_err(|e| {
+            LabeledError::new(format!("Failed to get resolver: {}", e))
+                .with_label("Authentication required", span)
+        })?;
+
+        return plugin
+            .run_async(resolver.resolve_type(space_id, &type_name))
+            .map_err(|e| {
+                LabeledError::new(format!(
+                    "Failed to resolve type '{}' in space '{}': {}",
+                    type_name, space_id, e
+                ))
+            });
+    }
+
+    // Priority 2: Check for AnytypeValue from pipeline
+    if let Ok(custom_value) = input.as_custom_value()
+        && let Some(anytype_value) = custom_value.as_any().downcast_ref::<AnytypeValue>()
+        && let Some(type_id) = anytype_value.type_id()
+    {
+        return Ok(type_id.to_string());
+    }
+
+    // No type context found
+    Err(LabeledError::new(
+        "Type context required. Use --type <name> or pipe a Type",
+    )
+    .with_label("Missing type context", span))
+}
