@@ -1,6 +1,6 @@
-use crate::{commands::common::get_space_id, AnytypePlugin};
+use crate::{commands::common::{get_space_id, get_type_id}, value::AnytypeValue, AnytypePlugin};
 use nu_plugin::{EngineInterface, EvaluatedCall, PluginCommand};
-use nu_protocol::{Category, LabeledError, PipelineData, Signature, SyntaxShape};
+use nu_protocol::{Category, LabeledError, PipelineData, Signature, SyntaxShape, Value};
 
 /// Command: anytype template list
 pub struct TemplateList;
@@ -13,17 +13,33 @@ impl PluginCommand for TemplateList {
     }
 
     fn description(&self) -> &str {
-        "List all templates in a space"
+        "List templates for a specific type in a space"
     }
 
     fn signature(&self) -> Signature {
         Signature::build(self.name())
             .named(
+                "type",
+                SyntaxShape::String,
+                "Name of the type to list templates for",
+                Some('t'),
+            )
+            .named(
                 "space",
                 SyntaxShape::String,
-                "Name of the space",
+                "Name of the space (can also accept Space or Type from pipeline)",
                 Some('s'),
             )
+            .input_output_types(vec![
+                (
+                    nu_protocol::Type::Nothing,
+                    nu_protocol::Type::List(Box::new(nu_protocol::Type::Custom("AnytypeValue".into()))),
+                ),
+                (
+                    nu_protocol::Type::Custom("AnytypeValue".into()),
+                    nu_protocol::Type::List(Box::new(nu_protocol::Type::Custom("AnytypeValue".into()))),
+                ),
+            ])
             .category(Category::Custom("anytype".into()))
     }
 
@@ -35,28 +51,35 @@ impl PluginCommand for TemplateList {
         input: PipelineData,
     ) -> Result<PipelineData, LabeledError> {
         let span = call.head;
-        let _input = input.into_value(span)?;
-        let _space_id = get_space_id(plugin, call, &_input, span)?;
+        let input = input.into_value(span)?;
 
-        // NOTE: list_templates API requires a type_id parameter which is not currently
-        // exposed in this command. This needs to be implemented properly with a --type flag
-        // or by listing all types and then fetching templates for each type.
-        // For now, return an error message to the user.
-        Err(LabeledError::new(
-            "Template listing is not yet fully implemented. The API requires a type_id parameter."
-        ).with_label(
-            "This command needs to be enhanced to accept a --type parameter",
-            span
-        ))
+        // Get space_id from multiple sources (flag, pipeline, config)
+        let space_id = get_space_id(plugin, call, &input, span)?;
 
-        // TODO: Implement this properly, either by:
-        // 1. Adding a required --type parameter to specify which type to list templates for
-        // 2. Or by listing all types first and fetching templates for each type
-        //
-        // Example implementation with --type flag:
-        // let type_name: String = call.req_flag("type")?;
-        // let resolver = plugin.resolver()?;
-        // let type_id = plugin.run_async(resolver.resolve_type(&space_id, &type_name))?;
-        // let templates = plugin.run_async(client.list_templates(&space_id, &type_id))?;
+        // Get type_id from multiple sources (flag, pipeline)
+        let type_id = get_type_id(plugin, call, &input, &space_id, span)?;
+
+        // Get client
+        let client = plugin.client().map_err(|e| {
+            LabeledError::new(format!("Failed to get client: {}", e))
+                .with_label("Authentication required", span)
+        })?;
+
+        // List templates from API
+        let templates = plugin
+            .run_async(client.list_templates(&space_id, &type_id))
+            .map_err(|e| LabeledError::new(format!("Failed to list templates: {}", e)))?;
+
+        // Convert to AnytypeValue::Template with space_id and type_id context
+        let values: Vec<Value> = templates
+            .into_iter()
+            .map(|template| {
+                // Use From<(Template, String, String)> to convert with context
+                let anytype_value: AnytypeValue = (template, space_id.clone(), type_id.clone()).into();
+                Value::custom(Box::new(anytype_value), span)
+            })
+            .collect();
+
+        Ok(PipelineData::Value(Value::list(values, span), None))
     }
 }
