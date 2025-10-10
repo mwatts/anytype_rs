@@ -187,6 +187,32 @@ impl CustomValue for AnytypeValue {
         self
     }
 
+    fn follow_path_string(
+        &self,
+        _self_span: Span,
+        column_name: String,
+        path_span: Span,
+    ) -> Result<Value, ShellError> {
+        // Convert to record and access the field
+        let record = self.to_base_value(path_span)?;
+        match record {
+            Value::Record { val, .. } => {
+                val.get(&column_name)
+                    .cloned()
+                    .ok_or_else(|| ShellError::CantFindColumn {
+                        col_name: column_name,
+                        span: Some(path_span),
+                        src_span: path_span,
+                    })
+            }
+            _ => Err(ShellError::CantFindColumn {
+                col_name: column_name,
+                span: Some(path_span),
+                src_span: path_span,
+            }),
+        }
+    }
+
     fn to_base_value(&self, span: Span) -> Result<Value, ShellError> {
         let mut record = Record::new();
 
