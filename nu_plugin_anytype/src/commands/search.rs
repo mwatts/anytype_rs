@@ -50,10 +50,16 @@ impl PluginCommand for Search {
                 "Sort direction: asc or desc (default: desc)",
                 Some('d'),
             )
-            .input_output_type(
-                nu_protocol::Type::Custom("AnytypeValue".into()),
-                nu_protocol::Type::List(Box::new(nu_protocol::Type::Custom("AnytypeValue".into()))),
-            )
+            .input_output_types(vec![
+                (
+                    nu_protocol::Type::Nothing,
+                    nu_protocol::Type::List(Box::new(nu_protocol::Type::Custom("AnytypeValue".into()))),
+                ),
+                (
+                    nu_protocol::Type::Custom("AnytypeValue".into()),
+                    nu_protocol::Type::List(Box::new(nu_protocol::Type::Custom("AnytypeValue".into()))),
+                ),
+            ])
             .category(Category::Custom("anytype".into()))
     }
 

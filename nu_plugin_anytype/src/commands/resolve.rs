@@ -74,10 +74,16 @@ impl PluginCommand for ResolveType {
                 "Name of the space (can also accept Space from pipeline)",
                 Some('s'),
             )
-            .input_output_type(
-                nu_protocol::Type::Custom("AnytypeValue".into()),
-                nu_protocol::Type::Record(vec![].into()),
-            )
+            .input_output_types(vec![
+                (
+                    nu_protocol::Type::Nothing,
+                    nu_protocol::Type::Record(vec![].into()),
+                ),
+                (
+                    nu_protocol::Type::Custom("AnytypeValue".into()),
+                    nu_protocol::Type::Record(vec![].into()),
+                ),
+            ])
             .category(Category::Custom("anytype".into()))
     }
 
@@ -151,10 +157,16 @@ impl PluginCommand for ResolveObject {
                 "Name of the space (can also accept Space from pipeline)",
                 Some('s'),
             )
-            .input_output_type(
-                nu_protocol::Type::Custom("AnytypeValue".into()),
-                nu_protocol::Type::Record(vec![].into()),
-            )
+            .input_output_types(vec![
+                (
+                    nu_protocol::Type::Nothing,
+                    nu_protocol::Type::Record(vec![].into()),
+                ),
+                (
+                    nu_protocol::Type::Custom("AnytypeValue".into()),
+                    nu_protocol::Type::Record(vec![].into()),
+                ),
+            ])
             .category(Category::Custom("anytype".into()))
     }
 

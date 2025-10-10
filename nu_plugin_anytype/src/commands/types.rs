@@ -24,10 +24,16 @@ impl PluginCommand for TypeList {
                 "Name of the space (can also accept Space from pipeline)",
                 Some('s'),
             )
-            .input_output_type(
-                nu_protocol::Type::Custom("AnytypeValue".into()),
-                nu_protocol::Type::List(Box::new(nu_protocol::Type::Custom("AnytypeValue".into()))),
-            )
+            .input_output_types(vec![
+                (
+                    nu_protocol::Type::Nothing,
+                    nu_protocol::Type::List(Box::new(nu_protocol::Type::Custom("AnytypeValue".into()))),
+                ),
+                (
+                    nu_protocol::Type::Custom("AnytypeValue".into()),
+                    nu_protocol::Type::List(Box::new(nu_protocol::Type::Custom("AnytypeValue".into()))),
+                ),
+            ])
             .category(Category::Custom("anytype".into()))
     }
 
@@ -92,10 +98,16 @@ impl PluginCommand for TypeGet {
                 "Name of the space (can also accept Space from pipeline)",
                 Some('s'),
             )
-            .input_output_type(
-                nu_protocol::Type::Custom("AnytypeValue".into()),
-                nu_protocol::Type::Custom("AnytypeValue".into()),
-            )
+            .input_output_types(vec![
+                (
+                    nu_protocol::Type::Nothing,
+                    nu_protocol::Type::Custom("AnytypeValue".into()),
+                ),
+                (
+                    nu_protocol::Type::Custom("AnytypeValue".into()),
+                    nu_protocol::Type::Custom("AnytypeValue".into()),
+                ),
+            ])
             .category(Category::Custom("anytype".into()))
     }
 
