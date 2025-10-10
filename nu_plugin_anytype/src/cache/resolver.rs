@@ -138,18 +138,37 @@ impl Resolver {
     }
 
     /// Resolve tag name to ID within a property
-    pub async fn resolve_tag(&self, property_id: &str, name: &str) -> Result<String> {
+    pub async fn resolve_tag(&self, space_id: &str, property_id: &str, name: &str) -> Result<String> {
         // Check cache first
         if let Some(id) = self.cache.get_tag(property_id, name) {
             return Ok(id);
         }
 
         // Cache miss - fetch from API
-        // TODO: Implement list_tags API call when available
-        // For now, return an error
-        Err(AnytypeError::Api {
-            message: format!("Tag resolution not yet implemented. Cannot find '{}'", name),
-        })
+        let tags = self.client.list_tags(space_id, property_id).await?;
+
+        let tag = tags
+            .iter()
+            .find(|t| t.name == name)
+            .ok_or_else(|| AnytypeError::Api {
+                message: format!("No Tag found with name '{}' in property '{}'", name, property_id),
+            })?;
+
+        // Cache the result
+        self.cache
+            .insert_tag(property_id.to_string(), name.to_string(), tag.id.clone());
+
+        Ok(tag.id.clone())
+    }
+
+    /// Invalidate tag cache
+    pub fn invalidate_tag(&self, property_id: &str, name: &str) {
+        self.cache.invalidate_tag(property_id, name);
+    }
+
+    /// Invalidate property cache (with cascade)
+    pub fn invalidate_property(&self, type_id: &str, property_id: &str) {
+        self.cache.invalidate_property(type_id, property_id);
     }
 
     /// Clear all caches
