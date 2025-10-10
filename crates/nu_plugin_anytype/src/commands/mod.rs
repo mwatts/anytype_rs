@@ -11,7 +11,8 @@ pub mod search;
 pub mod space;
 pub mod tag;
 pub mod template;
-pub mod types;
+#[path = "type.rs"]
+pub mod r#type;
 
 // Future phases:
 // Phase 8: tag.rs
@@ -23,9 +24,9 @@ pub use list::{ListAdd, ListObjects, ListRemove, ListViews};
 pub use member::MemberList;
 pub use object::{ObjectGet, ObjectList};
 pub use property::{PropertyCreate, PropertyDelete, PropertyGet, PropertyList, PropertyUpdate};
+pub use r#type::{TypeGet, TypeList};
 pub use resolve::{CacheClear, CacheStats, ResolveObject, ResolveSpace, ResolveType};
 pub use search::Search;
 pub use space::{SpaceCreate, SpaceGet, SpaceList};
 pub use tag::{TagCreate, TagDelete, TagGet, TagList, TagUpdate};
 pub use template::TemplateList;
-pub use types::{TypeGet, TypeList};
