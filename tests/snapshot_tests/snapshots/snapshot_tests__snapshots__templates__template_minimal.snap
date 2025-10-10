@@ -1,0 +1,20 @@
+---
+source: tests/snapshot_tests/templates.rs
+expression: template_minimal
+---
+{
+  "archived": null,
+  "icon": {
+    "format": "emoji",
+    "emoji": "⭐"
+  },
+  "id": "template789",
+  "layout": null,
+  "markdown": null,
+  "name": null,
+  "object": "template",
+  "properties": [],
+  "snippet": null,
+  "space_id": "space123",
+  "type": null
+}

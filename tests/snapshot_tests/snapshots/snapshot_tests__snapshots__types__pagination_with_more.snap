@@ -1,0 +1,10 @@
+---
+source: tests/snapshot_tests/types.rs
+expression: pagination
+---
+{
+  "has_more": true,
+  "limit": 50,
+  "offset": 100,
+  "total": 250
+}

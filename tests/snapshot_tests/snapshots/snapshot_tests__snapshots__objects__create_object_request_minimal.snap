@@ -1,0 +1,7 @@
+---
+source: tests/snapshot_tests/objects.rs
+expression: request_minimal
+---
+{
+  "type_key": "page"
+}

@@ -1,0 +1,15 @@
+---
+source: tests/snapshot_tests/spaces.rs
+expression: space
+---
+{
+  "id": "space123",
+  "name": "My Space",
+  "object": "space",
+  "description": "A workspace for collaboration",
+  "icon": {
+    "emoji": "🏢"
+  },
+  "gateway_url": "https://gateway.example.com",
+  "network_id": "network456"
+}

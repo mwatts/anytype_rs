@@ -1,0 +1,11 @@
+---
+source: tests/snapshot_tests/lists.rs
+expression: request
+---
+{
+  "object_ids": [
+    "obj1",
+    "obj2",
+    "obj3"
+  ]
+}

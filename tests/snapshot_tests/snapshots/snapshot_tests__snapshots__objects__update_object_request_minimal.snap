@@ -1,0 +1,5 @@
+---
+source: tests/snapshot_tests/objects.rs
+expression: request_minimal
+---
+{}

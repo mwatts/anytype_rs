@@ -1,0 +1,9 @@
+---
+source: tests/snapshot_tests/lists.rs
+expression: request_single
+---
+{
+  "object_ids": [
+    "obj123"
+  ]
+}

@@ -1,0 +1,14 @@
+---
+source: tests/snapshot_tests/objects.rs
+expression: request
+---
+{
+  "name": "Updated Name",
+  "markdown": "# Updated Content\n\nNew content here",
+  "properties": {
+    "description": "Updated description",
+    "tags": [
+      "updated"
+    ]
+  }
+}

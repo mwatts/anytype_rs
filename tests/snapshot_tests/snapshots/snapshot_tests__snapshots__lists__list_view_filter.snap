@@ -1,0 +1,11 @@
+---
+source: tests/snapshot_tests/lists.rs
+expression: filter
+---
+{
+  "condition": "equals",
+  "format": "text",
+  "id": "filter1",
+  "property_key": "status",
+  "value": "active"
+}

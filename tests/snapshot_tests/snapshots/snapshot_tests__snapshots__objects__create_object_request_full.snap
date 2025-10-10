@@ -1,0 +1,12 @@
+---
+source: tests/snapshot_tests/objects.rs
+expression: request
+---
+{
+  "type_key": "note",
+  "name": "New Note",
+  "properties": {
+    "content": "Note content",
+    "title": "My Note"
+  }
+}

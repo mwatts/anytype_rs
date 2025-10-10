@@ -1,0 +1,5 @@
+---
+source: tests/snapshot_tests/errors.rs
+expression: "format!(\"{}\", invalid_response)"
+---
+Invalid response: Missing required field

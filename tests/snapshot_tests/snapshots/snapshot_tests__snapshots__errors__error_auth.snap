@@ -1,0 +1,5 @@
+---
+source: tests/snapshot_tests/errors.rs
+expression: "format!(\"{}\", auth_error)"
+---
+Authentication failed: API key not set

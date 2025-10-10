@@ -1,0 +1,8 @@
+---
+source: tests/snapshot_tests/tags.rs
+expression: request_no_color
+---
+{
+  "name": "Simple Tag",
+  "color": null
+}

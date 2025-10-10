@@ -1,0 +1,7 @@
+---
+source: tests/snapshot_tests/spaces.rs
+expression: request_description_only
+---
+{
+  "description": "Description Only Update"
+}

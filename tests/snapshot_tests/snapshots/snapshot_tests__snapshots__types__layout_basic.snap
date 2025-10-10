@@ -1,0 +1,5 @@
+---
+source: tests/snapshot_tests/types.rs
+expression: "Layout::Basic"
+---
+"basic"

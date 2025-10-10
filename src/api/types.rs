@@ -64,7 +64,7 @@ pub struct TypeProperty {
     pub object: String,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 #[serde(rename_all = "snake_case")]
 pub enum Format {
     Text,
@@ -94,7 +94,7 @@ pub struct Type {
     pub properties: Vec<TypeProperty>,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 #[serde(rename_all = "lowercase")]
 pub enum Layout {
     Basic,

@@ -1,0 +1,8 @@
+---
+source: tests/snapshot_tests/search.rs
+expression: sort_asc_name
+---
+{
+  "direction": "asc",
+  "property_key": "name"
+}

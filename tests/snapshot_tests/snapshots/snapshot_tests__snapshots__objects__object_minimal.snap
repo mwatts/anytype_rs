@@ -1,0 +1,11 @@
+---
+source: tests/snapshot_tests/objects.rs
+expression: object_minimal
+---
+{
+  "id": "obj789",
+  "name": null,
+  "space_id": null,
+  "object": null,
+  "properties": {}
+}

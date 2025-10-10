@@ -1,0 +1,8 @@
+---
+source: tests/snapshot_tests/tags.rs
+expression: request_color_only
+---
+{
+  "name": null,
+  "color": "purple"
+}

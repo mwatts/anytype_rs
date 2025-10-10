@@ -1,0 +1,39 @@
+---
+source: tests/snapshot_tests/templates.rs
+expression: template
+---
+{
+  "archived": false,
+  "icon": {
+    "format": "icon",
+    "color": "blue",
+    "name": "template"
+  },
+  "id": "template123",
+  "layout": "basic",
+  "markdown": "# Template\n\nDefault content",
+  "name": "My Template",
+  "object": "template",
+  "properties": [
+    {
+      "key": "description",
+      "value": "Template description"
+    }
+  ],
+  "snippet": "A snippet preview...",
+  "space_id": "space456",
+  "type": {
+    "archived": false,
+    "icon": {
+      "format": "emoji",
+      "emoji": "📄"
+    },
+    "id": "type789",
+    "key": "page",
+    "layout": "basic",
+    "name": "Page",
+    "object": "type",
+    "plural_name": "Pages",
+    "properties": []
+  }
+}

@@ -1,0 +1,8 @@
+---
+source: tests/snapshot_tests/types.rs
+expression: file_icon
+---
+{
+  "format": "file",
+  "file": "path/to/icon.png"
+}

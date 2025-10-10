@@ -1,0 +1,11 @@
+---
+source: tests/snapshot_tests/tags.rs
+expression: tag_no_color
+---
+{
+  "color": null,
+  "id": "tag456",
+  "key": "note",
+  "name": "Note",
+  "object": "tag"
+}

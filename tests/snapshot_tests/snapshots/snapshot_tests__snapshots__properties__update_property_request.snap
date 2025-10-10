@@ -1,0 +1,8 @@
+---
+source: tests/snapshot_tests/properties.rs
+expression: request
+---
+{
+  "name": "Updated Property",
+  "format": "multi_select"
+}

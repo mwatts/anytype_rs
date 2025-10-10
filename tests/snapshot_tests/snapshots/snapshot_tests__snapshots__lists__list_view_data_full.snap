@@ -1,0 +1,26 @@
+---
+source: tests/snapshot_tests/lists.rs
+expression: view
+---
+{
+  "filters": [
+    {
+      "condition": "contains",
+      "format": "text",
+      "id": "filter1",
+      "property_key": "title",
+      "value": "test"
+    }
+  ],
+  "id": "view123",
+  "layout": "table",
+  "name": "My View",
+  "sorts": [
+    {
+      "format": "date",
+      "id": "sort1",
+      "property_key": "updated_at",
+      "sort_type": "desc"
+    }
+  ]
+}

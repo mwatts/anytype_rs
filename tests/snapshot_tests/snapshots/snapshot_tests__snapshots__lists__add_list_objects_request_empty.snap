@@ -1,0 +1,7 @@
+---
+source: tests/snapshot_tests/lists.rs
+expression: request_empty
+---
+{
+  "object_ids": []
+}

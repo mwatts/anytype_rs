@@ -1,0 +1,9 @@
+---
+source: tests/snapshot_tests/types.rs
+expression: color_icon
+---
+{
+  "format": "icon",
+  "color": "blue",
+  "name": "star"
+}

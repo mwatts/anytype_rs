@@ -1,0 +1,5 @@
+---
+source: tests/snapshot_tests/properties.rs
+expression: "PropertyFormat::Email"
+---
+"email"
