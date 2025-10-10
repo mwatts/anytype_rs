@@ -1,7 +1,7 @@
 //! Snapshot tests for types module
 
-use anytype_rs::api::{CreateTypeProperty, CreateTypeRequest, Layout, PropertyFormat};
 use anytype_rs::api::types::{Color, Icon};
+use anytype_rs::api::{CreateTypeProperty, CreateTypeRequest, Layout, PropertyFormat};
 
 #[test]
 fn test_create_type_property_serialization() {

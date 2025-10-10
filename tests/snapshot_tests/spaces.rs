@@ -60,7 +60,10 @@ fn test_update_space_request_serialization() {
         name: None,
         description: Some("Description Only Update".to_string()),
     };
-    insta::assert_json_snapshot!("update_space_request_description_only", request_description_only);
+    insta::assert_json_snapshot!(
+        "update_space_request_description_only",
+        request_description_only
+    );
 
     let request_empty = UpdateSpaceRequest {
         name: None,

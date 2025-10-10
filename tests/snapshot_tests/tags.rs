@@ -1,7 +1,7 @@
 //! Snapshot tests for tags module types
 
-use anytype_rs::api::{CreateTagRequest, Tag, UpdateTagRequest};
 use anytype_rs::api::types::Color;
+use anytype_rs::api::{CreateTagRequest, Tag, UpdateTagRequest};
 
 #[test]
 fn test_tag_serialization() {

@@ -4,8 +4,8 @@
 
 #[path = "property_tests"]
 mod proptests {
-    pub mod strategies;
-    pub mod serialization;
     pub mod invariants;
+    pub mod serialization;
+    pub mod strategies;
     pub mod validation;
 }

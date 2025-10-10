@@ -1,6 +1,6 @@
 //! Snapshot tests for properties module types
 
-use anytype_rs::api::{CreatePropertyRequest, Property, UpdatePropertyRequest, PropertyFormat};
+use anytype_rs::api::{CreatePropertyRequest, Property, PropertyFormat, UpdatePropertyRequest};
 
 #[test]
 fn test_property_format_serialization() {

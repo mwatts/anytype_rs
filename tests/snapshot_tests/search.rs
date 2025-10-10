@@ -1,7 +1,7 @@
 //! Snapshot tests for search module types
 
-use anytype_rs::api::{SearchObject, SearchRequest, Sort, SortDirection, SortProperty};
 use anytype_rs::api::types::{Icon, Layout, Type};
+use anytype_rs::api::{SearchObject, SearchRequest, Sort, SortDirection, SortProperty};
 
 #[test]
 fn test_sort_direction_serialization() {
@@ -12,8 +12,14 @@ fn test_sort_direction_serialization() {
 #[test]
 fn test_sort_property_serialization() {
     insta::assert_json_snapshot!("sort_property_created_date", SortProperty::CreatedDate);
-    insta::assert_json_snapshot!("sort_property_last_modified_date", SortProperty::LastModifiedDate);
-    insta::assert_json_snapshot!("sort_property_last_opened_date", SortProperty::LastOpenedDate);
+    insta::assert_json_snapshot!(
+        "sort_property_last_modified_date",
+        SortProperty::LastModifiedDate
+    );
+    insta::assert_json_snapshot!(
+        "sort_property_last_opened_date",
+        SortProperty::LastOpenedDate
+    );
     insta::assert_json_snapshot!("sort_property_name", SortProperty::Name);
 }
 

@@ -4,7 +4,7 @@
 //! for all types: deserialize(serialize(x)) == x
 
 use anytype_rs::api::types::{Color, Format, Icon, Pagination};
-use anytype_rs::api::{SearchRequest, Sort};
+use anytype_rs::api::Sort;
 use proptest::prelude::*;
 
 use super::strategies::*;

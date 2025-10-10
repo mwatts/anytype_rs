@@ -116,10 +116,7 @@ pub fn property_format_strategy() -> impl Strategy<Value = PropertyFormat> {
 
 /// Strategy for generating SortDirection enum variants
 pub fn sort_direction_strategy() -> impl Strategy<Value = SortDirection> {
-    prop_oneof![
-        Just(SortDirection::Asc),
-        Just(SortDirection::Desc),
-    ]
+    prop_oneof![Just(SortDirection::Asc), Just(SortDirection::Desc),]
 }
 
 /// Strategy for generating SortProperty enum variants
@@ -135,19 +132,6 @@ pub fn sort_property_strategy() -> impl Strategy<Value = SortProperty> {
 /// Strategy for generating non-empty alphanumeric strings (for IDs, keys)
 pub fn id_string_strategy() -> impl Strategy<Value = String> {
     "[a-zA-Z0-9_-]{1,64}"
-}
-
-/// Strategy for generating human-readable names
-pub fn name_string_strategy() -> impl Strategy<Value = String> {
-    "[A-Za-z][A-Za-z0-9 _-]{0,99}"
-}
-
-/// Strategy for generating optional strings
-pub fn optional_string_strategy() -> impl Strategy<Value = Option<String>> {
-    prop_oneof![
-        Just(None),
-        name_string_strategy().prop_map(Some),
-    ]
 }
 
 /// Strategy for generating valid limit values (1-1000)

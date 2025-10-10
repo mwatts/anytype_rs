@@ -2,9 +2,7 @@
 //!
 //! These tests verify that API types handle edge cases and arbitrary inputs correctly.
 
-use anytype_rs::api::{
-    CreateObjectRequest, SearchRequest, Sort, UpdateObjectRequest,
-};
+use anytype_rs::api::{CreateObjectRequest, SearchRequest, Sort, UpdateObjectRequest};
 use proptest::prelude::*;
 
 use super::strategies::*;
@@ -25,7 +23,7 @@ proptest! {
             space_id,
             sort: None,
         };
-        
+
         // Should serialize without panicking
         let result = serde_json::to_string(&request);
         assert!(result.is_ok(), "SearchRequest serialization failed: {:?}", result.err());
@@ -48,7 +46,7 @@ proptest! {
                 property_key: property,
             }),
         };
-        
+
         let result = serde_json::to_string(&request);
         assert!(result.is_ok());
     }
@@ -64,7 +62,7 @@ proptest! {
             name,
             properties: None,
         };
-        
+
         let result = serde_json::to_string(&request);
         assert!(result.is_ok(), "CreateObjectRequest serialization failed");
     }
@@ -81,13 +79,13 @@ proptest! {
         } else {
             None
         };
-        
+
         let request = UpdateObjectRequest {
             name,
             markdown,
             properties,
         };
-        
+
         let result = serde_json::to_string(&request);
         assert!(result.is_ok(), "UpdateObjectRequest serialization failed");
     }
@@ -104,7 +102,7 @@ proptest! {
                 name: Some("".to_string()),
                 properties: Some(serde_json::json!({})),
             };
-            
+
             let result = serde_json::to_string(&request);
             assert!(result.is_ok());
         }
@@ -124,7 +122,7 @@ proptest! {
             space_id: None,
             sort: None,
         };
-        
+
         let result = serde_json::to_string(&request);
         assert!(result.is_ok(), "Failed to serialize request with long string");
     }
@@ -139,7 +137,7 @@ proptest! {
             space_id: None,
             sort: None,
         };
-        
+
         let result = serde_json::to_string(&request);
         assert!(result.is_ok());
     }
@@ -154,7 +152,7 @@ proptest! {
             name: Some(special_chars),
             properties: None,
         };
-        
+
         let result = serde_json::to_string(&request);
         assert!(result.is_ok(), "Failed with special characters");
     }

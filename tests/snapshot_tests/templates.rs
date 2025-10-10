@@ -1,7 +1,7 @@
 //! Snapshot tests for templates module types
 
-use anytype_rs::api::{ObjectType, Template};
 use anytype_rs::api::types::{Color, Icon};
+use anytype_rs::api::{ObjectType, Template};
 
 #[test]
 fn test_object_type_serialization() {
@@ -16,14 +16,12 @@ fn test_object_type_serialization() {
         name: "Note".to_string(),
         object: "type".to_string(),
         plural_name: Some("Notes".to_string()),
-        properties: vec![
-            serde_json::json!({
-                "id": "prop1",
-                "key": "title",
-                "name": "Title",
-                "format": "text"
-            })
-        ],
+        properties: vec![serde_json::json!({
+            "id": "prop1",
+            "key": "title",
+            "name": "Title",
+            "format": "text"
+        })],
     };
     insta::assert_json_snapshot!("object_type", object_type);
 }
@@ -41,12 +39,10 @@ fn test_template_serialization() {
         markdown: Some("# Template\n\nDefault content".to_string()),
         name: Some("My Template".to_string()),
         object: "template".to_string(),
-        properties: vec![
-            serde_json::json!({
-                "key": "description",
-                "value": "Template description"
-            })
-        ],
+        properties: vec![serde_json::json!({
+            "key": "description",
+            "value": "Template description"
+        })],
         snippet: Some("A snippet preview...".to_string()),
         space_id: "space456".to_string(),
         object_type: Some(ObjectType {

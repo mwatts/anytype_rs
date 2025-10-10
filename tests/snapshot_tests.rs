@@ -4,15 +4,15 @@
 
 #[path = "snapshot_tests"]
 mod snapshots {
-    pub mod types;
-    pub mod search;
+    pub mod errors;
+    pub mod lists;
     pub mod members;
     pub mod objects;
-    pub mod tags;
     pub mod properties;
-    pub mod templates;
-    pub mod lists;
+    pub mod search;
     pub mod spaces;
+    pub mod tags;
+    pub mod templates;
     pub mod type_module;
-    pub mod errors;
+    pub mod types;
 }

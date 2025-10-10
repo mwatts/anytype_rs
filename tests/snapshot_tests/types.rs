@@ -1,6 +1,8 @@
 //! Snapshot tests for core API types
 
-use anytype_rs::api::types::{Color, Format, Icon, IconFormat, Layout, Pagination, Type, TypeProperty};
+use anytype_rs::api::types::{
+    Color, Format, Icon, IconFormat, Layout, Pagination, Type, TypeProperty,
+};
 
 #[test]
 fn test_color_serialization() {

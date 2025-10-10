@@ -5,7 +5,6 @@
 
 use anytype_rs::api::types::Pagination;
 use proptest::prelude::*;
-use proptest::strategy::ValueTree;
 
 use super::strategies::*;
 
@@ -25,7 +24,7 @@ proptest! {
             offset,
             total,
         };
-        
+
         // Invariant: if has_more is false, we've seen all items
         // This means offset + limit >= total (we're at or past the end)
         assert!(
@@ -52,7 +51,7 @@ proptest! {
             offset,
             total,
         };
-        
+
         // Invariant: if has_more is true, there should be items beyond current page
         assert!(
             pagination.offset + pagination.limit < pagination.total,
@@ -71,20 +70,21 @@ proptest! {
         base_offset in 0usize..200,
     ) {
         prop_assume!(limit > 0); // Ensure limit is positive
-        
+
+        #[allow(clippy::manual_range_contains)]
         let total = if has_more {
             base_offset + limit + 1
         } else {
             base_offset + (limit / 2).max(1)
         };
-        
+
         let pagination = Pagination {
             has_more,
             limit,
             offset: base_offset,
             total,
         };
-        
+
         // Offset should never exceed total
         assert!(
             pagination.offset <= pagination.total,
@@ -108,7 +108,7 @@ proptest! {
             offset,
             total,
         };
-        
+
         assert!(pagination.limit > 0, "Limit must be positive");
     }
 }
