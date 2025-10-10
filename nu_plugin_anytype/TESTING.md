@@ -57,21 +57,25 @@ Located in `test_all_commands.nu` - comprehensive integration testing against a 
 
 **Coverage:**
 - Authentication (2 tests) - Status and connectivity validation
-- Spaces (4 tests) - List, get, custom value verification, error handling
-- Types (4 tests) - List, pipeline, custom value verification, error handling
-- Objects (4 tests) - List, pipeline, structure validation, error handling
+- Spaces (3 tests) - List, get, custom value verification
+- Types (3 tests) - List, pipeline, custom value verification
+- Objects (3 tests) - List, pipeline, structure validation
 - Search (8 tests) - All search options, pagination, sorting, pipeline
 - Members (3 tests) - List, pipeline, structure validation
 - Templates (2 tests) - List, pipeline
-- Resolve (2 tests) - Name-to-ID resolution, error handling
+- Resolve (1 test) - Name-to-ID resolution
 - Cache (3 tests) - Stats, clear, verification
 - Pipelines (4 tests) - Context propagation across command types
 - Context Resolution (2 tests) - Pipeline and flag priority
-- Error Handling (3 tests) - Runtime errors (parse-time errors tested in integration tests)
 
-**Note**: Tests focus on command execution success and custom value types rather than
-detailed field validation, as Nushell custom values don't support cell path access.
-Field-level validation is handled by integration tests in `tests/plugin_test.rs`.
+**Limitations:**
+- **Error tests disabled**: Plugin LabeledErrors cause script termination in Nushell 0.106.1
+  even when wrapped in try/catch blocks. This appears to be a Nushell limitation when
+  executing script files (works fine in inline commands). All error cases are thoroughly
+  tested in `tests/plugin_test.rs` (32 integration tests).
+- **Custom value fields**: Tests focus on command execution success and custom value types
+  rather than detailed field validation, as Nushell custom values don't support cell path
+  access. Field-level validation is handled by integration tests.
 
 **Run:**
 ```bash
@@ -286,9 +290,12 @@ anytype space create dev-test
 | Test Type    | Count | What It Tests                    | External Deps |
 |--------------|-------|----------------------------------|---------------|
 | Unit         | 10    | Core logic, helpers, cache       | None          |
-| Integration  | 32    | Command structure, parsing       | None          |
-| End-to-End   | 41    | Full workflow with live API      | Anytype app   |
-| **Total**    | **83**| **Complete plugin functionality**| **Optional**  |
+| Integration  | 32    | Command structure, parsing, **errors** | None      |
+| End-to-End   | 34    | Full workflow with live API      | Anytype app   |
+| **Total**    | **76**| **Complete plugin functionality**| **Optional**  |
+
+**Note**: Error handling tests (`--expect_error`) are only in integration tests due to a
+Nushell 0.106.1 limitation where plugin LabeledErrors terminate scripts even in try/catch blocks.
 
 ## Best Practices
 
