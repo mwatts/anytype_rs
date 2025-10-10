@@ -3,13 +3,13 @@ use anytype_rs::api::AnytypeClient;
 use clap::{Args, Subcommand};
 
 #[derive(Debug, Args)]
-pub struct ListsArgs {
+pub struct ListArgs {
     #[command(subcommand)]
-    pub command: ListsCommand,
+    pub command: ListCommand,
 }
 
 #[derive(Debug, Subcommand)]
-pub enum ListsCommand {
+pub enum ListCommand {
     /// Add objects to a list (collection)
     Add {
         /// Space ID where the list exists
@@ -64,7 +64,7 @@ pub enum ListsCommand {
     },
 }
 
-pub async fn handle_lists_command(args: ListsArgs) -> Result<()> {
+pub async fn handle_list_command(args: ListArgs) -> Result<()> {
     let api_key = crate::config::load_api_key()?
         .ok_or_else(|| anyhow::anyhow!("Not authenticated. Run 'anytype auth login' first."))?;
 
@@ -72,20 +72,20 @@ pub async fn handle_lists_command(args: ListsArgs) -> Result<()> {
     client.set_api_key(api_key);
 
     match args.command {
-        ListsCommand::Add {
+        ListCommand::Add {
             space_id,
             list_id,
             object_ids,
         } => add_objects_to_list(&client, &space_id, &list_id, object_ids).await,
-        ListsCommand::Views { space_id, list_id } => {
+        ListCommand::Views { space_id, list_id } => {
             get_list_views(&client, &space_id, &list_id).await
         }
-        ListsCommand::Objects {
+        ListCommand::Objects {
             space_id,
             list_id,
             limit,
         } => get_list_objects(&client, &space_id, &list_id, limit).await,
-        ListsCommand::Remove {
+        ListCommand::Remove {
             space_id,
             list_id,
             object_id,

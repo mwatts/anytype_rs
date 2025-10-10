@@ -34,28 +34,28 @@ pub enum Commands {
     Import(commands::import::ImportArgs),
 
     /// List management commands
-    List(commands::list::ListsArgs),
+    List(commands::list::ListArgs),
 
     /// Member management commands
-    Member(commands::member::MembersArgs),
+    Member(commands::member::MemberArgs),
 
     /// Property management commands
-    Property(commands::property::PropertiesArgs),
+    Property(commands::property::PropertyArgs),
 
     /// Space management commands
-    Space(commands::space::SpacesArgs),
+    Space(commands::space::SpaceArgs),
 
     /// Search for objects
     Search(commands::search::SearchArgs),
 
     /// Tag management commands
-    Tag(commands::tag::TagsArgs),
+    Tag(commands::tag::TagArgs),
 
     /// Template management commands
-    Template(commands::template::TemplatesArgs),
+    Template(commands::template::TemplateArgs),
 
     /// Type management commands
-    Type(commands::r#type::TypesArgs),
+    Type(commands::r#type::TypeArgs),
 }
 
 #[tokio::main]
@@ -69,14 +69,14 @@ async fn main() -> Result<()> {
     let result = match cli.command {
         Commands::Auth(args) => commands::auth::handle_auth_command(args).await,
         Commands::Import(args) => commands::import::handle_import_command(args).await,
-        Commands::List(args) => commands::list::handle_lists_command(args).await,
-        Commands::Member(args) => commands::member::handle_members_command(args).await,
-        Commands::Property(args) => commands::property::handle_properties_command(args).await,
-        Commands::Space(args) => commands::space::handle_spaces_command(args).await,
+        Commands::List(args) => commands::list::handle_list_command(args).await,
+        Commands::Member(args) => commands::member::handle_member_command(args).await,
+        Commands::Property(args) => commands::property::handle_property_command(args).await,
+        Commands::Space(args) => commands::space::handle_space_command(args).await,
         Commands::Search(args) => commands::search::handle_search_command(args).await,
-        Commands::Tag(args) => commands::tag::handle_tags_command(args).await,
-        Commands::Template(args) => commands::template::handle_templates_command(args).await,
-        Commands::Type(args) => commands::r#type::handle_types_command(args).await,
+        Commands::Tag(args) => commands::tag::handle_tag_command(args).await,
+        Commands::Template(args) => commands::template::handle_template_command(args).await,
+        Commands::Type(args) => commands::r#type::handle_type_command(args).await,
     };
 
     if let Err(ref error) = result {

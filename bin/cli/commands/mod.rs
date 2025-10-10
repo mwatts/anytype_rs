@@ -7,5 +7,4 @@ pub mod search;
 pub mod space;
 pub mod tag;
 pub mod template;
-#[path = "type.rs"]
 pub mod r#type;

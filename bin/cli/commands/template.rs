@@ -3,13 +3,13 @@ use anytype_rs::api::AnytypeClient;
 use clap::{Args, Subcommand};
 
 #[derive(Debug, Args)]
-pub struct TemplatesArgs {
+pub struct TemplateArgs {
     #[command(subcommand)]
-    pub command: TemplatesCommand,
+    pub command: TemplateCommand,
 }
 
 #[derive(Debug, Subcommand)]
-pub enum TemplatesCommand {
+pub enum TemplateCommand {
     /// List templates for a specific type in a space
     List {
         /// Space ID
@@ -31,7 +31,7 @@ pub enum TemplatesCommand {
     },
 }
 
-pub async fn handle_templates_command(args: TemplatesArgs) -> Result<()> {
+pub async fn handle_template_command(args: TemplateArgs) -> Result<()> {
     let api_key = crate::config::load_api_key()?
         .ok_or_else(|| anyhow::anyhow!("Not authenticated. Run 'anytype auth login' first."))?;
 
@@ -39,12 +39,12 @@ pub async fn handle_templates_command(args: TemplatesArgs) -> Result<()> {
     client.set_api_key(api_key);
 
     match args.command {
-        TemplatesCommand::List {
+        TemplateCommand::List {
             space_id,
             type_id,
             limit,
         } => list_templates(&client, &space_id, &type_id, limit).await,
-        TemplatesCommand::Get {
+        TemplateCommand::Get {
             space_id,
             type_id,
             template_id,

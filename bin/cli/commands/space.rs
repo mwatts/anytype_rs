@@ -5,13 +5,13 @@ use anytype_rs::api::{
 use clap::{Args, Subcommand};
 
 #[derive(Debug, Args)]
-pub struct SpacesArgs {
+pub struct SpaceArgs {
     #[command(subcommand)]
-    pub command: SpacesCommand,
+    pub command: SpaceCommand,
 }
 
 #[derive(Debug, Subcommand)]
-pub enum SpacesCommand {
+pub enum SpaceCommand {
     /// List all spaces
     List,
     /// Get details of a specific space
@@ -80,7 +80,7 @@ pub enum SpacesCommand {
     },
 }
 
-pub async fn handle_spaces_command(args: SpacesArgs) -> Result<()> {
+pub async fn handle_space_command(args: SpaceArgs) -> Result<()> {
     let api_key = crate::config::load_api_key()?
         .ok_or_else(|| anyhow::anyhow!("Not authenticated. Run 'anytype auth login' first."))?;
 
@@ -88,27 +88,27 @@ pub async fn handle_spaces_command(args: SpacesArgs) -> Result<()> {
     client.set_api_key(api_key);
 
     match args.command {
-        SpacesCommand::List => list_spaces(&client).await,
-        SpacesCommand::Get { space_id } => get_space(&client, &space_id).await,
-        SpacesCommand::Create { name, description } => {
+        SpaceCommand::List => list_spaces(&client).await,
+        SpaceCommand::Get { space_id } => get_space(&client, &space_id).await,
+        SpaceCommand::Create { name, description } => {
             create_space(&client, &name, description).await
         }
-        SpacesCommand::Update {
+        SpaceCommand::Update {
             space_id,
             name,
             description,
         } => update_space(&client, &space_id, name, description).await,
-        SpacesCommand::Objects { space_id, limit } => list_objects(&client, &space_id, limit).await,
-        SpacesCommand::CreateObject {
+        SpaceCommand::Objects { space_id, limit } => list_objects(&client, &space_id, limit).await,
+        SpaceCommand::CreateObject {
             space_id,
             name,
             type_key,
         } => create_object(&client, &space_id, &name, &type_key).await,
-        SpacesCommand::DeleteObject {
+        SpaceCommand::DeleteObject {
             space_id,
             object_id,
         } => delete_object(&client, &space_id, &object_id).await,
-        SpacesCommand::UpdateObject {
+        SpaceCommand::UpdateObject {
             space_id,
             object_id,
             name,

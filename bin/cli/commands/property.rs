@@ -5,13 +5,13 @@ use anytype_rs::api::{
 use clap::{Args, Subcommand};
 
 #[derive(Debug, Args)]
-pub struct PropertiesArgs {
+pub struct PropertyArgs {
     #[command(subcommand)]
-    pub command: PropertiesCommand,
+    pub command: PropertyCommand,
 }
 
 #[derive(Debug, Subcommand)]
-pub enum PropertiesCommand {
+pub enum PropertyCommand {
     /// List properties in a space
     List {
         /// Space ID
@@ -60,7 +60,7 @@ pub enum PropertiesCommand {
     },
 }
 
-pub async fn handle_properties_command(args: PropertiesArgs) -> Result<()> {
+pub async fn handle_property_command(args: PropertyArgs) -> Result<()> {
     let api_key = crate::config::load_api_key()?
         .ok_or_else(|| anyhow::anyhow!("Not authenticated. Run 'anytype auth login' first."))?;
 
@@ -68,25 +68,25 @@ pub async fn handle_properties_command(args: PropertiesArgs) -> Result<()> {
     client.set_api_key(api_key);
 
     match args.command {
-        PropertiesCommand::List { space_id, limit } => {
+        PropertyCommand::List { space_id, limit } => {
             list_properties(&client, &space_id, limit).await
         }
-        PropertiesCommand::Get {
+        PropertyCommand::Get {
             space_id,
             property_id,
         } => get_property(&client, &space_id, &property_id).await,
-        PropertiesCommand::Create {
+        PropertyCommand::Create {
             space_id,
             name,
             format,
         } => create_property(&client, &space_id, &name, &format).await,
-        PropertiesCommand::Update {
+        PropertyCommand::Update {
             space_id,
             property_id,
             name,
             format,
         } => update_property(&client, &space_id, &property_id, &name, &format).await,
-        PropertiesCommand::Delete {
+        PropertyCommand::Delete {
             space_id,
             property_id,
         } => delete_property(&client, &space_id, &property_id).await,
