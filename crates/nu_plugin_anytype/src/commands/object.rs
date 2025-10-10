@@ -1,4 +1,4 @@
-use crate::{commands::common::get_space_id, value::AnytypeValue, AnytypePlugin};
+use crate::{AnytypePlugin, commands::common::get_space_id, value::AnytypeValue};
 use nu_plugin::{EngineInterface, EvaluatedCall, PluginCommand};
 use nu_protocol::{Category, LabeledError, PipelineData, Signature, SyntaxShape, Value};
 
@@ -27,11 +27,15 @@ impl PluginCommand for ObjectList {
             .input_output_types(vec![
                 (
                     nu_protocol::Type::Nothing,
-                    nu_protocol::Type::List(Box::new(nu_protocol::Type::Custom("AnytypeValue".into()))),
+                    nu_protocol::Type::List(Box::new(nu_protocol::Type::Custom(
+                        "AnytypeValue".into(),
+                    ))),
                 ),
                 (
                     nu_protocol::Type::Custom("AnytypeValue".into()),
-                    nu_protocol::Type::List(Box::new(nu_protocol::Type::Custom("AnytypeValue".into()))),
+                    nu_protocol::Type::List(Box::new(nu_protocol::Type::Custom(
+                        "AnytypeValue".into(),
+                    ))),
                 ),
             ])
             .category(Category::Custom("anytype".into()))
@@ -173,9 +177,11 @@ impl PluginCommand for ObjectGet {
             .map_err(|e| LabeledError::new(format!("Failed to get object: {}", e)))?;
 
         // Extract type_key from object.object field
-        let type_key = obj.object.as_ref().ok_or_else(|| {
-            LabeledError::new(format!("Object {} missing type key", obj.id))
-        })?.clone();
+        let type_key = obj
+            .object
+            .as_ref()
+            .ok_or_else(|| LabeledError::new(format!("Object {} missing type key", obj.id)))?
+            .clone();
 
         // Resolve type_key to space-specific type_id
         // If resolution fails (e.g., for system types), use the type_key as fallback
@@ -185,7 +191,10 @@ impl PluginCommand for ObjectGet {
 
         // Convert to AnytypeValue::Object with full context
         let anytype_value: AnytypeValue = (obj, space_id, type_id, type_key).into();
-        Ok(PipelineData::Value(Value::custom(Box::new(anytype_value), span), None))
+        Ok(PipelineData::Value(
+            Value::custom(Box::new(anytype_value), span),
+            None,
+        ))
     }
 }
 
@@ -249,9 +258,9 @@ impl PluginCommand for ObjectCreate {
 
         // Get arguments
         let name: String = call.req(0)?;
-        let type_name: String = call
-            .get_flag("type")?
-            .ok_or_else(|| LabeledError::new("--type is required").with_label("Missing --type", span))?;
+        let type_name: String = call.get_flag("type")?.ok_or_else(|| {
+            LabeledError::new("--type is required").with_label("Missing --type", span)
+        })?;
         let _markdown: Option<String> = call.get_flag("markdown")?;
 
         // Get space_id from multiple sources
@@ -295,12 +304,7 @@ impl PluginCommand for ObjectCreate {
         resolver.clear_cache();
 
         // Extract type_key from response (should match what we sent)
-        let response_type_key = response
-            .object
-            .object
-            .as_ref()
-            .unwrap_or(&type_key)
-            .clone();
+        let response_type_key = response.object.object.as_ref().unwrap_or(&type_key).clone();
 
         // Resolve type_key to space-specific type_id
         let type_id = plugin
@@ -308,8 +312,12 @@ impl PluginCommand for ObjectCreate {
             .unwrap_or_else(|_| response_type_key.clone());
 
         // Convert to AnytypeValue::Object with full context
-        let anytype_value: AnytypeValue = (response.object, space_id, type_id, response_type_key).into();
-        Ok(PipelineData::Value(Value::custom(Box::new(anytype_value), span), None))
+        let anytype_value: AnytypeValue =
+            (response.object, space_id, type_id, response_type_key).into();
+        Ok(PipelineData::Value(
+            Value::custom(Box::new(anytype_value), span),
+            None,
+        ))
     }
 }
 
@@ -427,7 +435,9 @@ impl PluginCommand for ObjectUpdate {
             .object
             .object
             .as_ref()
-            .ok_or_else(|| LabeledError::new(format!("Object {} missing type key", response.object.id)))?
+            .ok_or_else(|| {
+                LabeledError::new(format!("Object {} missing type key", response.object.id))
+            })?
             .clone();
 
         // Resolve type_key to space-specific type_id
@@ -437,7 +447,10 @@ impl PluginCommand for ObjectUpdate {
 
         // Convert to AnytypeValue::Object with full context
         let anytype_value: AnytypeValue = (response.object, space_id, type_id, type_key).into();
-        Ok(PipelineData::Value(Value::custom(Box::new(anytype_value), span), None))
+        Ok(PipelineData::Value(
+            Value::custom(Box::new(anytype_value), span),
+            None,
+        ))
     }
 }
 
@@ -527,7 +540,9 @@ impl PluginCommand for ObjectDelete {
             .object
             .object
             .as_ref()
-            .ok_or_else(|| LabeledError::new(format!("Object {} missing type key", response.object.id)))?
+            .ok_or_else(|| {
+                LabeledError::new(format!("Object {} missing type key", response.object.id))
+            })?
             .clone();
 
         // Resolve type_key to space-specific type_id
@@ -537,6 +552,9 @@ impl PluginCommand for ObjectDelete {
 
         // Convert to AnytypeValue::Object with full context
         let anytype_value: AnytypeValue = (response.object, space_id, type_id, type_key).into();
-        Ok(PipelineData::Value(Value::custom(Box::new(anytype_value), span), None))
+        Ok(PipelineData::Value(
+            Value::custom(Box::new(anytype_value), span),
+            None,
+        ))
     }
 }

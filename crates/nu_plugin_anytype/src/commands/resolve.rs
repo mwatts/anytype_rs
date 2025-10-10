@@ -1,4 +1,4 @@
-use crate::{commands::common::get_space_id, AnytypePlugin};
+use crate::{AnytypePlugin, commands::common::get_space_id};
 use nu_plugin::{EngineInterface, EvaluatedCall, PluginCommand};
 use nu_protocol::{Category, LabeledError, PipelineData, Record, Signature, SyntaxShape, Value};
 
@@ -39,9 +39,7 @@ impl PluginCommand for ResolveSpace {
 
         let id = plugin
             .run_async(resolver.resolve_space(&name))
-            .map_err(|e| {
-                LabeledError::new(format!("Failed to resolve space '{}': {}", name, e))
-            })?;
+            .map_err(|e| LabeledError::new(format!("Failed to resolve space '{}': {}", name, e)))?;
 
         let mut record = Record::new();
         record.push("name", Value::string(name, span));
@@ -240,7 +238,10 @@ impl PluginCommand for CacheClear {
 
         resolver.clear_cache();
 
-        Ok(PipelineData::Value(Value::string("Cache cleared", span), None))
+        Ok(PipelineData::Value(
+            Value::string("Cache cleared", span),
+            None,
+        ))
     }
 }
 
@@ -286,7 +287,10 @@ impl PluginCommand for CacheStats {
                 span,
             ),
         );
-        record.push("ttl_seconds", Value::int(plugin.config.cache_ttl as i64, span));
+        record.push(
+            "ttl_seconds",
+            Value::int(plugin.config.cache_ttl as i64, span),
+        );
 
         Ok(PipelineData::Value(Value::record(record, span), None))
     }

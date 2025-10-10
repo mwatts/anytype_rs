@@ -38,11 +38,9 @@ impl PluginCommand for AuthCreate {
         eprintln!("🔐 Starting authentication with local Anytype app...");
         eprintln!("📱 Creating authentication challenge...");
 
-        let challenge = plugin
-            .run_async(client.create_challenge())
-            .map_err(|e| {
-                LabeledError::new(format!("Failed to create authentication challenge: {}", e))
-            })?;
+        let challenge = plugin.run_async(client.create_challenge()).map_err(|e| {
+            LabeledError::new(format!("Failed to create authentication challenge: {}", e))
+        })?;
 
         eprintln!("✅ Challenge created with ID: {}", challenge.challenge_id);
         eprintln!("📧 Please check your local Anytype app for the 4-digit authentication code.");
@@ -58,9 +56,7 @@ impl PluginCommand for AuthCreate {
         let code = code.trim().to_string();
 
         if code.len() != 4 || !code.chars().all(|c| c.is_ascii_digit()) {
-            return Err(LabeledError::new(
-                "Invalid code format. Expected 4 digits.",
-            ));
+            return Err(LabeledError::new("Invalid code format. Expected 4 digits."));
         }
 
         // Step 3: Create API key
@@ -201,10 +197,7 @@ impl PluginCommand for AuthStatus {
 
                 match plugin.run_async(client.list_spaces()) {
                     Ok(spaces) => {
-                        eprintln!(
-                            "🏠 Connected successfully. Found {} spaces.",
-                            spaces.len()
-                        );
+                        eprintln!("🏠 Connected successfully. Found {} spaces.", spaces.len());
                         record.push("status", Value::string("authenticated", span));
                         record.push("connected", Value::bool(true, span));
                         record.push("spaces_count", Value::int(spaces.len() as i64, span));

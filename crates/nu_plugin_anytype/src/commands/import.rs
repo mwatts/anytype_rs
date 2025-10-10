@@ -1,7 +1,7 @@
-use crate::{commands::common::get_space_id, value::AnytypeValue, AnytypePlugin};
+use crate::{AnytypePlugin, commands::common::get_space_id, value::AnytypeValue};
 use anytype_rs::api::CreateObjectRequest;
-use gray_matter::engine::YAML;
 use gray_matter::Matter;
+use gray_matter::engine::YAML;
 use nu_plugin::{EngineInterface, EvaluatedCall, PluginCommand};
 use nu_protocol::{Category, LabeledError, PipelineData, Signature, SyntaxShape, Value};
 use serde_json::Value as JsonValue;
@@ -25,12 +25,7 @@ impl PluginCommand for ImportMarkdown {
     fn signature(&self) -> Signature {
         Signature::build(self.name())
             .required("file", SyntaxShape::Filepath, "Path to markdown file")
-            .named(
-                "space",
-                SyntaxShape::String,
-                "Target space name",
-                Some('s'),
-            )
+            .named("space", SyntaxShape::String, "Target space name", Some('s'))
             .named("type", SyntaxShape::String, "Object type name", Some('t'))
             .switch("dry-run", "Preview without importing", Some('d'))
             .switch("verbose", "Detailed output", Some('v'))
@@ -66,12 +61,10 @@ impl PluginCommand for ImportMarkdown {
         let space_id = get_space_id(plugin, call, &input, span)?;
 
         // Get type name from --type flag (required)
-        let type_name: String = call
-            .get_flag("type")?
-            .ok_or_else(|| {
-                LabeledError::new("Type is required")
-                    .with_label("Use --type <name> to specify object type", span)
-            })?;
+        let type_name: String = call.get_flag("type")?.ok_or_else(|| {
+            LabeledError::new("Type is required")
+                .with_label("Use --type <name> to specify object type", span)
+        })?;
 
         // Read the markdown file
         let content = std::fs::read_to_string(&file_path).map_err(|e| {
@@ -80,9 +73,8 @@ impl PluginCommand for ImportMarkdown {
         })?;
 
         // Parse frontmatter and content
-        let (frontmatter, markdown_body) = parse_frontmatter(&content).map_err(|e| {
-            LabeledError::new(format!("Failed to parse frontmatter: {}", e))
-        })?;
+        let (frontmatter, markdown_body) = parse_frontmatter(&content)
+            .map_err(|e| LabeledError::new(format!("Failed to parse frontmatter: {}", e)))?;
 
         if verbose || dry_run {
             eprintln!("📄 Reading markdown file: {}", file_path);
@@ -129,9 +121,8 @@ impl PluginCommand for ImportMarkdown {
 
         // Map frontmatter to properties
         let (properties, unmapped_fields) =
-            map_frontmatter_to_properties(&frontmatter, &type_data.properties).map_err(|e| {
-                LabeledError::new(format!("Failed to map properties: {}", e))
-            })?;
+            map_frontmatter_to_properties(&frontmatter, &type_data.properties)
+                .map_err(|e| LabeledError::new(format!("Failed to map properties: {}", e)))?;
 
         // Display mapping information
         if verbose || dry_run {
@@ -212,7 +203,10 @@ impl PluginCommand for ImportMarkdown {
         let response = plugin
             .run_async(client.create_object(&space_id, request))
             .map_err(|e| {
-                LabeledError::new(format!("Failed to create object in space '{}': {}", space_id, e))
+                LabeledError::new(format!(
+                    "Failed to create object in space '{}': {}",
+                    space_id, e
+                ))
             })?;
 
         // Update with markdown content if there is any
@@ -455,9 +449,9 @@ fn convert_value_to_format_str(
                     let strings: Result<Vec<String>, anyhow::Error> = arr
                         .iter()
                         .map(|v| {
-                            v.as_str()
-                                .map(|s| s.to_string())
-                                .ok_or_else(|| anyhow::anyhow!("MultiSelect array must contain only strings"))
+                            v.as_str().map(|s| s.to_string()).ok_or_else(|| {
+                                anyhow::anyhow!("MultiSelect array must contain only strings")
+                            })
                         })
                         .collect();
                     Ok(JsonValue::Array(

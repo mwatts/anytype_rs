@@ -1,4 +1,8 @@
-use crate::{commands::common::{get_space_id, get_type_id}, value::AnytypeValue, AnytypePlugin};
+use crate::{
+    AnytypePlugin,
+    commands::common::{get_space_id, get_type_id},
+    value::AnytypeValue,
+};
 use nu_plugin::{EngineInterface, EvaluatedCall, PluginCommand};
 use nu_protocol::{Category, LabeledError, PipelineData, Signature, SyntaxShape, Value};
 
@@ -33,11 +37,15 @@ impl PluginCommand for TemplateList {
             .input_output_types(vec![
                 (
                     nu_protocol::Type::Nothing,
-                    nu_protocol::Type::List(Box::new(nu_protocol::Type::Custom("AnytypeValue".into()))),
+                    nu_protocol::Type::List(Box::new(nu_protocol::Type::Custom(
+                        "AnytypeValue".into(),
+                    ))),
                 ),
                 (
                     nu_protocol::Type::Custom("AnytypeValue".into()),
-                    nu_protocol::Type::List(Box::new(nu_protocol::Type::Custom("AnytypeValue".into()))),
+                    nu_protocol::Type::List(Box::new(nu_protocol::Type::Custom(
+                        "AnytypeValue".into(),
+                    ))),
                 ),
             ])
             .category(Category::Custom("anytype".into()))
@@ -75,7 +83,8 @@ impl PluginCommand for TemplateList {
             .into_iter()
             .map(|template| {
                 // Use From<(Template, String, String)> to convert with context
-                let anytype_value: AnytypeValue = (template, space_id.clone(), type_id.clone()).into();
+                let anytype_value: AnytypeValue =
+                    (template, space_id.clone(), type_id.clone()).into();
                 Value::custom(Box::new(anytype_value), span)
             })
             .collect();

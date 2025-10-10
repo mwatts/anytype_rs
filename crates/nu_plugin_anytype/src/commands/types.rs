@@ -1,4 +1,4 @@
-use crate::{commands::common::get_space_id, value::AnytypeValue, AnytypePlugin};
+use crate::{AnytypePlugin, commands::common::get_space_id, value::AnytypeValue};
 use nu_plugin::{EngineInterface, EvaluatedCall, PluginCommand};
 use nu_protocol::{Category, LabeledError, PipelineData, Signature, SyntaxShape, Value};
 
@@ -27,11 +27,15 @@ impl PluginCommand for TypeList {
             .input_output_types(vec![
                 (
                     nu_protocol::Type::Nothing,
-                    nu_protocol::Type::List(Box::new(nu_protocol::Type::Custom("AnytypeValue".into()))),
+                    nu_protocol::Type::List(Box::new(nu_protocol::Type::Custom(
+                        "AnytypeValue".into(),
+                    ))),
                 ),
                 (
                     nu_protocol::Type::Custom("AnytypeValue".into()),
-                    nu_protocol::Type::List(Box::new(nu_protocol::Type::Custom("AnytypeValue".into()))),
+                    nu_protocol::Type::List(Box::new(nu_protocol::Type::Custom(
+                        "AnytypeValue".into(),
+                    ))),
                 ),
             ])
             .category(Category::Custom("anytype".into()))
@@ -156,7 +160,10 @@ impl PluginCommand for TypeGet {
 
         // Convert to AnytypeValue::Type with space_id context
         let anytype_value: AnytypeValue = (type_data, space_id).into();
-        Ok(PipelineData::Value(Value::custom(Box::new(anytype_value), span), None))
+        Ok(PipelineData::Value(
+            Value::custom(Box::new(anytype_value), span),
+            None,
+        ))
     }
 }
 
@@ -232,13 +239,15 @@ impl PluginCommand for TypeCreate {
 
         // Get arguments
         let name: String = call.req(0)?;
-        let key: String = call
-            .get_flag("key")?
-            .ok_or_else(|| LabeledError::new("--key is required").with_label("Missing --key", span))?;
-        let plural_name: String = call
-            .get_flag("plural")?
-            .ok_or_else(|| LabeledError::new("--plural is required").with_label("Missing --plural", span))?;
-        let layout_str: String = call.get_flag("layout")?.unwrap_or_else(|| "basic".to_string());
+        let key: String = call.get_flag("key")?.ok_or_else(|| {
+            LabeledError::new("--key is required").with_label("Missing --key", span)
+        })?;
+        let plural_name: String = call.get_flag("plural")?.ok_or_else(|| {
+            LabeledError::new("--plural is required").with_label("Missing --plural", span)
+        })?;
+        let layout_str: String = call
+            .get_flag("layout")?
+            .unwrap_or_else(|| "basic".to_string());
         let icon_emoji: Option<String> = call.get_flag("icon")?;
 
         // Get space_id from multiple sources
@@ -246,7 +255,8 @@ impl PluginCommand for TypeCreate {
 
         // Parse layout
         let layout = parse_layout(&layout_str).map_err(|e| {
-            LabeledError::new(format!("Invalid layout: {}", e)).with_label("Invalid layout value", span)
+            LabeledError::new(format!("Invalid layout: {}", e))
+                .with_label("Invalid layout value", span)
         })?;
 
         // Parse icon
@@ -278,14 +288,17 @@ impl PluginCommand for TypeCreate {
             .map_err(|e| LabeledError::new(format!("Failed to create type: {}", e)))?;
 
         // Invalidate type cache
-        let resolver = plugin.resolver().map_err(|e| {
-            LabeledError::new(format!("Failed to get resolver: {}", e))
-        })?;
+        let resolver = plugin
+            .resolver()
+            .map_err(|e| LabeledError::new(format!("Failed to get resolver: {}", e)))?;
         resolver.clear_cache();
 
         // Convert to AnytypeValue::Type with space_id context
         let anytype_value: AnytypeValue = (response.type_data, space_id).into();
-        Ok(PipelineData::Value(Value::custom(Box::new(anytype_value), span), None))
+        Ok(PipelineData::Value(
+            Value::custom(Box::new(anytype_value), span),
+            None,
+        ))
     }
 }
 
@@ -380,10 +393,10 @@ impl PluginCommand for TypeUpdate {
             && layout_str.is_none()
             && icon_emoji.is_none()
         {
-            return Err(LabeledError::new(
-                "At least one field must be provided to update",
-            )
-            .with_label("No update fields provided", span));
+            return Err(
+                LabeledError::new("At least one field must be provided to update")
+                    .with_label("No update fields provided", span),
+            );
         }
 
         // Get space_id from multiple sources
@@ -469,7 +482,10 @@ impl PluginCommand for TypeUpdate {
 
         // Convert to AnytypeValue::Type with space_id context
         let anytype_value: AnytypeValue = (response.type_data, space_id).into();
-        Ok(PipelineData::Value(Value::custom(Box::new(anytype_value), span), None))
+        Ok(PipelineData::Value(
+            Value::custom(Box::new(anytype_value), span),
+            None,
+        ))
     }
 }
 
@@ -556,7 +572,10 @@ impl PluginCommand for TypeDelete {
 
         // Convert to AnytypeValue::Type with space_id context
         let anytype_value: AnytypeValue = (response.type_data, space_id).into();
-        Ok(PipelineData::Value(Value::custom(Box::new(anytype_value), span), None))
+        Ok(PipelineData::Value(
+            Value::custom(Box::new(anytype_value), span),
+            None,
+        ))
     }
 }
 
@@ -595,4 +614,3 @@ fn parse_property_format(format: &str) -> anytype_rs::PropertyFormat {
         _ => anytype_rs::PropertyFormat::Text, // Default fallback
     }
 }
-

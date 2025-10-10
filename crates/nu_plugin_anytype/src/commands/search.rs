@@ -1,5 +1,7 @@
-use crate::{commands::common::get_space_id, value::AnytypeValue, AnytypePlugin};
-use anytype_rs::client::search::{SearchRequest, SearchSpaceRequest, Sort, SortDirection, SortProperty};
+use crate::{AnytypePlugin, commands::common::get_space_id, value::AnytypeValue};
+use anytype_rs::client::search::{
+    SearchRequest, SearchSpaceRequest, Sort, SortDirection, SortProperty,
+};
 use nu_plugin::{EngineInterface, EvaluatedCall, PluginCommand};
 use nu_protocol::{Category, LabeledError, PipelineData, Signature, SyntaxShape, Value};
 
@@ -53,11 +55,15 @@ impl PluginCommand for Search {
             .input_output_types(vec![
                 (
                     nu_protocol::Type::Nothing,
-                    nu_protocol::Type::List(Box::new(nu_protocol::Type::Custom("AnytypeValue".into()))),
+                    nu_protocol::Type::List(Box::new(nu_protocol::Type::Custom(
+                        "AnytypeValue".into(),
+                    ))),
                 ),
                 (
                     nu_protocol::Type::Custom("AnytypeValue".into()),
-                    nu_protocol::Type::List(Box::new(nu_protocol::Type::Custom("AnytypeValue".into()))),
+                    nu_protocol::Type::List(Box::new(nu_protocol::Type::Custom(
+                        "AnytypeValue".into(),
+                    ))),
                 ),
             ])
             .category(Category::Custom("anytype".into()))

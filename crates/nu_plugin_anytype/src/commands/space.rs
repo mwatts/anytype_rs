@@ -1,4 +1,4 @@
-use crate::{value::AnytypeValue, AnytypePlugin};
+use crate::{AnytypePlugin, value::AnytypeValue};
 use nu_plugin::{EngineInterface, EvaluatedCall, PluginCommand};
 use nu_protocol::{Category, LabeledError, PipelineData, Signature, SyntaxShape, Value};
 
@@ -103,7 +103,10 @@ impl PluginCommand for SpaceGet {
 
         // Convert to AnytypeValue::Space
         let anytype_value: AnytypeValue = space.into();
-        Ok(PipelineData::Value(Value::custom(Box::new(anytype_value), span), None))
+        Ok(PipelineData::Value(
+            Value::custom(Box::new(anytype_value), span),
+            None,
+        ))
     }
 }
 
@@ -171,14 +174,17 @@ impl PluginCommand for SpaceCreate {
             .map_err(|e| LabeledError::new(format!("Failed to create space: {}", e)))?;
 
         // Invalidate space cache
-        let resolver = plugin.resolver().map_err(|e| {
-            LabeledError::new(format!("Failed to get resolver: {}", e))
-        })?;
+        let resolver = plugin
+            .resolver()
+            .map_err(|e| LabeledError::new(format!("Failed to get resolver: {}", e)))?;
         resolver.clear_cache();
 
         // Convert to AnytypeValue::Space
         let anytype_value: AnytypeValue = response.space.into();
-        Ok(PipelineData::Value(Value::custom(Box::new(anytype_value), span), None))
+        Ok(PipelineData::Value(
+            Value::custom(Box::new(anytype_value), span),
+            None,
+        ))
     }
 }
 
@@ -245,9 +251,7 @@ impl PluginCommand for SpaceUpdate {
         // Resolve space name to ID
         let space_id = plugin
             .run_async(resolver.resolve_space(&name))
-            .map_err(|e| {
-                LabeledError::new(format!("Failed to resolve space '{}': {}", name, e))
-            })?;
+            .map_err(|e| LabeledError::new(format!("Failed to resolve space '{}': {}", name, e)))?;
 
         let client = plugin.client().map_err(|e| {
             LabeledError::new(format!("Failed to get client: {}", e))
@@ -269,6 +273,9 @@ impl PluginCommand for SpaceUpdate {
 
         // Convert to AnytypeValue::Space
         let anytype_value: AnytypeValue = response.space.into();
-        Ok(PipelineData::Value(Value::custom(Box::new(anytype_value), span), None))
+        Ok(PipelineData::Value(
+            Value::custom(Box::new(anytype_value), span),
+            None,
+        ))
     }
 }

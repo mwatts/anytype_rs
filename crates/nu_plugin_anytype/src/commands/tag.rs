@@ -1,4 +1,4 @@
-use crate::{commands::common::get_space_id, value::AnytypeValue, AnytypePlugin};
+use crate::{AnytypePlugin, commands::common::get_space_id, value::AnytypeValue};
 use anytype_rs::{Color, CreateTagRequest, UpdateTagRequest};
 use nu_plugin::{EngineInterface, EvaluatedCall, PluginCommand};
 use nu_protocol::{Category, LabeledError, PipelineData, Signature, SyntaxShape, Value};
@@ -29,11 +29,15 @@ impl PluginCommand for TagList {
             .input_output_types(vec![
                 (
                     nu_protocol::Type::Nothing,
-                    nu_protocol::Type::List(Box::new(nu_protocol::Type::Custom("AnytypeValue".into()))),
+                    nu_protocol::Type::List(Box::new(nu_protocol::Type::Custom(
+                        "AnytypeValue".into(),
+                    ))),
                 ),
                 (
                     nu_protocol::Type::Custom("AnytypeValue".into()),
-                    nu_protocol::Type::List(Box::new(nu_protocol::Type::Custom("AnytypeValue".into()))),
+                    nu_protocol::Type::List(Box::new(nu_protocol::Type::Custom(
+                        "AnytypeValue".into(),
+                    ))),
                 ),
             ])
             .category(Category::Custom("anytype".into()))
@@ -53,7 +57,8 @@ impl PluginCommand for TagList {
         let property_name: String = call.req(0)?;
 
         // Get space_id and property_id from multiple sources
-        let (space_id, property_id) = get_property_context(plugin, call, &input, &property_name, span)?;
+        let (space_id, property_id) =
+            get_property_context(plugin, call, &input, &property_name, span)?;
 
         // Get client
         let client = plugin.client().map_err(|e| {
@@ -71,7 +76,8 @@ impl PluginCommand for TagList {
             .into_iter()
             .map(|tag| {
                 // Use From<(Tag, String, String)> to convert with context
-                let anytype_value: AnytypeValue = (tag, space_id.clone(), property_id.clone()).into();
+                let anytype_value: AnytypeValue =
+                    (tag, space_id.clone(), property_id.clone()).into();
                 Value::custom(Box::new(anytype_value), span)
             })
             .collect();
@@ -146,7 +152,9 @@ impl PluginCommand for TagGet {
             if let Ok(custom_value) = input.as_custom_value()
                 && let Some(anytype_value) = custom_value.as_any().downcast_ref::<AnytypeValue>()
             {
-                if let (Some(space_id), Some(property_id)) = (anytype_value.space_id(), anytype_value.property_id()) {
+                if let (Some(space_id), Some(property_id)) =
+                    (anytype_value.space_id(), anytype_value.property_id())
+                {
                     (space_id.to_string(), property_id.to_string())
                 } else {
                     return Err(LabeledError::new(
@@ -191,7 +199,10 @@ impl PluginCommand for TagGet {
 
         // Convert to AnytypeValue::Tag with space_id and property_id context
         let anytype_value: AnytypeValue = (tag, space_id, property_id).into();
-        Ok(PipelineData::Value(Value::custom(Box::new(anytype_value), span), None))
+        Ok(PipelineData::Value(
+            Value::custom(Box::new(anytype_value), span),
+            None,
+        ))
     }
 }
 
@@ -257,11 +268,12 @@ impl PluginCommand for TagCreate {
         let tag_name: String = call.req(0)?;
 
         // Get property name from flag if provided
-        let property_name = call.get_flag::<String>("property")?
-            .ok_or_else(|| {
-                LabeledError::new("Property name required. Use --property <name> flag or pipe a Property")
-                    .with_label("Missing property name", span)
-            })?;
+        let property_name = call.get_flag::<String>("property")?.ok_or_else(|| {
+            LabeledError::new(
+                "Property name required. Use --property <name> flag or pipe a Property",
+            )
+            .with_label("Missing property name", span)
+        })?;
 
         // Get color from flag if provided
         let color_str = call.get_flag::<String>("color")?;
@@ -272,7 +284,8 @@ impl PluginCommand for TagCreate {
         };
 
         // Get space_id and property_id from multiple sources
-        let (space_id, property_id) = get_property_context(plugin, call, &input, &property_name, span)?;
+        let (space_id, property_id) =
+            get_property_context(plugin, call, &input, &property_name, span)?;
 
         // Get client
         let client = plugin.client().map_err(|e| {
@@ -292,14 +305,17 @@ impl PluginCommand for TagCreate {
             .map_err(|e| LabeledError::new(format!("Failed to create tag: {}", e)))?;
 
         // Invalidate cache
-        let resolver = plugin.resolver().map_err(|e| {
-            LabeledError::new(format!("Failed to get resolver: {}", e))
-        })?;
+        let resolver = plugin
+            .resolver()
+            .map_err(|e| LabeledError::new(format!("Failed to get resolver: {}", e)))?;
         resolver.invalidate_tag(&property_id, &tag_name);
 
         // Convert to AnytypeValue::Tag with space_id and property_id context
         let anytype_value: AnytypeValue = (response.tag, space_id, property_id).into();
-        Ok(PipelineData::Value(Value::custom(Box::new(anytype_value), span), None))
+        Ok(PipelineData::Value(
+            Value::custom(Box::new(anytype_value), span),
+            None,
+        ))
     }
 }
 
@@ -381,7 +397,9 @@ impl PluginCommand for TagUpdate {
             if let Ok(custom_value) = input.as_custom_value()
                 && let Some(anytype_value) = custom_value.as_any().downcast_ref::<AnytypeValue>()
             {
-                if let (Some(space_id), Some(property_id)) = (anytype_value.space_id(), anytype_value.property_id()) {
+                if let (Some(space_id), Some(property_id)) =
+                    (anytype_value.space_id(), anytype_value.property_id())
+                {
                     (space_id.to_string(), property_id.to_string())
                 } else {
                     return Err(LabeledError::new(
@@ -449,7 +467,10 @@ impl PluginCommand for TagUpdate {
 
         // Convert to AnytypeValue::Tag with space_id and property_id context
         let anytype_value: AnytypeValue = (response.tag, space_id, property_id).into();
-        Ok(PipelineData::Value(Value::custom(Box::new(anytype_value), span), None))
+        Ok(PipelineData::Value(
+            Value::custom(Box::new(anytype_value), span),
+            None,
+        ))
     }
 }
 
@@ -483,10 +504,7 @@ impl PluginCommand for TagDelete {
                 Some('s'),
             )
             .input_output_types(vec![
-                (
-                    nu_protocol::Type::Nothing,
-                    nu_protocol::Type::String,
-                ),
+                (nu_protocol::Type::Nothing, nu_protocol::Type::String),
                 (
                     nu_protocol::Type::Custom("AnytypeValue".into()),
                     nu_protocol::Type::String,
@@ -519,7 +537,9 @@ impl PluginCommand for TagDelete {
             if let Ok(custom_value) = input.as_custom_value()
                 && let Some(anytype_value) = custom_value.as_any().downcast_ref::<AnytypeValue>()
             {
-                if let (Some(space_id), Some(property_id)) = (anytype_value.space_id(), anytype_value.property_id()) {
+                if let (Some(space_id), Some(property_id)) =
+                    (anytype_value.space_id(), anytype_value.property_id())
+                {
                     (space_id.to_string(), property_id.to_string())
                 } else {
                     return Err(LabeledError::new(

@@ -1,4 +1,4 @@
-use crate::{commands::common::get_space_id, value::AnytypeValue, AnytypePlugin};
+use crate::{AnytypePlugin, commands::common::get_space_id, value::AnytypeValue};
 use anytype_rs::{CreatePropertyRequest, PropertyFormat, UpdatePropertyRequest};
 use nu_plugin::{EngineInterface, EvaluatedCall, PluginCommand};
 use nu_protocol::{Category, LabeledError, PipelineData, Signature, SyntaxShape, Value};
@@ -28,11 +28,15 @@ impl PluginCommand for PropertyList {
             .input_output_types(vec![
                 (
                     nu_protocol::Type::Nothing,
-                    nu_protocol::Type::List(Box::new(nu_protocol::Type::Custom("AnytypeValue".into()))),
+                    nu_protocol::Type::List(Box::new(nu_protocol::Type::Custom(
+                        "AnytypeValue".into(),
+                    ))),
                 ),
                 (
                     nu_protocol::Type::Custom("AnytypeValue".into()),
-                    nu_protocol::Type::List(Box::new(nu_protocol::Type::Custom("AnytypeValue".into()))),
+                    nu_protocol::Type::List(Box::new(nu_protocol::Type::Custom(
+                        "AnytypeValue".into(),
+                    ))),
                 ),
             ])
             .category(Category::Custom("anytype".into()))
@@ -67,7 +71,8 @@ impl PluginCommand for PropertyList {
         let values: Vec<Value> = properties
             .into_iter()
             .map(|property| {
-                let anytype_value: AnytypeValue = (property, space_id.clone(), String::new()).into();
+                let anytype_value: AnytypeValue =
+                    (property, space_id.clone(), String::new()).into();
                 Value::custom(Box::new(anytype_value), span)
             })
             .collect();
@@ -157,7 +162,10 @@ impl PluginCommand for PropertyGet {
 
         // Convert to AnytypeValue::Property with space_id context
         let anytype_value: AnytypeValue = (property, space_id, String::new()).into();
-        Ok(PipelineData::Value(Value::custom(Box::new(anytype_value), span), None))
+        Ok(PipelineData::Value(
+            Value::custom(Box::new(anytype_value), span),
+            None,
+        ))
     }
 }
 
@@ -217,13 +225,13 @@ impl PluginCommand for PropertyCreate {
         let name: String = call.req(0)?;
 
         // Get format from flag (default: text)
-        let format_str: String = call.get_flag("format")?.unwrap_or_else(|| "text".to_string());
+        let format_str: String = call
+            .get_flag("format")?
+            .unwrap_or_else(|| "text".to_string());
 
         // Parse format string to PropertyFormat enum
-        let format = parse_property_format(&format_str).map_err(|e| {
-            LabeledError::new(e)
-                .with_label("Invalid format", span)
-        })?;
+        let format = parse_property_format(&format_str)
+            .map_err(|e| LabeledError::new(e).with_label("Invalid format", span))?;
 
         // Get space_id from multiple sources
         let space_id = get_space_id(plugin, call, &input, span)?;
@@ -246,14 +254,17 @@ impl PluginCommand for PropertyCreate {
             .map_err(|e| LabeledError::new(format!("Failed to create property: {}", e)))?;
 
         // Invalidate cache for this space
-        let resolver = plugin.resolver().map_err(|e| {
-            LabeledError::new(format!("Failed to get resolver: {}", e))
-        })?;
+        let resolver = plugin
+            .resolver()
+            .map_err(|e| LabeledError::new(format!("Failed to get resolver: {}", e)))?;
         resolver.invalidate_space(&space_id);
 
         // Convert to AnytypeValue::Property with space_id context
         let anytype_value: AnytypeValue = (response.property, space_id, String::new()).into();
-        Ok(PipelineData::Value(Value::custom(Box::new(anytype_value), span), None))
+        Ok(PipelineData::Value(
+            Value::custom(Box::new(anytype_value), span),
+            None,
+        ))
     }
 }
 
@@ -349,16 +360,18 @@ impl PluginCommand for PropertyUpdate {
             .map_err(|e| LabeledError::new(format!("Failed to get current property: {}", e)))?;
 
         // Get new name from flag (default: keep current)
-        let new_name: String = call.get_flag("new-name")?.unwrap_or_else(|| current.name.clone());
+        let new_name: String = call
+            .get_flag("new-name")?
+            .unwrap_or_else(|| current.name.clone());
 
         // Get format from flag (default: keep current)
-        let format_str: String = call.get_flag("format")?.unwrap_or_else(|| current.format.clone());
+        let format_str: String = call
+            .get_flag("format")?
+            .unwrap_or_else(|| current.format.clone());
 
         // Parse format string to PropertyFormat enum
-        let format = parse_property_format(&format_str).map_err(|e| {
-            LabeledError::new(e)
-                .with_label("Invalid format", span)
-        })?;
+        let format = parse_property_format(&format_str)
+            .map_err(|e| LabeledError::new(e).with_label("Invalid format", span))?;
 
         // Update property request
         let request = UpdatePropertyRequest {
@@ -376,7 +389,10 @@ impl PluginCommand for PropertyUpdate {
 
         // Convert to AnytypeValue::Property with space_id context
         let anytype_value: AnytypeValue = (response.property, space_id, String::new()).into();
-        Ok(PipelineData::Value(Value::custom(Box::new(anytype_value), span), None))
+        Ok(PipelineData::Value(
+            Value::custom(Box::new(anytype_value), span),
+            None,
+        ))
     }
 }
 
@@ -396,7 +412,11 @@ impl PluginCommand for PropertyDelete {
 
     fn signature(&self) -> Signature {
         Signature::build(self.name())
-            .required("name", SyntaxShape::String, "Name of the property to delete")
+            .required(
+                "name",
+                SyntaxShape::String,
+                "Name of the property to delete",
+            )
             .named(
                 "space",
                 SyntaxShape::String,
@@ -464,7 +484,10 @@ impl PluginCommand for PropertyDelete {
 
         // Convert to AnytypeValue::Property with space_id context
         let anytype_value: AnytypeValue = (response.property, space_id, String::new()).into();
-        Ok(PipelineData::Value(Value::custom(Box::new(anytype_value), span), None))
+        Ok(PipelineData::Value(
+            Value::custom(Box::new(anytype_value), span),
+            None,
+        ))
     }
 }
 

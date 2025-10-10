@@ -7,10 +7,7 @@ use nu_protocol::{ShellError, Span};
 
 /// Helper to create the plugin test instance
 fn create_plugin_test() -> Result<PluginTest, ShellError> {
-    PluginTest::new(
-        "anytype",
-        nu_plugin_anytype::AnytypePlugin::new().into(),
-    )
+    PluginTest::new("anytype", nu_plugin_anytype::AnytypePlugin::new().into())
 }
 
 #[test]
@@ -131,8 +128,8 @@ fn test_space_create_requires_auth() -> Result<(), ShellError> {
 
 #[test]
 fn test_space_create_with_description() -> Result<(), ShellError> {
-    let result = create_plugin_test()?
-        .eval("anytype space create 'TestSpace' --description 'A test space'");
+    let result =
+        create_plugin_test()?.eval("anytype space create 'TestSpace' --description 'A test space'");
 
     // Should fail with authentication error (but command parsing should work)
     assert!(result.is_err());
@@ -225,8 +222,7 @@ fn test_search_with_space_requires_auth() -> Result<(), ShellError> {
 
 #[test]
 fn test_search_with_pagination_flags() -> Result<(), ShellError> {
-    let result = create_plugin_test()?
-        .eval("anytype search 'notes' --limit 10 --offset 5");
+    let result = create_plugin_test()?.eval("anytype search 'notes' --limit 10 --offset 5");
 
     // Should fail with authentication error (but flags should parse correctly)
     assert!(result.is_err());
@@ -235,8 +231,8 @@ fn test_search_with_pagination_flags() -> Result<(), ShellError> {
 
 #[test]
 fn test_search_with_sort_flags() -> Result<(), ShellError> {
-    let result = create_plugin_test()?
-        .eval("anytype search 'notes' --sort created_date --direction asc");
+    let result =
+        create_plugin_test()?.eval("anytype search 'notes' --sort created_date --direction asc");
 
     // Should fail with authentication error (but flags should parse correctly)
     assert!(result.is_err());
@@ -302,7 +298,8 @@ fn test_list_add_requires_space_context() -> Result<(), ShellError> {
 
 #[test]
 fn test_list_add_with_space_flag() -> Result<(), ShellError> {
-    let result = create_plugin_test()?.eval("anytype list add 'MyList' --objects ['obj1', 'obj2'] --space 'Work'");
+    let result = create_plugin_test()?
+        .eval("anytype list add 'MyList' --objects ['obj1', 'obj2'] --space 'Work'");
 
     // Should fail with authentication error
     assert!(result.is_err());
@@ -356,7 +353,8 @@ fn test_list_objects_with_space_flag() -> Result<(), ShellError> {
 
 #[test]
 fn test_list_objects_with_limit() -> Result<(), ShellError> {
-    let result = create_plugin_test()?.eval("anytype list objects 'MyList' --space 'Work' --limit 10");
+    let result =
+        create_plugin_test()?.eval("anytype list objects 'MyList' --space 'Work' --limit 10");
 
     // Should fail with authentication error (but limit flag should parse correctly)
     assert!(result.is_err());
@@ -374,7 +372,8 @@ fn test_list_remove_requires_space_context() -> Result<(), ShellError> {
 
 #[test]
 fn test_list_remove_with_space_flag() -> Result<(), ShellError> {
-    let result = create_plugin_test()?.eval("anytype list remove 'MyList' --object 'obj1' --space 'Work'");
+    let result =
+        create_plugin_test()?.eval("anytype list remove 'MyList' --object 'obj1' --space 'Work'");
 
     // Should fail with authentication error
     assert!(result.is_err());
@@ -436,8 +435,7 @@ fn test_authentication_error_message_is_helpful() -> Result<(), ShellError> {
             let msg = format!("{:?}", err);
             // Should mention authentication or auth
             assert!(
-                msg.to_lowercase().contains("auth") ||
-                msg.to_lowercase().contains("credentials")
+                msg.to_lowercase().contains("auth") || msg.to_lowercase().contains("credentials")
             );
         }
         Ok(_) => panic!("Expected authentication error"),
@@ -584,7 +582,8 @@ fn test_property_create_requires_name() -> Result<(), ShellError> {
 
 #[test]
 fn test_property_create_with_format_flag() -> Result<(), ShellError> {
-    let result = create_plugin_test()?.eval("anytype property create 'Status' --format select --space 'Work'");
+    let result = create_plugin_test()?
+        .eval("anytype property create 'Status' --format select --space 'Work'");
 
     // Should fail with authentication error (but flags should parse correctly)
     assert!(result.is_err());
@@ -633,7 +632,8 @@ fn test_import_markdown_requires_type_flag() -> Result<(), ShellError> {
 
 #[test]
 fn test_import_markdown_with_all_required_flags() -> Result<(), ShellError> {
-    let result = create_plugin_test()?.eval("anytype import markdown 'test.md' --space 'Work' --type 'Page'");
+    let result = create_plugin_test()?
+        .eval("anytype import markdown 'test.md' --space 'Work' --type 'Page'");
 
     // Should fail with file not found or authentication error (but command parsing should work)
     assert!(result.is_err());
@@ -642,7 +642,8 @@ fn test_import_markdown_with_all_required_flags() -> Result<(), ShellError> {
 
 #[test]
 fn test_import_markdown_with_dry_run_flag() -> Result<(), ShellError> {
-    let result = create_plugin_test()?.eval("anytype import markdown 'test.md' --space 'Work' --type 'Page' --dry-run");
+    let result = create_plugin_test()?
+        .eval("anytype import markdown 'test.md' --space 'Work' --type 'Page' --dry-run");
 
     // Should fail with file not found or authentication error (but command parsing should work)
     assert!(result.is_err());
@@ -651,11 +652,10 @@ fn test_import_markdown_with_dry_run_flag() -> Result<(), ShellError> {
 
 #[test]
 fn test_import_markdown_with_verbose_flag() -> Result<(), ShellError> {
-    let result = create_plugin_test()?.eval("anytype import markdown 'test.md' --space 'Work' --type 'Page' --verbose");
+    let result = create_plugin_test()?
+        .eval("anytype import markdown 'test.md' --space 'Work' --type 'Page' --verbose");
 
     // Should fail with file not found or authentication error (but command parsing should work)
     assert!(result.is_err());
     Ok(())
 }
-
-

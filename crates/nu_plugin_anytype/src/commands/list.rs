@@ -1,4 +1,4 @@
-use crate::{commands::common::get_space_id, value::AnytypeValue, AnytypePlugin};
+use crate::{AnytypePlugin, commands::common::get_space_id, value::AnytypeValue};
 use nu_plugin::{EngineInterface, EvaluatedCall, PluginCommand};
 use nu_protocol::{Category, LabeledError, PipelineData, Signature, SyntaxShape, Value};
 
@@ -58,11 +58,9 @@ impl PluginCommand for ListAdd {
         let space_id = get_space_id(plugin, call, &input, span)?;
 
         // Get object_ids from --objects flag
-        let object_ids: Vec<String> = call
-            .get_flag::<Vec<String>>("objects")?
-            .ok_or_else(|| {
-                LabeledError::new("Missing --objects flag")
-                    .with_label("Object IDs required", span)
+        let object_ids: Vec<String> =
+            call.get_flag::<Vec<String>>("objects")?.ok_or_else(|| {
+                LabeledError::new("Missing --objects flag").with_label("Object IDs required", span)
             })?;
 
         if object_ids.is_empty() {
@@ -90,9 +88,7 @@ impl PluginCommand for ListAdd {
         // Add objects to list
         let response = plugin
             .run_async(client.add_list_objects(&space_id, &list_id, object_ids.clone()))
-            .map_err(|e| {
-                LabeledError::new(format!("Failed to add objects to list: {}", e))
-            })?;
+            .map_err(|e| LabeledError::new(format!("Failed to add objects to list: {}", e)))?;
 
         // Format success message
         let message = format!(
@@ -189,10 +185,7 @@ impl PluginCommand for ListViews {
                 record.push("id", Value::string(&view.id, span));
                 record.push("name", Value::string(&view.name, span));
                 record.push("layout", Value::string(&view.layout, span));
-                record.push(
-                    "filter_count",
-                    Value::int(view.filters.len() as i64, span),
-                );
+                record.push("filter_count", Value::int(view.filters.len() as i64, span));
                 record.push("sort_count", Value::int(view.sorts.len() as i64, span));
                 Value::record(record, span)
             })
@@ -412,9 +405,7 @@ impl PluginCommand for ListRemove {
         // Remove object from list
         let response = plugin
             .run_async(client.remove_list_object(&space_id, &list_id, &object_id))
-            .map_err(|e| {
-                LabeledError::new(format!("Failed to remove object from list: {}", e))
-            })?;
+            .map_err(|e| LabeledError::new(format!("Failed to remove object from list: {}", e)))?;
 
         Ok(PipelineData::Value(
             Value::string(response.message, span),
