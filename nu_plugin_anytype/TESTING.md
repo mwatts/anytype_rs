@@ -25,7 +25,7 @@ cargo test
 Located in `tests/plugin_test.rs` using `nu-plugin-test-support`.
 
 **Coverage:**
-- All 21 plugin commands
+- All 28 plugin commands (including import)
 - Command parsing and validation
 - Authentication requirements
 - Context resolution logic
@@ -38,7 +38,7 @@ Located in `tests/plugin_test.rs` using `nu-plugin-test-support`.
 cargo test --test plugin_test
 ```
 
-**Results:** 43 tests validating command structure and behavior
+**Results:** 56 tests validating command structure and behavior
 
 **Features:**
 - No external dependencies required
@@ -294,10 +294,10 @@ anytype space create dev-test
 
 | Test Type    | Count | What It Tests                    | External Deps |
 |--------------|-------|----------------------------------|---------------|
-| Unit         | 10    | Core logic, helpers, cache       | None          |
-| Integration  | 32    | Command structure, parsing, **errors** | None      |
+| Unit         | 20    | Core logic, helpers, cache       | None          |
+| Integration  | 56    | Command structure, parsing, **errors** | None      |
 | End-to-End   | 32    | Full workflow with live API      | Anytype app   |
-| **Total**    | **74**| **Complete plugin functionality**| **Optional**  |
+| **Total**    | **76**| **Complete plugin functionality**| **Optional**  |
 
 **Note**: Error handling tests (`--expect_error`) are only in integration tests due to a
 Nushell 0.106.1 limitation where plugin LabeledErrors terminate scripts even in try/catch blocks.

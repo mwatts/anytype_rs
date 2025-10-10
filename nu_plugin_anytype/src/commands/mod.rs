@@ -1,6 +1,7 @@
 // Command modules
 pub mod auth;
 pub mod common;
+pub mod import;
 pub mod list;
 pub mod member;
 pub mod object;
@@ -17,6 +18,7 @@ pub mod types;
 // Phase 9: list.rs
 
 pub use auth::{AuthCreate, AuthDelete, AuthStatus};
+pub use import::ImportMarkdown;
 pub use list::{ListAdd, ListObjects, ListRemove, ListViews};
 pub use member::MemberList;
 pub use object::{ObjectGet, ObjectList};

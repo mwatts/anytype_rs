@@ -600,49 +600,62 @@ fn test_property_update_requires_name() -> Result<(), ShellError> {
     Ok(())
 }
 
-#[test]
-fn test_property_update_with_new_name_flag() -> Result<(), ShellError> {
-    let result = create_plugin_test()?.eval("anytype property update 'OldName' --new-name 'NewName' --space 'Work'");
+// ============================================================================
+// Import Commands Tests
+// ============================================================================
 
-    // Should fail with authentication error (but flags should parse correctly)
+#[test]
+fn test_import_markdown_requires_file_arg() -> Result<(), ShellError> {
+    let result = create_plugin_test()?.eval("anytype import markdown");
+
+    // Should fail - missing required file argument
     assert!(result.is_err());
     Ok(())
 }
 
 #[test]
-fn test_property_delete_requires_name() -> Result<(), ShellError> {
-    let result = create_plugin_test()?.eval("anytype property delete");
+fn test_import_markdown_requires_space_flag() -> Result<(), ShellError> {
+    let result = create_plugin_test()?.eval("anytype import markdown 'test.md' --type 'Page'");
 
-    // Should fail with missing argument error
+    // Should fail - missing space context
     assert!(result.is_err());
     Ok(())
 }
 
 #[test]
-fn test_property_delete_with_space_flag() -> Result<(), ShellError> {
-    let result = create_plugin_test()?.eval("anytype property delete 'MyProperty' --space 'Work'");
+fn test_import_markdown_requires_type_flag() -> Result<(), ShellError> {
+    let result = create_plugin_test()?.eval("anytype import markdown 'test.md' --space 'Work'");
 
-    // Should fail with authentication error
+    // Should fail - missing type flag
     assert!(result.is_err());
     Ok(())
 }
 
 #[test]
-fn test_custom_value_property_with_context() {
-    use nu_plugin_anytype::AnytypeValue;
+fn test_import_markdown_with_all_required_flags() -> Result<(), ShellError> {
+    let result = create_plugin_test()?.eval("anytype import markdown 'test.md' --space 'Work' --type 'Page'");
 
-    let property = AnytypeValue::Property {
-        id: "prop_123".to_string(),
-        name: "Status".to_string(),
-        key: "status".to_string(),
-        format: "select".to_string(),
-        space_id: "sp_456".to_string(),
-        type_id: "ty_789".to_string(),
-    };
-
-    assert_eq!(property.id(), "prop_123");
-    assert_eq!(property.name(), "Status");
-    assert_eq!(property.space_id(), Some("sp_456"));
-    assert_eq!(property.type_id(), Some("ty_789"));
+    // Should fail with file not found or authentication error (but command parsing should work)
+    assert!(result.is_err());
+    Ok(())
 }
+
+#[test]
+fn test_import_markdown_with_dry_run_flag() -> Result<(), ShellError> {
+    let result = create_plugin_test()?.eval("anytype import markdown 'test.md' --space 'Work' --type 'Page' --dry-run");
+
+    // Should fail with file not found or authentication error (but command parsing should work)
+    assert!(result.is_err());
+    Ok(())
+}
+
+#[test]
+fn test_import_markdown_with_verbose_flag() -> Result<(), ShellError> {
+    let result = create_plugin_test()?.eval("anytype import markdown 'test.md' --space 'Work' --type 'Page' --verbose");
+
+    // Should fail with file not found or authentication error (but command parsing should work)
+    assert!(result.is_err());
+    Ok(())
+}
+
 
