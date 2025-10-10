@@ -132,6 +132,37 @@ anytype tag delete <name> --property <name> [--space <name>]  # Delete tag
 
 **Colors:** `grey`, `yellow`, `orange`, `red`, `pink`, `purple`, `blue`, `ice`, `teal`, `lime`
 
+### Import (1 command)
+
+```nushell
+anytype import markdown <file> --space <name> --type <type>  # Import markdown file
+  --dry-run                                                   # Preview without importing
+  --verbose                                                   # Detailed output
+```
+
+**Features:**
+- YAML frontmatter parsing for metadata
+- Automatic title extraction from frontmatter or filename
+- Property mapping based on type definition
+- Dry-run mode for previewing imports
+- Returns created object as AnytypeValue for pipeline use
+
+**Example markdown with frontmatter:**
+```markdown
+---
+title: My Document
+date: 2025-10-10
+status: active
+priority: 5
+published: true
+tags:
+  - rust
+  - anytype
+---
+
+# Content here
+```
+
 ### Resolution & Cache (5 commands)
 
 ```nushell

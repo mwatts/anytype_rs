@@ -202,8 +202,10 @@ impl PluginCommand for CommandName {
 - **Member** (1) - Member listing
 - **Template** (1) - Template listing
 - **Search** (1) - Full-text search
+- **Tag** (5) - Tag management
 - **Resolve** (3) - Name-to-ID resolution
 - **Cache** (2) - Cache management
+- **Import** (1) - External content import
 
 ## Data Flow
 
