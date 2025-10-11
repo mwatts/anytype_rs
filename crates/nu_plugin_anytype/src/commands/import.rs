@@ -165,7 +165,7 @@ impl PluginCommand for ImportMarkdown {
             eprintln!("    Name: {}", object_name);
             eprintln!("    Type: {}", type_name);
             eprintln!("    Space: {}", space_id);
-            eprintln!("    Markdown: {} characters", markdown_body.len());
+            eprintln!("    Body: {} characters", markdown_body.len());
             eprintln!(
                 "    Properties: {} mapped",
                 properties.as_object().map(|o| o.len()).unwrap_or(0)
@@ -193,8 +193,8 @@ impl PluginCommand for ImportMarkdown {
             return Ok(PipelineData::Value(Value::record(record, span), None));
         }
 
-        // Create the object with markdown in a single API call
-        let markdown_content = if markdown_body.trim().is_empty() {
+        // Create the object with body content in a single API call
+        let body_content = if markdown_body.trim().is_empty() {
             None
         } else {
             Some(markdown_body.clone())
@@ -203,8 +203,18 @@ impl PluginCommand for ImportMarkdown {
         let request = CreateObjectRequest {
             type_key: type_data.key.clone(),
             name: Some(object_name.clone()),
-            markdown: markdown_content,
-            properties: Some(properties.clone()),
+            body: body_content,
+            icon: None,
+            template_id: None,
+            properties: if let Some(props_obj) = properties.as_object() {
+                if props_obj.is_empty() {
+                    None
+                } else {
+                    Some(vec![properties.clone()])
+                }
+            } else {
+                None
+            },
         };
 
         if verbose {
@@ -213,7 +223,7 @@ impl PluginCommand for ImportMarkdown {
             eprintln!("  Type Key: {}", type_data.key);
             eprintln!("  Type ID: {}", type_id);
             eprintln!("  Object Name: {}", object_name);
-            eprintln!("  Markdown: {} characters", markdown_body.len());
+            eprintln!("  Body: {} characters", markdown_body.len());
             eprintln!("  Request JSON: {}", serde_json::to_string_pretty(&request).unwrap_or_else(|_| "Failed to serialize".to_string()));
         }
 
@@ -236,8 +246,8 @@ impl PluginCommand for ImportMarkdown {
             if let Some(props) = &response.properties {
                 eprintln!("  Response properties: {}", serde_json::to_string_pretty(props).unwrap_or_else(|_| "Failed to serialize".to_string()));
             }
-            if let Some(md) = &response.markdown {
-                eprintln!("  Markdown: {} characters", md.len());
+            if let Some(body) = &response.body {
+                eprintln!("  Body: {} characters", body.len());
             }
         }
 
@@ -245,7 +255,7 @@ impl PluginCommand for ImportMarkdown {
             eprintln!("\n✓ Created object in space {}", space_id);
             eprintln!("  🆔 ID: {}", response.object.id);
             eprintln!("  📝 Name: {}", object_name);
-            eprintln!("  📄 Markdown: {} characters", markdown_body.len());
+            eprintln!("  📄 Body: {} characters", markdown_body.len());
             eprintln!(
                 "  🔑 Properties: {} mapped",
                 response

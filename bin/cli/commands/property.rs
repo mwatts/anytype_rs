@@ -47,9 +47,9 @@ pub enum PropertyCommand {
         /// Property name
         #[arg(short, long)]
         name: String,
-        /// Property format
-        #[arg(short, long, default_value = "text")]
-        format: String,
+        /// Property key (optional, snake_case)
+        #[arg(short, long)]
+        key: Option<String>,
     },
     /// Delete a property in a space
     Delete {
@@ -84,8 +84,8 @@ pub async fn handle_property_command(args: PropertyArgs) -> Result<()> {
             space_id,
             property_id,
             name,
-            format,
-        } => update_property(&client, &space_id, &property_id, &name, &format).await,
+            key,
+        } => update_property(&client, &space_id, &property_id, &name, key).await,
         PropertyCommand::Delete {
             space_id,
             property_id,
@@ -172,6 +172,7 @@ async fn create_property(
     let request = CreatePropertyRequest {
         name: name.to_string(),
         format,
+        key: None,
     };
 
     println!("🔧 Creating property '{name}' in space '{space_id}'...");
@@ -198,32 +199,11 @@ async fn update_property(
     space_id: &str,
     property_id: &str,
     name: &str,
-    format_str: &str,
+    key: Option<String>,
 ) -> Result<()> {
-    // Parse the format string to PropertyFormat enum
-    let format = match format_str.to_lowercase().as_str() {
-        "text" => PropertyFormat::Text,
-        "number" => PropertyFormat::Number,
-        "select" => PropertyFormat::Select,
-        "multi_select" | "multiselect" => PropertyFormat::MultiSelect,
-        "date" => PropertyFormat::Date,
-        "files" => PropertyFormat::Files,
-        "checkbox" => PropertyFormat::Checkbox,
-        "url" => PropertyFormat::Url,
-        "email" => PropertyFormat::Email,
-        "phone" => PropertyFormat::Phone,
-        "objects" => PropertyFormat::Objects,
-        _ => {
-            println!(
-                "❌ Invalid format: {format_str}. Valid options: text, number, select, multi_select, date, files, checkbox, url, email, phone, objects"
-            );
-            return Ok(());
-        }
-    };
-
     let request = UpdatePropertyRequest {
         name: name.to_string(),
-        format,
+        key,
     };
 
     println!("🔧 Updating property '{property_id}' in space '{space_id}'...");

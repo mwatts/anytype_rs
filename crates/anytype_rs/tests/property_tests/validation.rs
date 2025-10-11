@@ -60,7 +60,9 @@ proptest! {
         let request = CreateObjectRequest {
             type_key,
             name,
-            markdown: None,
+            body: None,
+            icon: None,
+            template_id: None,
             properties: None,
         };
 
@@ -72,18 +74,18 @@ proptest! {
     #[test]
     fn test_update_object_request_combinations(
         name in prop::option::of(".*{0,200}"),
-        markdown in prop::option::of(".*{0,1000}"),
+        body in prop::option::of(".*{0,1000}"),
         has_properties in any::<bool>(),
     ) {
         let properties = if has_properties {
-            Some(serde_json::json!({"key": "value"}))
+            Some(vec![serde_json::json!({"key": "value"})])
         } else {
             None
         };
 
         let request = UpdateObjectRequest {
             name,
-            markdown,
+            body,
             properties,
         };
 
@@ -101,8 +103,10 @@ proptest! {
             let request = CreateObjectRequest {
                 type_key: key,
                 name: Some("".to_string()),
-                markdown: None,
-                properties: Some(serde_json::json!({})),
+                body: None,
+                icon: None,
+                template_id: None,
+                properties: Some(vec![serde_json::json!({})]),
             };
 
             let result = serde_json::to_string(&request);
@@ -152,7 +156,9 @@ proptest! {
         let request = CreateObjectRequest {
             type_key: "test".to_string(),
             name: Some(special_chars),
-            markdown: None,
+            body: None,
+            icon: None,
+            template_id: None,
             properties: None,
         };
 

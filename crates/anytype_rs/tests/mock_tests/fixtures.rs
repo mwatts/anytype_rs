@@ -172,10 +172,10 @@ pub mod objects {
         json!({
             "type_key": "ot-page",
             "name": "New Page",
-            "markdown": "# Hello World\n\nThis is a test page.",
-            "properties": {
+            "body": "# Hello World\n\nThis is a test page.",
+            "properties": [{
                 "title": "New Page Title"
-            }
+            }]
         })
     }
 
@@ -194,7 +194,7 @@ pub mod objects {
             "properties": {
                 "title": "New Page Title"
             },
-            "markdown": "# Hello World\n\nThis is a test page."
+            "body": "# Hello World\n\nThis is a test page."
         })
     }
 
@@ -202,10 +202,10 @@ pub mod objects {
     pub fn update_object_request() -> serde_json::Value {
         json!({
             "name": "Updated Page Name",
-            "markdown": "# Updated Content",
-            "properties": {
+            "body": "# Updated Content",
+            "properties": [{
                 "title": "Updated Title"
-            }
+            }]
         })
     }
 
@@ -224,7 +224,7 @@ pub mod objects {
             "properties": {
                 "title": "Updated Title"
             },
-            "markdown": "# Updated Content"
+            "body": "# Updated Content"
         })
     }
 
@@ -492,8 +492,7 @@ pub mod properties {
     /// Sample update property request
     pub fn update_property_request() -> serde_json::Value {
         json!({
-            "name": "Updated Field Name",
-            "format": "text"
+            "name": "Updated Field Name"
         })
     }
 

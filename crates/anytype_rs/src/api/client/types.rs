@@ -105,12 +105,18 @@ pub struct ListTypesResponse {
 /// Request to update an existing type
 #[derive(Debug, Serialize)]
 pub struct UpdateTypeRequest {
-    pub icon: Icon,
-    pub key: String,
-    pub layout: Layout,
-    pub name: String,
-    pub plural_name: String,
-    pub properties: Vec<CreateTypeProperty>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub icon: Option<Icon>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub key: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub layout: Option<Layout>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub plural_name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub properties: Option<Vec<CreateTypeProperty>>,
 }
 
 /// Response when updating a type

@@ -28,13 +28,25 @@ pub struct ListObjectsResponse {
 /// Request to create a new object
 #[derive(Debug, Serialize)]
 pub struct CreateObjectRequest {
+    /// The key of the type of object to create (required)
+    /// Example: "page"
     pub type_key: String,
+    /// The name of the object (optional)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
+    /// The body/content of the object - supports Markdown (optional)
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub markdown: Option<String>,
+    pub body: Option<String>,
+    /// The icon for the object (optional)
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub properties: Option<serde_json::Value>,
+    pub icon: Option<serde_json::Value>,
+    /// The id of the template to use (optional)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub template_id: Option<String>,
+    /// Properties to set on the object (optional)
+    /// Warning: Properties are experimental and may change in the next update
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub properties: Option<Vec<serde_json::Value>>,
 }
 
 /// Response when creating an object
@@ -42,7 +54,8 @@ pub struct CreateObjectRequest {
 pub struct CreateObjectResponse {
     pub object: Object,
     pub properties: Option<serde_json::Value>,
-    pub markdown: Option<String>,
+    /// The body/content of the created object (supports Markdown)
+    pub body: Option<String>,
 }
 
 /// Response when deleting an object
@@ -56,10 +69,13 @@ pub struct DeleteObjectResponse {
 pub struct UpdateObjectRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
+    /// The body/content of the object - supports Markdown (optional)
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub markdown: Option<String>,
+    pub body: Option<String>,
+    /// Properties to set on the object (optional)
+    /// Warning: Properties are experimental and may change in the next update
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub properties: Option<serde_json::Value>,
+    pub properties: Option<Vec<serde_json::Value>>,
 }
 
 /// Response when updating an object
@@ -67,7 +83,8 @@ pub struct UpdateObjectRequest {
 pub struct UpdateObjectResponse {
     pub object: Object,
     pub properties: Option<serde_json::Value>,
-    pub markdown: Option<String>,
+    /// The body/content of the updated object (supports Markdown)
+    pub body: Option<String>,
 }
 
 impl AnytypeClient {

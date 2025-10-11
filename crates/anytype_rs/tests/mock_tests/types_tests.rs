@@ -200,18 +200,18 @@ async fn test_update_type_success() {
     client.set_api_key(TEST_API_KEY.to_string());
 
     let request = UpdateTypeRequest {
-        key: "custom-type".to_string(),
-        name: "Updated Custom Type".to_string(),
-        plural_name: "Updated Custom Types".to_string(),
-        layout: Layout::Basic,
-        icon: Icon::Emoji {
+        key: Some("custom-type".to_string()),
+        name: Some("Updated Custom Type".to_string()),
+        plural_name: Some("Updated Custom Types".to_string()),
+        layout: Some(Layout::Basic),
+        icon: Some(Icon::Emoji {
             emoji: "✨".to_string(),
-        },
-        properties: vec![CreateTypeProperty {
+        }),
+        properties: Some(vec![CreateTypeProperty {
             key: "title".to_string(),
             name: "Title".to_string(),
             format: PropertyFormat::Text,
-        }],
+        }]),
     };
 
     let result = client.update_type(TEST_SPACE_ID, TEST_TYPE_ID, request).await;
@@ -241,14 +241,14 @@ async fn test_update_type_not_found() {
     client.set_api_key(TEST_API_KEY.to_string());
 
     let request = UpdateTypeRequest {
-        key: "custom-type".to_string(),
-        name: "Updated Name".to_string(),
-        plural_name: "Updated Names".to_string(),
-        layout: Layout::Basic,
-        icon: Icon::Emoji {
+        key: Some("custom-type".to_string()),
+        name: Some("Updated Name".to_string()),
+        plural_name: Some("Updated Names".to_string()),
+        layout: Some(Layout::Basic),
+        icon: Some(Icon::Emoji {
             emoji: "✨".to_string(),
-        },
-        properties: vec![],
+        }),
+        properties: Some(vec![]),
     };
 
     let result = client.update_type(TEST_SPACE_ID, "nonexistent", request).await;

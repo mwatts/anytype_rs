@@ -478,12 +478,12 @@ async fn update_type(
     }
 
     let request = UpdateTypeRequest {
-        key: params.key,
-        name: params.name.clone(),
-        plural_name: params.plural_name,
-        layout: layout_enum,
-        icon,
-        properties: parsed_properties,
+        key: Some(params.key),
+        name: Some(params.name.clone()),
+        plural_name: Some(params.plural_name),
+        layout: Some(layout_enum),
+        icon: Some(icon),
+        properties: Some(parsed_properties),
     };
 
     let response = client

@@ -1,14 +1,17 @@
 ---
-source: tests/snapshot_tests/objects.rs
+source: crates/anytype_rs/tests/snapshot_tests/objects.rs
+assertion_line: 66
 expression: request
 ---
 {
   "name": "Updated Name",
-  "markdown": "# Updated Content\n\nNew content here",
-  "properties": {
-    "description": "Updated description",
-    "tags": [
-      "updated"
-    ]
-  }
+  "body": "# Updated Content\n\nNew content here",
+  "properties": [
+    {
+      "description": "Updated description",
+      "tags": [
+        "updated"
+      ]
+    }
+  ]
 }

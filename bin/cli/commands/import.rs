@@ -147,12 +147,28 @@ async fn import_markdown(
         return Ok(());
     }
 
-    // Create the object
+    // Create the object with body content if available
     let request = CreateObjectRequest {
         type_key: type_key.to_string(),
         name: Some(object_name.clone()),
-        markdown: None,
-        properties: Some(properties),
+        body: if markdown_body.trim().is_empty() {
+            None
+        } else {
+            Some(markdown_body.clone())
+        },
+        icon: None,
+        template_id: None,
+        properties: if let Some(props_obj) = properties.as_object() {
+            if props_obj.is_empty() {
+                None
+            } else {
+                // Convert properties object to array format expected by API
+                // For now, we'll keep it as a single-element vec with the object
+                Some(vec![properties])
+            }
+        } else {
+            None
+        },
     };
 
     let response = client
@@ -160,24 +176,12 @@ async fn import_markdown(
         .await
         .with_context(|| format!("Failed to create object in space '{}'", space_id))?;
 
-    // Update with markdown content if there is any
-    if !markdown_body.trim().is_empty() {
-        let update_request = anytype_rs::api::UpdateObjectRequest {
-            name: None,
-            markdown: Some(markdown_body.clone()),
-            properties: None,
-        };
-
-        client
-            .update_object(space_id, &response.object.id, update_request)
-            .await
-            .context("Failed to update object with markdown content")?;
-    }
-
     println!("\n✓ Created object in space {}", space_id);
     println!("  🆔 ID: {}", response.object.id);
     println!("  📝 Name: {}", object_name);
-    println!("  📄 Markdown: {} characters", markdown_body.len());
+    if !markdown_body.trim().is_empty() {
+        println!("  📄 Body: {} characters", markdown_body.len());
+    }
     println!(
         "  🔑 Properties: {} mapped",
         response

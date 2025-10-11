@@ -1,12 +1,15 @@
 ---
-source: tests/snapshot_tests/objects.rs
+source: crates/anytype_rs/tests/snapshot_tests/objects.rs
+assertion_line: 43
 expression: request
 ---
 {
   "type_key": "note",
   "name": "New Note",
-  "properties": {
-    "content": "Note content",
-    "title": "My Note"
-  }
+  "properties": [
+    {
+      "content": "Note content",
+      "title": "My Note"
+    }
+  ]
 }

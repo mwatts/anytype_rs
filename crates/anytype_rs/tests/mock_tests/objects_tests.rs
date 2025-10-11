@@ -126,8 +126,10 @@ async fn test_create_object_success() {
     let request = CreateObjectRequest {
         type_key: "ot-page".to_string(),
         name: Some("New Page".to_string()),
-        markdown: Some("# Hello World\n\nThis is a test page.".to_string()),
-        properties: Some(serde_json::json!({"title": "New Page Title"})),
+        body: Some("# Hello World\n\nThis is a test page.".to_string()),
+        icon: None,
+        template_id: None,
+        properties: Some(vec![serde_json::json!({"title": "New Page Title"})]),
     };
 
     let result = client.create_object(TEST_SPACE_ID, request).await;
@@ -159,7 +161,9 @@ async fn test_create_object_bad_request() {
     let request = CreateObjectRequest {
         type_key: "".to_string(), // Invalid empty type
         name: None,
-        markdown: None,
+        body: None,
+        icon: None,
+        template_id: None,
         properties: None,
     };
 
@@ -189,8 +193,8 @@ async fn test_update_object_success() {
 
     let request = UpdateObjectRequest {
         name: Some("Updated Page Name".to_string()),
-        markdown: Some("# Updated Content".to_string()),
-        properties: Some(serde_json::json!({"title": "Updated Title"})),
+        body: Some("# Updated Content".to_string()),
+        properties: Some(vec![serde_json::json!({"title": "Updated Title"})]),
     };
 
     let result = client.update_object(TEST_SPACE_ID, TEST_OBJECT_ID, request).await;
@@ -221,7 +225,7 @@ async fn test_update_object_not_found() {
 
     let request = UpdateObjectRequest {
         name: Some("Updated Name".to_string()),
-        markdown: None,
+        body: None,
         properties: None,
     };
 

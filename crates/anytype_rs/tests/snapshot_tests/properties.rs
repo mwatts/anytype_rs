@@ -43,12 +43,14 @@ fn test_create_property_request_serialization() {
     let request = CreatePropertyRequest {
         name: "New Property".to_string(),
         format: PropertyFormat::Text,
+        key: None,
     };
     insta::assert_json_snapshot!("create_property_request_text", request);
 
     let request_select = CreatePropertyRequest {
         name: "Status".to_string(),
         format: PropertyFormat::Select,
+        key: None,
     };
     insta::assert_json_snapshot!("create_property_request_select", request_select);
 }
@@ -57,7 +59,7 @@ fn test_create_property_request_serialization() {
 fn test_update_property_request_serialization() {
     let request = UpdatePropertyRequest {
         name: "Updated Property".to_string(),
-        format: PropertyFormat::MultiSelect,
+        key: Some("updated_prop".to_string()),
     };
     insta::assert_json_snapshot!("update_property_request", request);
 }

@@ -1,8 +1,9 @@
 ---
-source: tests/snapshot_tests/properties.rs
+source: crates/anytype_rs/tests/snapshot_tests/properties.rs
+assertion_line: 64
 expression: request
 ---
 {
   "name": "Updated Property",
-  "format": "multi_select"
+  "key": "updated_prop"
 }

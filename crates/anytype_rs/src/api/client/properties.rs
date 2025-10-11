@@ -38,6 +38,8 @@ pub struct GetPropertyResponse {
 pub struct CreatePropertyRequest {
     pub name: String,
     pub format: PropertyFormat,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub key: Option<String>,
 }
 
 /// Response when creating a property
@@ -50,7 +52,8 @@ pub struct CreatePropertyResponse {
 #[derive(Debug, Serialize)]
 pub struct UpdatePropertyRequest {
     pub name: String,
-    pub format: PropertyFormat,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub key: Option<String>,
 }
 
 /// Response when updating a property

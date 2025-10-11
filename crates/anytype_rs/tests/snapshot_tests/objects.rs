@@ -32,18 +32,22 @@ fn test_create_object_request_serialization() {
     let request = CreateObjectRequest {
         type_key: "note".to_string(),
         name: Some("New Note".to_string()),
-        markdown: None,
-        properties: Some(serde_json::json!({
+        body: None,
+        icon: None,
+        template_id: None,
+        properties: Some(vec![serde_json::json!({
             "title": "My Note",
             "content": "Note content"
-        })),
+        })]),
     };
     insta::assert_json_snapshot!("create_object_request_full", request);
 
     let request_minimal = CreateObjectRequest {
         type_key: "page".to_string(),
         name: None,
-        markdown: None,
+        body: None,
+        icon: None,
+        template_id: None,
         properties: None,
     };
     insta::assert_json_snapshot!("create_object_request_minimal", request_minimal);
@@ -53,17 +57,17 @@ fn test_create_object_request_serialization() {
 fn test_update_object_request_serialization() {
     let request = UpdateObjectRequest {
         name: Some("Updated Name".to_string()),
-        markdown: Some("# Updated Content\n\nNew content here".to_string()),
-        properties: Some(serde_json::json!({
+        body: Some("# Updated Content\n\nNew content here".to_string()),
+        properties: Some(vec![serde_json::json!({
             "description": "Updated description",
             "tags": ["updated"]
-        })),
+        })]),
     };
     insta::assert_json_snapshot!("update_object_request_full", request);
 
     let request_minimal = UpdateObjectRequest {
         name: None,
-        markdown: None,
+        body: None,
         properties: None,
     };
     insta::assert_json_snapshot!("update_object_request_minimal", request_minimal);
@@ -71,7 +75,7 @@ fn test_update_object_request_serialization() {
     // Test partial updates
     let request_name_only = UpdateObjectRequest {
         name: Some("Name Only".to_string()),
-        markdown: None,
+        body: None,
         properties: None,
     };
     insta::assert_json_snapshot!("update_object_request_name_only", request_name_only);

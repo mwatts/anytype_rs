@@ -38,9 +38,9 @@ pub enum ObjectCommand {
         /// New name for the object
         #[arg(short, long)]
         name: Option<String>,
-        /// New markdown content for the object
+        /// New body/content for the object (supports Markdown)
         #[arg(short, long)]
-        markdown: Option<String>,
+        body: Option<String>,
     },
     /// Delete an object in a space (archives it)
     Delete {
@@ -69,8 +69,8 @@ pub async fn handle_object_command(args: ObjectArgs) -> Result<()> {
             space_id,
             object_id,
             name,
-            markdown,
-        } => update_object(&client, &space_id, &object_id, name, markdown).await,
+            body,
+        } => update_object(&client, &space_id, &object_id, name, body).await,
         ObjectCommand::Delete {
             space_id,
             object_id,
@@ -134,7 +134,9 @@ async fn create_object(
     let request = CreateObjectRequest {
         name: Some(name.to_string()),
         type_key: type_key.to_string(),
-        markdown: None,
+        body: None,
+        icon: None,
+        template_id: None,
         properties: None,
     };
 
@@ -165,12 +167,12 @@ async fn update_object(
     space_id: &str,
     object_id: &str,
     name: Option<String>,
-    markdown: Option<String>,
+    body: Option<String>,
 ) -> Result<()> {
     // Check if at least one field is provided for update
-    if name.is_none() && markdown.is_none() {
+    if name.is_none() && body.is_none() {
         return Err(anyhow::anyhow!(
-            "At least one field (name or markdown) must be provided to update"
+            "At least one field (name or body) must be provided to update"
         ));
     }
 
@@ -178,7 +180,7 @@ async fn update_object(
 
     let request = UpdateObjectRequest {
         name,
-        markdown,
+        body,
         properties: None, // For now, we don't support updating properties via CLI
     };
 
@@ -200,8 +202,8 @@ async fn update_object(
     if let Some(object_type) = &response.object.object {
         println!("   🏷️  Type: {object_type}");
     }
-    if let Some(markdown) = &response.markdown {
-        println!("   📄 Markdown: {} characters", markdown.len());
+    if let Some(body) = &response.body {
+        println!("   📄 Body: {} characters", body.len());
     }
 
     Ok(())

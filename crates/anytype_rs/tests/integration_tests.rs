@@ -222,18 +222,18 @@ async fn test_unauthenticated_update_type_request_fails() {
     let client = AnytypeClient::new().expect("Failed to create client");
 
     let request = UpdateTypeRequest {
-        key: "test_type".to_string(),
-        name: "Test Type".to_string(),
-        plural_name: "Test Types".to_string(),
-        layout: Layout::Basic,
-        icon: Icon::Emoji {
+        key: Some("test_type".to_string()),
+        name: Some("Test Type".to_string()),
+        plural_name: Some("Test Types".to_string()),
+        layout: Some(Layout::Basic),
+        icon: Some(Icon::Emoji {
             emoji: "📝".to_string(),
-        },
-        properties: vec![CreateTypeProperty {
+        }),
+        properties: Some(vec![CreateTypeProperty {
             key: "test_prop".to_string(),
             name: "Test Property".to_string(),
             format: PropertyFormat::Text,
-        }],
+        }]),
     };
 
     // This should fail because no API key is set
@@ -379,6 +379,7 @@ async fn test_unauthenticated_create_property_request_fails() {
     let request = CreatePropertyRequest {
         name: "Test Property".to_string(),
         format: PropertyFormat::Text,
+        key: None,
     };
 
     // This should fail because no API key is set
@@ -401,7 +402,7 @@ async fn test_unauthenticated_update_property_request_fails() {
 
     let request = UpdatePropertyRequest {
         name: "Updated Property".to_string(),
-        format: PropertyFormat::Number,
+        key: None,
     };
 
     // This should fail because no API key is set

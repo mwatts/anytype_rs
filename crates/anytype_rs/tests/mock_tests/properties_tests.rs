@@ -127,6 +127,7 @@ async fn test_create_property_success() {
     let request = CreatePropertyRequest {
         name: "New Field".to_string(),
         format: PropertyFormat::Text,
+        key: None,
     };
 
     let result = client.create_property(TEST_SPACE_ID, request).await;
@@ -158,6 +159,7 @@ async fn test_create_property_bad_request() {
     let request = CreatePropertyRequest {
         name: "".to_string(), // Invalid empty name
         format: PropertyFormat::Text,
+        key: None,
     };
 
     let result = client.create_property(TEST_SPACE_ID, request).await;
@@ -186,7 +188,7 @@ async fn test_update_property_success() {
 
     let request = UpdatePropertyRequest {
         name: "Updated Field Name".to_string(),
-        format: PropertyFormat::Text,
+        key: None,
     };
 
     let result = client.update_property(TEST_SPACE_ID, TEST_PROPERTY_ID, request).await;
@@ -217,7 +219,7 @@ async fn test_update_property_not_found() {
 
     let request = UpdatePropertyRequest {
         name: "Updated Name".to_string(),
-        format: PropertyFormat::Text,
+        key: None,
     };
 
     let result = client.update_property(TEST_SPACE_ID, "nonexistent", request).await;

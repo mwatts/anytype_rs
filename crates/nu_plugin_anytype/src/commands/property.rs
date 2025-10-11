@@ -246,6 +246,7 @@ impl PluginCommand for PropertyCreate {
         let request = CreatePropertyRequest {
             name: name.clone(),
             format,
+            key: None,
         };
 
         // Create property via API
@@ -298,10 +299,10 @@ impl PluginCommand for PropertyUpdate {
                 Some('n'),
             )
             .named(
-                "format",
+                "key",
                 SyntaxShape::String,
-                "Property format (text, number, select, multi_select, date, files, checkbox, url, email, phone, objects)",
-                Some('f'),
+                "Property key (snake_case identifier)",
+                Some('k'),
             )
             .input_output_types(vec![
                 (
@@ -364,19 +365,13 @@ impl PluginCommand for PropertyUpdate {
             .get_flag("new-name")?
             .unwrap_or_else(|| current.name.clone());
 
-        // Get format from flag (default: keep current)
-        let format_str: String = call
-            .get_flag("format")?
-            .unwrap_or_else(|| current.format.clone());
-
-        // Parse format string to PropertyFormat enum
-        let format = parse_property_format(&format_str)
-            .map_err(|e| LabeledError::new(e).with_label("Invalid format", span))?;
+        // Get key from flag (optional)
+        let key: Option<String> = call.get_flag("key")?;
 
         // Update property request
         let request = UpdatePropertyRequest {
             name: new_name,
-            format,
+            key,
         };
 
         // Update property via API
