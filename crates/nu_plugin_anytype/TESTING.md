@@ -52,7 +52,7 @@ Located in `test_all_commands.nu` - comprehensive integration testing against a 
 
 **Prerequisites:**
 - Anytype app running locally on `localhost:31009`
-- Authentication completed (`anytype auth create`)
+- Authentication completed (`anytype auth login`)
 - Space named `dev-test` exists
 
 **Coverage:**
@@ -266,7 +266,7 @@ echo "Tests passed!"
 
 **Solution:**
 ```bash
-anytype auth create
+anytype auth login
 ```
 
 **Problem:** `./test_all_commands.nu` fails with "Space 'dev-test' not found"

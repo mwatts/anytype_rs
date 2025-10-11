@@ -1,16 +1,15 @@
 use crate::AnytypePlugin;
 use nu_plugin::{EngineInterface, EvaluatedCall, PluginCommand};
 use nu_protocol::{Category, LabeledError, PipelineData, Record, Signature, Value};
-use std::io::{self, Write};
 
-/// Command: anytype auth create
-pub struct AuthCreate;
+/// Command: anytype auth login
+pub struct AuthLogin;
 
-impl PluginCommand for AuthCreate {
+impl PluginCommand for AuthLogin {
     type Plugin = AnytypePlugin;
 
     fn name(&self) -> &str {
-        "anytype auth create"
+        "anytype auth login"
     }
 
     fn description(&self) -> &str {
@@ -18,7 +17,9 @@ impl PluginCommand for AuthCreate {
     }
 
     fn signature(&self) -> Signature {
-        Signature::build(self.name()).category(Category::Custom("anytype".into()))
+        Signature::build(self.name())
+            .optional("code", nu_protocol::SyntaxShape::String, "4-digit authentication code from Anytype app")
+            .category(Category::Custom("anytype".into()))
     }
 
     fn run(
@@ -30,73 +31,93 @@ impl PluginCommand for AuthCreate {
     ) -> Result<PipelineData, LabeledError> {
         let span = call.head;
 
-        // Create unauthenticated client for auth flow
-        let client = anytype_rs::AnytypeClient::new()
-            .map_err(|e| LabeledError::new(format!("Failed to create client: {}", e)))?;
+        // Check if code was provided as argument
+        let code_arg: Option<String> = call.opt(0)?;
 
-        // Step 1: Create challenge
-        eprintln!("🔐 Starting authentication with local Anytype app...");
-        eprintln!("📱 Creating authentication challenge...");
+        if let Some(code) = code_arg {
+            // Code provided - complete the authentication flow
+            if code.len() != 4 || !code.chars().all(|c| c.is_ascii_digit()) {
+                return Err(LabeledError::new("Invalid code format. Expected 4 digits."));
+            }
 
-        let challenge = plugin.run_async(client.create_challenge()).map_err(|e| {
-            LabeledError::new(format!("Failed to create authentication challenge: {}", e))
-        })?;
+            // Load the challenge ID from temp storage
+            let challenge_id = load_challenge_id()
+                .map_err(|e| LabeledError::new(format!("Failed to load challenge: {}. Please run 'anytype auth login' without arguments first.", e)))?;
 
-        eprintln!("✅ Challenge created with ID: {}", challenge.challenge_id);
-        eprintln!("📧 Please check your local Anytype app for the 4-digit authentication code.");
+            eprintln!("🔑 Creating API key with code {}...", code);
 
-        // Step 2: Get code from user
-        eprint!("🔢 Enter the 4-digit code: ");
-        io::stderr().flush().ok();
+            let client = anytype_rs::AnytypeClient::new()
+                .map_err(|e| LabeledError::new(format!("Failed to create client: {}", e)))?;
 
-        let mut code = String::new();
-        io::stdin()
-            .read_line(&mut code)
-            .map_err(|e| LabeledError::new(format!("Failed to read input: {}", e)))?;
-        let code = code.trim().to_string();
+            let api_key_response = plugin
+                .run_async(client.create_api_key(challenge_id.clone(), code))
+                .map_err(|e| {
+                    LabeledError::new(format!(
+                        "Failed to create API key. Please check your code and try again: {}",
+                        e
+                    ))
+                })?;
 
-        if code.len() != 4 || !code.chars().all(|c| c.is_ascii_digit()) {
-            return Err(LabeledError::new("Invalid code format. Expected 4 digits."));
-        }
+            // Save the API key and clean up challenge
+            save_api_key(&api_key_response.api_key)
+                .map_err(|e| LabeledError::new(format!("Failed to save API key: {}", e)))?;
 
-        // Step 3: Create API key
-        eprintln!("🔑 Creating API key...");
-        let api_key_response = plugin
-            .run_async(client.create_api_key(challenge.challenge_id, code))
-            .map_err(|e| {
-                LabeledError::new(format!(
-                    "Failed to create API key. Please check your code and try again: {}",
-                    e
-                ))
+            remove_challenge_id().ok(); // Clean up
+
+            eprintln!("✅ Authentication successful! API key saved.");
+            eprintln!("🚀 You can now use other commands to interact with your local Anytype app.");
+
+            // Return success
+            let mut record = Record::new();
+            record.push("status", Value::string("authenticated", span));
+            record.push(
+                "api_key",
+                Value::string(
+                    format!(
+                        "{}...{}",
+                        &api_key_response.api_key[..8.min(api_key_response.api_key.len())],
+                        if api_key_response.api_key.len() > 16 {
+                            &api_key_response.api_key[api_key_response.api_key.len() - 8..]
+                        } else {
+                            ""
+                        }
+                    ),
+                    span,
+                ),
+            );
+
+            Ok(PipelineData::Value(Value::record(record, span), None))
+        } else {
+            // No code provided - create challenge and show instructions
+            eprintln!("🔐 Starting authentication with local Anytype app...");
+            eprintln!("📱 Creating authentication challenge...");
+
+            let client = anytype_rs::AnytypeClient::new()
+                .map_err(|e| LabeledError::new(format!("Failed to create client: {}", e)))?;
+
+            let challenge = plugin.run_async(client.create_challenge()).map_err(|e| {
+                LabeledError::new(format!("Failed to create authentication challenge: {}", e))
             })?;
 
-        // Step 4: Save API key
-        save_api_key(&api_key_response.api_key)
-            .map_err(|e| LabeledError::new(format!("Failed to save API key: {}", e)))?;
+            // Save challenge ID for next step
+            save_challenge_id(&challenge.challenge_id)
+                .map_err(|e| LabeledError::new(format!("Failed to save challenge: {}", e)))?;
 
-        eprintln!("✅ Authentication successful! API key saved.");
-        eprintln!("🚀 You can now use other commands to interact with your local Anytype app.");
+            eprintln!("✅ Challenge created with ID: {}", challenge.challenge_id);
+            eprintln!("📧 Please check your local Anytype app for the 4-digit authentication code.");
+            eprintln!("");
+            eprintln!("⚠️  To complete authentication, run:");
+            eprintln!("   anytype auth login <CODE>");
+            eprintln!("");
+            eprintln!("   Replace <CODE> with the 4-digit code from your Anytype app.");
 
-        // Return success message as a record
-        let mut record = Record::new();
-        record.push("status", Value::string("authenticated", span));
-        record.push(
-            "api_key",
-            Value::string(
-                format!(
-                    "{}...{}",
-                    &api_key_response.api_key[..8.min(api_key_response.api_key.len())],
-                    if api_key_response.api_key.len() > 16 {
-                        &api_key_response.api_key[api_key_response.api_key.len() - 8..]
-                    } else {
-                        ""
-                    }
-                ),
-                span,
-            ),
-        );
+            let mut record = Record::new();
+            record.push("status", Value::string("challenge_created", span));
+            record.push("challenge_id", Value::string(challenge.challenge_id, span));
+            record.push("message", Value::string("Challenge created. Run 'anytype auth login <code>' to complete.", span));
 
-        Ok(PipelineData::Value(Value::record(record, span), None))
+            Ok(PipelineData::Value(Value::record(record, span), None))
+        }
     }
 }
 
@@ -228,7 +249,7 @@ impl PluginCommand for AuthStatus {
             }
             Ok(None) => {
                 eprintln!("❌ Not authenticated");
-                eprintln!("💡 Run 'anytype auth create' to authenticate.");
+                eprintln!("💡 Run 'anytype auth login' to authenticate.");
                 record.push("status", Value::string("not_authenticated", span));
                 record.push("connected", Value::bool(false, span));
             }
@@ -288,6 +309,43 @@ fn remove_api_key() -> Result<(), String> {
     let key_file = api_key_file()?;
     if key_file.exists() {
         std::fs::remove_file(key_file).map_err(|e| format!("Failed to remove API key: {}", e))?;
+    }
+    Ok(())
+}
+
+fn challenge_file() -> Result<std::path::PathBuf, String> {
+    Ok(config_dir()?.join("challenge_id"))
+}
+
+fn save_challenge_id(challenge_id: &str) -> Result<(), String> {
+    let file = challenge_file()?;
+    std::fs::write(file, challenge_id).map_err(|e| format!("Failed to write challenge ID: {}", e))?;
+    Ok(())
+}
+
+fn load_challenge_id() -> Result<String, String> {
+    let file = challenge_file()?;
+
+    if !file.exists() {
+        return Err("No pending authentication challenge found".to_string());
+    }
+
+    let challenge_id = std::fs::read_to_string(file)
+        .map_err(|e| format!("Failed to read challenge ID: {}", e))?
+        .trim()
+        .to_string();
+
+    if challenge_id.is_empty() {
+        Err("Challenge ID file is empty".to_string())
+    } else {
+        Ok(challenge_id)
+    }
+}
+
+fn remove_challenge_id() -> Result<(), String> {
+    let file = challenge_file()?;
+    if file.exists() {
+        std::fs::remove_file(file).map_err(|e| format!("Failed to remove challenge ID: {}", e))?;
     }
     Ok(())
 }

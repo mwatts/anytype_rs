@@ -17,7 +17,7 @@ pub mod r#type;
 // Phase 8: tag.rs
 // Phase 9: list.rs
 
-pub use auth::{AuthCreate, AuthDelete, AuthStatus};
+pub use auth::{AuthLogin, AuthDelete, AuthStatus};
 pub use import::ImportMarkdown;
 pub use list::{ListAdd, ListObjects, ListRemove, ListViews};
 pub use member::MemberList;

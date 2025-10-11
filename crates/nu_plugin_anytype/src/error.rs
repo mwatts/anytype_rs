@@ -7,11 +7,11 @@ pub fn convert_anytype_error(err: AnytypeError) -> ShellError {
         AnytypeError::Auth { message } => ShellError::GenericError {
             error: "Authentication error".to_string(),
             msg: format!(
-                "Authentication failed: {}. Run `anytype auth create` to authenticate",
+                "Authentication failed: {}. Run `anytype auth login` to authenticate",
                 message
             ),
             span: None,
-            help: Some("Run 'anytype auth create' to authenticate".to_string()),
+            help: Some("Run 'anytype auth login' to authenticate".to_string()),
             inner: vec![],
         },
         AnytypeError::Http { source } => ShellError::NetworkFailure {
@@ -55,7 +55,7 @@ mod tests {
         match shell_err {
             ShellError::GenericError { msg, .. } => {
                 assert!(msg.contains("Authentication failed"));
-                assert!(msg.contains("anytype auth create"));
+                assert!(msg.contains("anytype auth login"));
             }
             _ => panic!("Expected GenericError"),
         }

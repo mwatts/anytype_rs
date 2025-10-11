@@ -115,7 +115,7 @@ impl AnytypePlugin {
                     error: "Authentication required".to_string(),
                     msg: "API key file is empty".to_string(),
                     span: None,
-                    help: Some("Run `anytype auth create` to authenticate".to_string()),
+                    help: Some("Run `anytype auth login` to authenticate".to_string()),
                     inner: vec![],
                 });
             }
@@ -126,7 +126,7 @@ impl AnytypePlugin {
                 error: "Authentication required".to_string(),
                 msg: "No API key found".to_string(),
                 span: None,
-                help: Some("Run `anytype auth create` to authenticate".to_string()),
+                help: Some("Run `anytype auth login` to authenticate".to_string()),
                 inner: vec![],
             })
         }
@@ -186,7 +186,7 @@ impl Plugin for AnytypePlugin {
 
     fn commands(&self) -> Vec<Box<dyn nu_plugin::PluginCommand<Plugin = Self>>> {
         vec![
-            Box::new(crate::commands::AuthCreate),
+            Box::new(crate::commands::AuthLogin),
             Box::new(crate::commands::AuthDelete),
             Box::new(crate::commands::AuthStatus),
             Box::new(crate::commands::SpaceList),

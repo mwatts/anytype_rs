@@ -3,7 +3,7 @@
 #
 # Prerequisites:
 # - Anytype app running locally on localhost:31009
-# - Authentication already completed (anytype auth create)
+# - Authentication already completed (anytype auth login)
 # - Space named 'dev-test' exists
 #
 # Usage: nu test_all_commands.nu

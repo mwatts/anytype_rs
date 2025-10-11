@@ -38,7 +38,7 @@ exit  # then reopen
 
 ```nushell
 # Authenticate with your local Anytype app
-anytype auth create
+anytype auth login
 
 # List your spaces
 anytype space list
@@ -54,7 +54,7 @@ anytype search "meeting notes" --space "Work"
 
 The plugin provides 40+ commands organized by domain:
 
-- **Authentication** (3 commands): `auth create`, `auth status`, `auth delete`
+- **Authentication** (3 commands): `auth login`, `auth status`, `auth delete`
 - **Spaces** (3 commands): `space list`, `space get`, `space create`
 - **Types** (2 commands): `type list`, `type get`
 - **Objects** (2 commands): `object list`, `object get`
@@ -72,9 +72,9 @@ For detailed command documentation, see the sections below.
 ## Authentication Commands
 
 ```nushell
-anytype auth create   # Authenticate with local Anytype app
-anytype auth status   # Check authentication status
-anytype auth delete   # Remove stored credentials
+anytype auth login   # Authenticate with local Anytype app
+anytype auth status  # Check authentication status
+anytype auth delete  # Remove stored credentials
 ```
 
 ## Space Commands
@@ -316,7 +316,7 @@ anytype object list  # Uses default_space from config
 
 ```nushell
 # Re-authenticate
-anytype auth create
+anytype auth login
 
 # Check authentication status
 anytype auth status
@@ -341,7 +341,7 @@ RUST_LOG=debug nu -c "anytype space list"
 ### Common Errors
 
 **"Authentication required"**
-- Run `anytype auth create` to authenticate with your local Anytype app
+- Run `anytype auth login` to authenticate with your local Anytype app
 
 **"No space found with name 'X'"**
 - Check space name with `anytype space list`

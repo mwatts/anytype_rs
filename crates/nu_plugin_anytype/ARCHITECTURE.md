@@ -74,7 +74,7 @@ pub struct AnytypePlugin {
 
 **Authentication:**
 - Loads API key from `~/.config/anytype-cli/api_key`
-- Created by `anytype auth create` command
+- Created by `anytype auth login` command
 - Validated on first client access
 
 ### 3. Resolution & Caching
