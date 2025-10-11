@@ -3,9 +3,10 @@
 //! This module is organized to match the official API reference structure.
 
 use crate::{error::Result, types::ApiErrorResponse};
-use reqwest::{Client, Method, RequestBuilder};
+use reqwest::{Client, Method, RequestBuilder, Response};
 use serde::{Serialize, de::DeserializeOwned};
-use tracing::{debug, error};
+use std::time::Instant;
+use tracing::{debug, error, info, trace};
 
 // Include all module implementations
 pub mod auth;
@@ -82,13 +83,15 @@ impl AnytypeClient {
     /// Make an authenticated GET request
     pub(crate) async fn get<T: DeserializeOwned>(&self, path: &str) -> Result<T> {
         let url = format!("{}{}", self.config.base_url, path);
-        debug!("GET {}", url);
+        let request = self.authenticated_request(Method::GET, &url)?;
 
-        let response = self
-            .authenticated_request(Method::GET, &url)?
-            .send()
-            .await?;
+        self.log_request(&Method::GET, &url, &request);
 
+        let start = Instant::now();
+        let response = request.send().await?;
+        let duration = start.elapsed();
+
+        self.log_response(&response, duration).await;
         self.handle_response(response).await
     }
 
@@ -99,14 +102,22 @@ impl AnytypeClient {
         body: &B,
     ) -> Result<T> {
         let url = format!("{}{}", self.config.base_url, path);
-        debug!("POST {}", url);
+        let request = self.authenticated_request(Method::POST, &url)?.json(body);
 
-        let response = self
-            .authenticated_request(Method::POST, &url)?
-            .json(body)
-            .send()
-            .await?;
+        self.log_request(&Method::POST, &url, &request);
 
+        // Log request body at TRACE level
+        if tracing::enabled!(tracing::Level::TRACE) {
+            if let Ok(body_json) = serde_json::to_string_pretty(body) {
+                trace!(body = %body_json, "Request body");
+            }
+        }
+
+        let start = Instant::now();
+        let response = request.send().await?;
+        let duration = start.elapsed();
+
+        self.log_response(&response, duration).await;
         self.handle_response(response).await
     }
 
@@ -117,27 +128,37 @@ impl AnytypeClient {
         body: &B,
     ) -> Result<T> {
         let url = format!("{}{}", self.config.base_url, path);
-        debug!("PATCH {}", url);
+        let request = self.authenticated_request(Method::PATCH, &url)?.json(body);
 
-        let response = self
-            .authenticated_request(Method::PATCH, &url)?
-            .json(body)
-            .send()
-            .await?;
+        self.log_request(&Method::PATCH, &url, &request);
 
+        // Log request body at TRACE level
+        if tracing::enabled!(tracing::Level::TRACE) {
+            if let Ok(body_json) = serde_json::to_string_pretty(body) {
+                trace!(body = %body_json, "Request body");
+            }
+        }
+
+        let start = Instant::now();
+        let response = request.send().await?;
+        let duration = start.elapsed();
+
+        self.log_response(&response, duration).await;
         self.handle_response(response).await
     }
 
     /// Make an authenticated DELETE request
     pub(crate) async fn delete<T: DeserializeOwned>(&self, path: &str) -> Result<T> {
         let url = format!("{}{}", self.config.base_url, path);
-        debug!("DELETE {}", url);
+        let request = self.authenticated_request(Method::DELETE, &url)?;
 
-        let response = self
-            .authenticated_request(Method::DELETE, &url)?
-            .send()
-            .await?;
+        self.log_request(&Method::DELETE, &url, &request);
 
+        let start = Instant::now();
+        let response = request.send().await?;
+        let duration = start.elapsed();
+
+        self.log_response(&response, duration).await;
         self.handle_response(response).await
     }
 
@@ -148,16 +169,26 @@ impl AnytypeClient {
         body: &B,
     ) -> Result<T> {
         let url = format!("{}{}", self.config.base_url, path);
-        debug!("POST {} (unauthenticated)", url);
-
-        let response = self
+        let request = self
             .http_client
             .post(&url)
             .header(ANYTYPE_API_HEADER, ANYTYPE_API_VERSION)
-            .json(body)
-            .send()
-            .await?;
+            .json(body);
 
+        self.log_request(&Method::POST, &url, &request);
+
+        // Log request body at TRACE level
+        if tracing::enabled!(tracing::Level::TRACE) {
+            if let Ok(body_json) = serde_json::to_string_pretty(body) {
+                trace!(body = %body_json, auth = "unauthenticated", "Request body");
+            }
+        }
+
+        let start = Instant::now();
+        let response = request.send().await?;
+        let duration = start.elapsed();
+
+        self.log_response(&response, duration).await;
         self.handle_response(response).await
     }
 
@@ -187,15 +218,93 @@ impl AnytypeClient {
             .bearer_auth(api_key))
     }
 
+    /// Log HTTP request details at appropriate level
+    fn log_request(&self, method: &Method, url: &str, _request: &RequestBuilder) {
+        // Log at INFO level: just method and URL
+        info!(
+            method = %method,
+            url = %url,
+            "HTTP request"
+        );
+
+        // Log at DEBUG level: add headers (but not body)
+        if tracing::enabled!(tracing::Level::DEBUG) {
+            debug!(
+                method = %method,
+                url = %url,
+                api_version = ANYTYPE_API_VERSION,
+                has_auth = self.api_key.is_some(),
+                "HTTP request details"
+            );
+        }
+
+        // Log at TRACE level: full details
+        // Note: We can't access RequestBuilder internals, so we log what we know
+        if tracing::enabled!(tracing::Level::TRACE) {
+            trace!(
+                method = %method,
+                url = %url,
+                headers.anytype_version = ANYTYPE_API_VERSION,
+                headers.authorization = if self.api_key.is_some() { "Bearer [REDACTED]" } else { "none" },
+                "HTTP request (full)"
+            );
+        }
+    }
+
+    /// Log HTTP response details at appropriate level
+    async fn log_response(&self, response: &Response, duration: std::time::Duration) {
+        let status = response.status();
+        let url = response.url().as_str();
+
+        // Log at INFO level: just status and timing
+        info!(
+            status = status.as_u16(),
+            duration_ms = duration.as_millis(),
+            url = %url,
+            "HTTP response"
+        );
+
+        // Log at DEBUG level: add headers
+        if tracing::enabled!(tracing::Level::DEBUG) {
+            let headers: Vec<String> = response
+                .headers()
+                .iter()
+                .map(|(k, v)| format!("{}: {}", k, v.to_str().unwrap_or("[binary]")))
+                .collect();
+
+            debug!(
+                status = status.as_u16(),
+                duration_ms = duration.as_millis(),
+                url = %url,
+                headers = headers.len(),
+                "HTTP response with headers"
+            );
+        }
+
+        // Log at TRACE level: headers detail (body will be logged separately)
+        if tracing::enabled!(tracing::Level::TRACE) {
+            let headers: Vec<(String, String)> = response
+                .headers()
+                .iter()
+                .map(|(k, v)| (k.to_string(), v.to_str().unwrap_or("[binary]").to_string()))
+                .collect();
+
+            trace!(
+                status = status.as_u16(),
+                duration_ms = duration.as_millis(),
+                url = %url,
+                ?headers,
+                "HTTP response (full headers)"
+            );
+        }
+    }
+
     /// Handle HTTP response and deserialize JSON
     pub(crate) async fn handle_response<T: DeserializeOwned>(
         &self,
         response: reqwest::Response,
     ) -> Result<T> {
         let status = response.status();
-        let url = response.url().clone();
-
-        debug!("Response status: {} for {}", status, url);
 
         if status.is_success() {
             // Get the response text first for debugging
@@ -207,7 +316,19 @@ impl AnytypeClient {
                         message: format!("Failed to read response body: {e}"),
                     })?;
 
-            debug!("Response body: {response_text}");
+            // Log response body at TRACE level (pretty formatted)
+            if tracing::enabled!(tracing::Level::TRACE) {
+                if let Ok(parsed) = serde_json::from_str::<serde_json::Value>(&response_text) {
+                    if let Ok(pretty) = serde_json::to_string_pretty(&parsed) {
+                        trace!(body = %pretty, "Response body");
+                    }
+                } else {
+                    trace!(body = %response_text, "Response body (non-JSON)");
+                }
+            } else if tracing::enabled!(tracing::Level::DEBUG) {
+                // At DEBUG level, just show body size
+                debug!(body_size = response_text.len(), "Response body size");
+            }
 
             let response = serde_json::from_str::<T>(&response_text);
 
@@ -232,7 +353,12 @@ impl AnytypeClient {
 
             match response {
                 Ok(error) => {
-                    let message = error.message;
+                    let message = error.message.clone();
+
+                    // Log error response at TRACE level
+                    if tracing::enabled!(tracing::Level::TRACE) {
+                        trace!(error_message = %error.message, "API error response");
+                    }
 
                     if status == 401 || status == 403 {
                         Err(crate::error::AnytypeError::Auth { message })
