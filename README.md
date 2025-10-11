@@ -9,7 +9,8 @@ A Rust workspace providing a library, CLI tool, and Nushell plugin for interacti
 This workspace provides Rust interfaces to interact with Anytype's local API server, which runs in your Anytype app at `http://localhost:31009`.
 
 **Workspace Members:**
-- **`anytype_rs`**: Core library + CLI tool for programmatic access
+- **`anytype_rs`**: Core library providing the Anytype API client
+- **CLI** (`atc`): Command-line interface (workspace root binary)
 - **`nu_plugin_anytype`**: Nushell plugin for shell integration
 
 You can download the library crate from [crates.io](https://crates.io/crates/anytype_rs).
@@ -131,7 +132,7 @@ cargo build --release -p nu_plugin_anytype  # Nushell plugin
 ```
 
 **Binaries will be available at:**
-- CLI: `target/release/anytype`
+- CLI: `target/release/atc` (anytype-cli)
 - Plugin: `target/release/nu_plugin_anytype`
 
 ### Install from Cargo
@@ -141,7 +142,7 @@ cargo build --release -p nu_plugin_anytype  # Nushell plugin
 cargo install anytype_rs
 ```
 
-This will install the `anytype` binary to your Cargo bin directory.
+This will install the `atc` binary to your Cargo bin directory (anytype-cli).
 
 ### Install Nushell Plugin
 
@@ -175,12 +176,12 @@ The CLI supports importing markdown files with frontmatter into Anytype. This is
 
 **Basic Import:**
 ```bash
-anytype import markdown note.md --space sp_abc123 --type ot_note
+atc import markdown note.md --space sp_abc123 --type ot_note
 ```
 
 **Dry-Run (Preview without creating):**
 ```bash
-anytype import markdown note.md --space sp_abc123 --type ot_note --dry-run --verbose
+atc import markdown note.md --space sp_abc123 --type ot_note --dry-run --verbose
 ```
 
 **Example Markdown File with Frontmatter:**
@@ -235,8 +236,8 @@ This client is designed to work with your local Anytype application. Make sure:
 You can verify your local Anytype API is accessible by running the authentication status command:
 
 ```bash
-# Or use the CLI to check status
-anytype auth status
+# Use the CLI to check status
+atc auth status
 ```
 
 ## Configuration
@@ -277,7 +278,10 @@ nu crates/nu_plugin_anytype/test_all_commands.nu
 
 ```bash
 # For the CLI
-anytype --debug auth status
+atc --debug auth status
+
+# Or with cargo run
+cargo run --bin atc -- --debug auth status
 
 # For library development
 RUST_LOG=debug cargo run -p anytype_rs

@@ -142,3 +142,8 @@ When adding new API types:
 - [insta documentation](https://insta.rs/)
 - [proptest book](https://proptest-rs.github.io/proptest/)
 - [Property-Based Testing in Rust](https://www.lpalmieri.com/posts/property-based-testing-in-rust/)
+
+## See Also
+
+- **[archive/MOCK_TEST_PLAN.md](archive/MOCK_TEST_PLAN.md)** - Original implementation plan (archived, complete)
+- **[archive/MOCK_TEST_IMPLEMENTATION_STATUS.md](archive/MOCK_TEST_IMPLEMENTATION_STATUS.md)** - Implementation tracking (archived, 73/73 tests passing)
