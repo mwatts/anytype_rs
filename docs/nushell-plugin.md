@@ -37,8 +37,10 @@ exit  # then reopen
 ### First Steps
 
 ```nushell
-# Authenticate with your local Anytype app
+# Authenticate with your local Anytype app to get an API key
 anytype auth login
+# Follow the instructions to set the environment variable:
+# $env.anytype_api_key = "<your-api-key>"
 
 # List your spaces
 anytype space list
@@ -69,12 +71,53 @@ The plugin provides 40+ commands organized by domain:
 
 For detailed command documentation, see the sections below.
 
-## Authentication Commands
+## Authentication
+
+The plugin uses an environment variable for authentication. This is more secure than storing credentials in a file and integrates naturally with Nushell's environment management.
+
+### Authentication Commands
 
 ```nushell
-anytype auth login   # Authenticate with local Anytype app
+anytype auth login   # Get an API key from local Anytype app
 anytype auth status  # Check authentication status
-anytype auth delete  # Remove stored credentials
+anytype auth delete  # Show how to remove credentials
+```
+
+### Setting up Authentication
+
+1. **Get an API key:**
+   ```nushell
+   anytype auth login
+   # This will show a 4-digit code in your Anytype app
+   anytype auth login <CODE>
+   # The command will display your API key
+   ```
+
+2. **Set the environment variable:**
+   ```nushell
+   # For the current session
+   $env.anytype_api_key = "<your-api-key>"
+   ```
+
+3. **Make it permanent** (add to `~/.config/nushell/env.nu`):
+   ```nushell
+   # Add this line to your env.nu
+   $env.anytype_api_key = "<your-api-key>"
+   ```
+
+4. **Verify authentication:**
+   ```nushell
+   anytype auth status
+   ```
+
+### Logging Out
+
+To log out, simply unset the environment variable:
+```nushell
+# For the current session
+hide-env anytype_api_key
+
+# To permanently remove, delete the line from ~/.config/nushell/env.nu
 ```
 
 ## Space Commands
@@ -343,11 +386,17 @@ anytype object list  # Uses default_space from config
 ### Authentication Issues
 
 ```nushell
-# Re-authenticate
+# Check if environment variable is set
+$env.anytype_api_key
+
+# Re-authenticate to get a new API key
 anytype auth login
 
 # Check authentication status
 anytype auth status
+
+# Make sure the environment variable is set correctly
+$env.anytype_api_key = "<your-api-key>"
 ```
 
 ### Cache Issues
@@ -368,8 +417,10 @@ RUST_LOG=debug nu -c "anytype space list"
 
 ### Common Errors
 
-**"Authentication required"**
-- Run `anytype auth login` to authenticate with your local Anytype app
+**"Authentication required"** or **"Environment variable 'anytype_api_key' not found"**
+- Run `anytype auth login` to get an API key
+- Set the environment variable: `$env.anytype_api_key = "<your-api-key>"`
+- For persistent authentication, add the line to `~/.config/nushell/env.nu`
 
 **"No space found with name 'X'"**
 - Check space name with `anytype space list`

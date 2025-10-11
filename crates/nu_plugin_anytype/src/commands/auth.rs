@@ -58,13 +58,18 @@ impl PluginCommand for AuthLogin {
                     ))
                 })?;
 
-            // Save the API key and clean up challenge
-            save_api_key(&api_key_response.api_key)
-                .map_err(|e| LabeledError::new(format!("Failed to save API key: {}", e)))?;
+            // Clean up challenge
+            remove_challenge_id().ok();
 
-            remove_challenge_id().ok(); // Clean up
-
-            eprintln!("✅ Authentication successful! API key saved.");
+            eprintln!("✅ Authentication successful!");
+            eprintln!("");
+            eprintln!("🔑 Your API key:");
+            eprintln!("   {}", api_key_response.api_key);
+            eprintln!("");
+            eprintln!("📝 To use this plugin, set the environment variable:");
+            eprintln!("   $env.anytype_api_key = \"{}\"", api_key_response.api_key);
+            eprintln!("");
+            eprintln!("💡 Add this to your Nushell config (~/.config/nushell/env.nu) to make it permanent.");
             eprintln!("🚀 You can now use other commands to interact with your local Anytype app.");
 
             // Return success
@@ -148,19 +153,17 @@ impl PluginCommand for AuthDelete {
     ) -> Result<PipelineData, LabeledError> {
         let span = call.head;
 
-        eprintln!("🔐 Removing authentication...");
-
-        remove_api_key()
-            .map_err(|e| LabeledError::new(format!("Failed to remove API key: {}", e)))?;
-
-        eprintln!("✅ Logged out successfully. API key removed.");
+        eprintln!("🔐 To log out, unset the environment variable:");
+        eprintln!("   hide-env anytype_api_key");
+        eprintln!("");
+        eprintln!("💡 To permanently remove it, delete the line from your Nushell config (~/.config/nushell/env.nu).");
 
         // Return success message
         let mut record = Record::new();
-        record.push("status", Value::string("logged_out", span));
+        record.push("status", Value::string("instructions_provided", span));
         record.push(
             "message",
-            Value::string("API key removed successfully", span),
+            Value::string("Unset the 'anytype_api_key' environment variable to log out", span),
         );
 
         Ok(PipelineData::Value(Value::record(record, span), None))
@@ -198,66 +201,68 @@ impl PluginCommand for AuthStatus {
 
         let mut record = Record::new();
 
-        match load_api_key() {
-            Ok(Some(api_key)) => {
-                eprintln!("✅ Authenticated");
-                eprintln!(
-                    "🔑 API key: {}...{}",
-                    &api_key[..8.min(api_key.len())],
-                    if api_key.len() > 16 {
-                        &api_key[api_key.len() - 8..]
-                    } else {
-                        ""
-                    }
-                );
+        match std::env::var("anytype_api_key") {
+            Ok(api_key) => {
+                let api_key = api_key.trim().to_string();
+                if api_key.is_empty() {
+                    eprintln!("❌ Environment variable 'anytype_api_key' is empty");
+                    eprintln!("💡 Run 'anytype auth login' to get an API key and set the environment variable.");
+                    record.push("status", Value::string("not_authenticated", span));
+                    record.push("connected", Value::bool(false, span));
+                } else {
+                    eprintln!("✅ Authenticated");
+                    eprintln!(
+                        "🔑 API key: {}...{}",
+                        &api_key[..8.min(api_key.len())],
+                        if api_key.len() > 16 {
+                            &api_key[api_key.len() - 8..]
+                        } else {
+                            ""
+                        }
+                    );
 
-                // Test the API key by making a simple request
-                let mut client = anytype_rs::AnytypeClient::new()
-                    .map_err(|e| LabeledError::new(format!("Failed to create client: {}", e)))?;
-                client.set_api_key(api_key.clone());
+                    // Test the API key by making a simple request
+                    let mut client = anytype_rs::AnytypeClient::new()
+                        .map_err(|e| LabeledError::new(format!("Failed to create client: {}", e)))?;
+                    client.set_api_key(api_key.clone());
 
-                match plugin.run_async(client.list_spaces()) {
-                    Ok(spaces) => {
-                        eprintln!("🏠 Connected successfully. Found {} spaces.", spaces.len());
-                        record.push("status", Value::string("authenticated", span));
-                        record.push("connected", Value::bool(true, span));
-                        record.push("spaces_count", Value::int(spaces.len() as i64, span));
+                    match plugin.run_async(client.list_spaces()) {
+                        Ok(spaces) => {
+                            eprintln!("🏠 Connected successfully. Found {} spaces.", spaces.len());
+                            record.push("status", Value::string("authenticated", span));
+                            record.push("connected", Value::bool(true, span));
+                            record.push("spaces_count", Value::int(spaces.len() as i64, span));
+                        }
+                        Err(e) => {
+                            eprintln!("⚠️  API key may be invalid or expired: {}", e);
+                            record.push("status", Value::string("authenticated", span));
+                            record.push("connected", Value::bool(false, span));
+                            record.push("error", Value::string(e.to_string(), span));
+                        }
                     }
-                    Err(e) => {
-                        eprintln!("⚠️  API key may be invalid or expired: {}", e);
-                        record.push("status", Value::string("authenticated", span));
-                        record.push("connected", Value::bool(false, span));
-                        record.push("error", Value::string(e.to_string(), span));
-                    }
-                }
 
-                record.push(
-                    "api_key",
-                    Value::string(
-                        format!(
-                            "{}...{}",
-                            &api_key[..8.min(api_key.len())],
-                            if api_key.len() > 16 {
-                                &api_key[api_key.len() - 8..]
-                            } else {
-                                ""
-                            }
+                    record.push(
+                        "api_key",
+                        Value::string(
+                            format!(
+                                "{}...{}",
+                                &api_key[..8.min(api_key.len())],
+                                if api_key.len() > 16 {
+                                    &api_key[api_key.len() - 8..]
+                                } else {
+                                    ""
+                                }
+                            ),
+                            span,
                         ),
-                        span,
-                    ),
-                );
+                    );
+                }
             }
-            Ok(None) => {
-                eprintln!("❌ Not authenticated");
-                eprintln!("💡 Run 'anytype auth login' to authenticate.");
+            Err(_) => {
+                eprintln!("❌ Not authenticated - environment variable 'anytype_api_key' not set");
+                eprintln!("💡 Run 'anytype auth login' to get an API key, then set: $env.anytype_api_key = \"<your-api-key>\"");
                 record.push("status", Value::string("not_authenticated", span));
                 record.push("connected", Value::bool(false, span));
-            }
-            Err(e) => {
-                return Err(LabeledError::new(format!(
-                    "Failed to check authentication status: {}",
-                    e
-                )));
             }
         }
 
@@ -265,9 +270,9 @@ impl PluginCommand for AuthStatus {
     }
 }
 
-// Helper functions for API key management
+// Helper functions for challenge management
 
-fn config_dir() -> Result<std::path::PathBuf, String> {
+fn challenge_dir() -> Result<std::path::PathBuf, String> {
     let config_dir = dirs::config_dir()
         .ok_or_else(|| "Could not determine config directory".to_string())?
         .join("anytype-cli");
@@ -277,44 +282,8 @@ fn config_dir() -> Result<std::path::PathBuf, String> {
     Ok(config_dir)
 }
 
-fn api_key_file() -> Result<std::path::PathBuf, String> {
-    Ok(config_dir()?.join("api_key"))
-}
-
-fn save_api_key(api_key: &str) -> Result<(), String> {
-    let key_file = api_key_file()?;
-    std::fs::write(key_file, api_key).map_err(|e| format!("Failed to write API key: {}", e))?;
-    Ok(())
-}
-
-fn load_api_key() -> Result<Option<String>, String> {
-    let key_file = api_key_file()?;
-
-    if key_file.exists() {
-        let api_key = std::fs::read_to_string(key_file)
-            .map_err(|e| format!("Failed to read API key: {}", e))?
-            .trim()
-            .to_string();
-        if api_key.is_empty() {
-            Ok(None)
-        } else {
-            Ok(Some(api_key))
-        }
-    } else {
-        Ok(None)
-    }
-}
-
-fn remove_api_key() -> Result<(), String> {
-    let key_file = api_key_file()?;
-    if key_file.exists() {
-        std::fs::remove_file(key_file).map_err(|e| format!("Failed to remove API key: {}", e))?;
-    }
-    Ok(())
-}
-
 fn challenge_file() -> Result<std::path::PathBuf, String> {
-    Ok(config_dir()?.join("challenge_id"))
+    Ok(challenge_dir()?.join("challenge_id"))
 }
 
 fn save_challenge_id(challenge_id: &str) -> Result<(), String> {

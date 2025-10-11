@@ -150,51 +150,32 @@ impl AnytypePlugin {
         }
     }
 
-    /// Load authentication token from existing CLI config
+    /// Load authentication token from environment variable
     fn load_auth_token(&self) -> Result<String, ShellError> {
-        let config_dir = dirs::config_dir()
-            .ok_or_else(|| ShellError::GenericError {
-                error: "Configuration error".to_string(),
-                msg: "Could not determine config directory".to_string(),
-                span: None,
-                help: None,
-                inner: vec![],
-            })?
-            .join("anytype-cli");
-
-        let key_file = config_dir.join("api_key");
-
-        if key_file.exists() {
-            let api_key = std::fs::read_to_string(&key_file)
-                .map_err(|e| ShellError::GenericError {
-                    error: "Failed to read API key".to_string(),
-                    msg: e.to_string(),
-                    span: None,
-                    help: Some("Check file permissions".to_string()),
-                    inner: vec![],
-                })?
-                .trim()
-                .to_string();
-
-            if api_key.is_empty() {
-                return Err(ShellError::GenericError {
-                    error: "Authentication required".to_string(),
-                    msg: "API key file is empty".to_string(),
-                    span: None,
-                    help: Some("Run `anytype auth login` to authenticate".to_string()),
-                    inner: vec![],
-                });
+        match std::env::var("anytype_api_key") {
+            Ok(api_key) => {
+                let api_key = api_key.trim().to_string();
+                if api_key.is_empty() {
+                    Err(ShellError::GenericError {
+                        error: "Authentication required".to_string(),
+                        msg: "Environment variable 'anytype_api_key' is empty".to_string(),
+                        span: None,
+                        help: Some("Run `anytype auth login` to get an API key and set the environment variable".to_string()),
+                        inner: vec![],
+                    })
+                } else {
+                    Ok(api_key)
+                }
             }
-
-            Ok(api_key)
-        } else {
-            Err(ShellError::GenericError {
-                error: "Authentication required".to_string(),
-                msg: "No API key found".to_string(),
-                span: None,
-                help: Some("Run `anytype auth login` to authenticate".to_string()),
-                inner: vec![],
-            })
+            Err(_) => {
+                Err(ShellError::GenericError {
+                    error: "Authentication required".to_string(),
+                    msg: "Environment variable 'anytype_api_key' not found".to_string(),
+                    span: None,
+                    help: Some("Run `anytype auth login` to get an API key, then set the environment variable: $env.anytype_api_key = \"<your-api-key>\"".to_string()),
+                    inner: vec![],
+                })
+            }
         }
     }
 
