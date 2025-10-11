@@ -20,8 +20,10 @@ tokio.workspace = true
 tracing.workspace = true
 
 [dev-dependencies]
+httpmock = "0.8"
 insta.workspace = true
 proptest.workspace = true
+tokio = { workspace = true, features = ["macros"] }
 
 [lib]
 name = "anytype_rs"
