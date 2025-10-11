@@ -17,7 +17,6 @@ mod mock_tests {
     pub mod members_tests;
 
     use anytype_rs::api::{AnytypeClient, ClientConfig};
-    use httpmock::prelude::*;
 
     /// Create a test client configured to use the mock server
     pub fn create_test_client(base_url: &str) -> AnytypeClient {

@@ -612,6 +612,330 @@ pub mod tags {
     }
 }
 
+/// Search fixtures
+pub mod search {
+    use super::*;
+
+    /// Sample search object
+    pub fn search_object() -> serde_json::Value {
+        json!({
+            "archived": false,
+            "icon": {
+                "format": "emoji",
+                "emoji": "📄"
+            },
+            "id": "bafyreiabc456object",
+            "name": "Test Page",
+            "object": "ot-page",
+            "properties": {
+                "title": "Test Page"
+            },
+            "snippet": "This is a test page content...",
+            "space_id": "bafyreiabc123example",
+            "type": {
+                "archived": false,
+                "id": "ot-page",
+                "key": "ot-page",
+                "name": "Page",
+                "plural_name": "Pages",
+                "layout": "basic",
+                "object": "type",
+                "icon": {
+                    "format": "emoji",
+                    "emoji": "📄"
+                },
+                "properties": []
+            }
+        })
+    }
+
+    /// Sample search response
+    pub fn search_response() -> serde_json::Value {
+        json!({
+            "data": [
+                search_object(),
+                {
+                    "archived": false,
+                    "icon": {
+                        "format": "emoji",
+                        "emoji": "📝"
+                    },
+                    "id": "bafyreiabc789note",
+                    "name": "Test Note",
+                    "object": "ot-note",
+                    "properties": {
+                        "content": "Note content"
+                    },
+                    "snippet": "This is a test note...",
+                    "space_id": "bafyreiabc123example",
+                    "type": {
+                        "archived": false,
+                        "id": "ot-note",
+                        "key": "ot-note",
+                        "name": "Note",
+                        "plural_name": "Notes",
+                        "layout": "note",
+                        "object": "type",
+                        "icon": {
+                            "format": "emoji",
+                            "emoji": "📝"
+                        },
+                        "properties": []
+                    }
+                }
+            ],
+            "pagination": {
+                "has_more": false,
+                "limit": 50,
+                "offset": 0,
+                "total": 2
+            }
+        })
+    }
+}
+
+/// Template fixtures
+pub mod templates {
+    use super::*;
+
+    /// Sample template
+    pub fn template() -> serde_json::Value {
+        json!({
+            "archived": false,
+            "icon": {
+                "format": "emoji",
+                "emoji": "📋"
+            },
+            "id": "template-123",
+            "layout": "basic",
+            "markdown": "# Template\n\nThis is a template.",
+            "name": "Basic Template",
+            "object": "template",
+            "properties": [],
+            "snippet": "This is a template.",
+            "space_id": "bafyreiabc123example",
+            "type": {
+                "archived": false,
+                "icon": {
+                    "format": "emoji",
+                    "emoji": "📄"
+                },
+                "id": "ot-page",
+                "key": "ot-page",
+                "layout": "basic",
+                "name": "Page",
+                "object": "type",
+                "plural_name": "Pages",
+                "properties": []
+            }
+        })
+    }
+
+    /// Sample list templates response
+    pub fn list_templates_response() -> serde_json::Value {
+        json!({
+            "data": [
+                template(),
+                {
+                    "archived": false,
+                    "icon": {
+                        "format": "emoji",
+                        "emoji": "📝"
+                    },
+                    "id": "template-456",
+                    "layout": "note",
+                    "markdown": "# Note Template",
+                    "name": "Note Template",
+                    "object": "template",
+                    "properties": [],
+                    "snippet": "Note template content.",
+                    "space_id": "bafyreiabc123example",
+                    "type": {
+                        "archived": false,
+                        "icon": {
+                            "format": "emoji",
+                            "emoji": "📝"
+                        },
+                        "id": "ot-note",
+                        "key": "ot-note",
+                        "layout": "note",
+                        "name": "Note",
+                        "object": "type",
+                        "plural_name": "Notes",
+                        "properties": []
+                    }
+                }
+            ],
+            "pagination": {
+                "has_more": false,
+                "limit": 50,
+                "offset": 0,
+                "total": 2
+            }
+        })
+    }
+
+    /// Sample get template response
+    pub fn get_template_response() -> serde_json::Value {
+        json!({
+            "template": template()
+        })
+    }
+}
+
+/// List fixtures
+pub mod lists {
+    use super::*;
+
+    /// Sample add list objects request
+    pub fn add_list_objects_request() -> serde_json::Value {
+        json!({
+            "object_ids": ["bafyreiabc456object", "bafyreiabc789note"]
+        })
+    }
+
+    /// Sample add list objects response
+    pub fn add_list_objects_response() -> serde_json::Value {
+        json!({
+            "message": "Objects added successfully",
+            "added_objects": ["bafyreiabc456object", "bafyreiabc789note"]
+        })
+    }
+
+    /// Sample list object
+    pub fn list_object() -> serde_json::Value {
+        json!({
+            "archived": false,
+            "icon": {
+                "format": "emoji",
+                "emoji": "📄"
+            },
+            "id": "bafyreiabc456object",
+            "layout": "basic",
+            "name": "Test Page",
+            "object": "ot-page",
+            "properties": [],
+            "snippet": "Test page content",
+            "space_id": "bafyreiabc123example",
+            "type": {
+                "archived": false,
+                "icon": {
+                    "format": "emoji",
+                    "emoji": "📄"
+                },
+                "id": "ot-page",
+                "key": "ot-page",
+                "layout": "basic",
+                "name": "Page",
+                "object": "type",
+                "plural_name": "Pages",
+                "properties": []
+            }
+        })
+    }
+
+    /// Sample get list objects response
+    pub fn get_list_objects_response() -> serde_json::Value {
+        json!({
+            "data": [list_object()],
+            "pagination": {
+                "has_more": false,
+                "limit": 50,
+                "offset": 0,
+                "total": 1
+            }
+        })
+    }
+
+    /// Sample remove list object response
+    pub fn remove_list_object_response() -> serde_json::Value {
+        json!({
+            "message": "Object removed successfully"
+        })
+    }
+
+    /// Sample list view
+    pub fn list_view() -> serde_json::Value {
+        json!({
+            "filters": [],
+            "id": "view-123",
+            "layout": "table",
+            "name": "Default View",
+            "sorts": []
+        })
+    }
+
+    /// Sample get list views response
+    pub fn get_list_views_response() -> serde_json::Value {
+        json!({
+            "data": [list_view()],
+            "pagination": {
+                "has_more": false,
+                "limit": 50,
+                "offset": 0,
+                "total": 1
+            }
+        })
+    }
+}
+
+/// Member fixtures
+pub mod members {
+    use super::*;
+
+    /// Sample member
+    pub fn member() -> serde_json::Value {
+        json!({
+            "id": "member-123",
+            "name": "John Doe",
+            "global_name": "john.any",
+            "identity": "identity-abc",
+            "object": "member",
+            "role": "editor",
+            "status": "active",
+            "icon": {
+                "format": "emoji",
+                "emoji": "👤"
+            }
+        })
+    }
+
+    /// Sample list members response
+    pub fn list_members_response() -> serde_json::Value {
+        json!({
+            "data": [
+                member(),
+                {
+                    "id": "member-456",
+                    "name": "Jane Smith",
+                    "global_name": "jane.any",
+                    "identity": "identity-def",
+                    "object": "member",
+                    "role": "viewer",
+                    "status": "active",
+                    "icon": {
+                        "format": "emoji",
+                        "emoji": "👤"
+                    }
+                }
+            ],
+            "pagination": {
+                "has_more": false,
+                "limit": 50,
+                "offset": 0,
+                "total": 2
+            }
+        })
+    }
+
+    /// Sample get member response
+    pub fn get_member_response() -> serde_json::Value {
+        json!({
+            "member": member()
+        })
+    }
+}
+
 /// Error response fixtures
 pub mod errors {
     use super::*;
