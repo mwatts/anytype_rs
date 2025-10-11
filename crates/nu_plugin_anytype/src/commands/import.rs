@@ -45,7 +45,7 @@ impl PluginCommand for ImportMarkdown {
     fn run(
         &self,
         plugin: &Self::Plugin,
-        _engine: &EngineInterface,
+        engine: &EngineInterface,
         call: &EvaluatedCall,
         input: PipelineData,
     ) -> Result<PipelineData, LabeledError> {
@@ -53,9 +53,36 @@ impl PluginCommand for ImportMarkdown {
         let input = input.into_value(span)?;
 
         // Get parameters
-        let file_path: String = call.req(0)?;
+        let file_path_arg: String = call.req(0)?;
         let dry_run = call.has_flag("dry-run")?;
         let verbose = call.has_flag("verbose")?;
+
+        // Get current working directory from Nushell engine
+        let cwd = engine.get_current_dir().map_err(|e| {
+            LabeledError::new(format!("Failed to get current directory: {}", e))
+                .with_label("Could not determine working directory", span)
+        })?;
+
+        // Resolve the file path against the current working directory
+        let file_path = if Path::new(&file_path_arg).is_absolute() {
+            // Already absolute, use as-is
+            std::path::PathBuf::from(&file_path_arg)
+        } else {
+            // Relative path, resolve against cwd
+            std::path::PathBuf::from(&cwd).join(&file_path_arg)
+        };
+
+        // Canonicalize to get the full absolute path and resolve any symlinks
+        let resolved_path = file_path.canonicalize().map_err(|e| {
+            LabeledError::new(format!("Failed to resolve file path '{}': {}", file_path_arg, e))
+                .with_label("File not found or inaccessible", span)
+                .with_help(format!("Current directory: {}", cwd))
+        })?;
+
+        if verbose {
+            eprintln!("📂 Current directory: {}", cwd);
+            eprintln!("📄 Resolved file path: {}", resolved_path.display());
+        }
 
         // Get space_id from multiple sources
         let space_id = get_space_id(plugin, call, &input, span)?;
@@ -66,9 +93,9 @@ impl PluginCommand for ImportMarkdown {
                 .with_label("Use --type <name> to specify object type", span)
         })?;
 
-        // Read the markdown file
-        let content = std::fs::read_to_string(&file_path).map_err(|e| {
-            LabeledError::new(format!("Failed to read file: {}", e))
+        // Read the markdown file using the resolved path
+        let content = std::fs::read_to_string(&resolved_path).map_err(|e| {
+            LabeledError::new(format!("Failed to read file '{}': {}", resolved_path.display(), e))
                 .with_label("File read error", span)
         })?;
 
@@ -77,7 +104,7 @@ impl PluginCommand for ImportMarkdown {
             .map_err(|e| LabeledError::new(format!("Failed to parse frontmatter: {}", e)))?;
 
         if verbose || dry_run {
-            eprintln!("📄 Reading markdown file: {}", file_path);
+            eprintln!("📄 Reading markdown file: {}", resolved_path.display());
             eprintln!("✓ Parsed frontmatter: {} fields found", frontmatter.len());
         }
 
@@ -117,7 +144,7 @@ impl PluginCommand for ImportMarkdown {
         }
 
         // Extract title from frontmatter or use filename
-        let object_name = extract_object_name(&frontmatter, &file_path);
+        let object_name = extract_object_name(&frontmatter, resolved_path.to_str().unwrap_or("Untitled"));
 
         // Map frontmatter to properties
         let (properties, unmapped_fields) =
@@ -173,7 +200,7 @@ impl PluginCommand for ImportMarkdown {
 
             // Return a record with preview information
             let mut record = nu_protocol::Record::new();
-            record.push("file", Value::string(&file_path, span));
+            record.push("file", Value::string(resolved_path.to_string_lossy().to_string(), span));
             record.push("name", Value::string(&object_name, span));
             record.push("type", Value::string(&type_name, span));
             record.push("space_id", Value::string(&space_id, span));
