@@ -45,17 +45,27 @@ license.workspace = true
 publish = false
 
 [[bin]]
-name = "anytype"
+name = "atc"
 path = "bin/cli/main.rs"
+
+[[bin]]
+name = "nu_plugin_anytype"
+path = "crates/nu_plugin_anytype/src/main.rs"
 
 [dependencies]
 anytype_rs.workspace = true
 anyhow.workspace = true
 clap.workspace = true
+dashmap.workspace = true
 dirs.workspace = true
 gray_matter.workspace = true
+nu-plugin.workspace = true
+nu-protocol.workspace = true
+nu_plugin_anytype = { path = "crates/nu_plugin_anytype" }
 serde.workspace = true
 serde_json.workspace = true
+thiserror.workspace = true
 tokio.workspace = true
 tracing.workspace = true
 tracing-subscriber.workspace = true
+typetag.workspace = true
