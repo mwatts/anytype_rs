@@ -94,9 +94,9 @@ async fn search_objects() -> Result<()> {
     };
     
     let results = client.search(request).await?;
-    println!("Found {} objects", results.objects.len());
-    
-    for object in results.objects {
+    println!("Found {} objects", results.data.len());
+
+    for object in results.data {
         println!("Object: {} in space {}", object.id, object.space_id);
         
         // Access object properties
@@ -300,9 +300,9 @@ async fn main() -> Result<()> {
         };
         
         let results = client.search(search_request).await?;
-        println!("Search results from local Anytype: {} objects found", results.objects.len());
-        
-        for object in results.objects {
+        println!("Search results from local Anytype: {} objects found", results.data.len());
+
+        for object in results.data {
             println!("  - Object: {}", object.id);
         }
     }

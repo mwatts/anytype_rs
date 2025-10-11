@@ -100,22 +100,117 @@ TRACE ... headers.authorization="Bearer [REDACTED]"
 
 ## Usage Examples
 
-### Debugging Failed Requests
+### CLI Usage
+
+#### Debugging Failed Requests
 ```bash
 # See full request/response to understand API errors
 atc --trace-http object create --space-id abc --name "Test"
 ```
 
-### Performance Analysis
+#### Performance Analysis
 ```bash
 # Use DEBUG to see request timing without verbose bodies
 atc --debug space list
 ```
 
-### Production Use
+#### Production Use
 ```bash
 # No HTTP tracing by default (minimal overhead)
 atc space list
+```
+
+### Library Usage
+
+When using the `anytype_rs` library directly in your Rust code, enable tracing using the `tracing-subscriber` crate:
+
+#### Basic Setup
+
+```rust
+use anytype_rs::AnytypeClient;
+use tracing_subscriber;
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Initialize tracing subscriber with INFO level
+    tracing_subscriber::fmt()
+        .with_max_level(tracing::Level::INFO)
+        .init();
+
+    let client = AnytypeClient::new()?;
+    // Your API calls here...
+
+    Ok(())
+}
+```
+
+#### Enable TRACE Level for Full HTTP Details
+
+```rust
+use tracing_subscriber::{fmt, EnvFilter};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Enable TRACE level for anytype_rs, INFO for everything else
+    tracing_subscriber::fmt()
+        .with_env_filter(
+            EnvFilter::try_from_default_env()
+                .unwrap_or_else(|_| EnvFilter::new("anytype_rs=trace,info"))
+        )
+        .init();
+
+    let client = AnytypeClient::new()?;
+    let spaces = client.list_spaces().await?;
+    // Will show full HTTP request/response details
+
+    Ok(())
+}
+```
+
+#### Conditional Tracing
+
+```rust
+use tracing_subscriber::fmt::format::FmtSpan;
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Only in debug builds
+    #[cfg(debug_assertions)]
+    tracing_subscriber::fmt()
+        .with_max_level(tracing::Level::DEBUG)
+        .with_span_events(FmtSpan::CLOSE)
+        .init();
+
+    // In release builds, minimal logging
+    #[cfg(not(debug_assertions))]
+    tracing_subscriber::fmt()
+        .with_max_level(tracing::Level::WARN)
+        .init();
+
+    let client = AnytypeClient::new()?;
+    // API calls...
+
+    Ok(())
+}
+```
+
+#### Environment Variable Control
+
+```rust
+use tracing_subscriber::EnvFilter;
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Respects RUST_LOG environment variable
+    tracing_subscriber::fmt()
+        .with_env_filter(EnvFilter::from_default_env())
+        .init();
+
+    let client = AnytypeClient::new()?;
+    // Control via: RUST_LOG=anytype_rs=trace cargo run
+
+    Ok(())
+}
 ```
 
 ### Custom RUST_LOG Patterns
