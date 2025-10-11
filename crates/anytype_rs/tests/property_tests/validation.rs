@@ -60,6 +60,7 @@ proptest! {
         let request = CreateObjectRequest {
             type_key,
             name,
+            markdown: None,
             properties: None,
         };
 
@@ -100,6 +101,7 @@ proptest! {
             let request = CreateObjectRequest {
                 type_key: key,
                 name: Some("".to_string()),
+                markdown: None,
                 properties: Some(serde_json::json!({})),
             };
 
@@ -150,6 +152,7 @@ proptest! {
         let request = CreateObjectRequest {
             type_key: "test".to_string(),
             name: Some(special_chars),
+            markdown: None,
             properties: None,
         };
 

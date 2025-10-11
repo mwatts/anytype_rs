@@ -193,38 +193,52 @@ impl PluginCommand for ImportMarkdown {
             return Ok(PipelineData::Value(Value::record(record, span), None));
         }
 
-        // Create the object
-        let request = CreateObjectRequest {
-            type_key: type_id.clone(),
-            name: Some(object_name.clone()),
-            properties: Some(properties),
+        // Create the object with markdown in a single API call
+        let markdown_content = if markdown_body.trim().is_empty() {
+            None
+        } else {
+            Some(markdown_body.clone())
         };
+
+        let request = CreateObjectRequest {
+            type_key: type_data.key.clone(),
+            name: Some(object_name.clone()),
+            markdown: markdown_content,
+            properties: Some(properties.clone()),
+        };
+
+        if verbose {
+            eprintln!("\n🔨 Creating object...");
+            eprintln!("  Space ID: {}", space_id);
+            eprintln!("  Type Key: {}", type_data.key);
+            eprintln!("  Type ID: {}", type_id);
+            eprintln!("  Object Name: {}", object_name);
+            eprintln!("  Markdown: {} characters", markdown_body.len());
+            eprintln!("  Request JSON: {}", serde_json::to_string_pretty(&request).unwrap_or_else(|_| "Failed to serialize".to_string()));
+        }
 
         let response = plugin
             .run_async(client.create_object(&space_id, request))
             .map_err(|e| {
+                eprintln!("\n❌ API Error Details:");
+                eprintln!("  Error: {}", e);
+                eprintln!("  Space ID: {}", space_id);
+                eprintln!("  Type Key: {}", type_data.key);
                 LabeledError::new(format!(
                     "Failed to create object in space '{}': {}",
                     space_id, e
                 ))
             })?;
 
-        // Update with markdown content if there is any
-        if !markdown_body.trim().is_empty() {
-            let update_request = anytype_rs::api::UpdateObjectRequest {
-                name: None,
-                markdown: Some(markdown_body.clone()),
-                properties: None,
-            };
-
-            plugin
-                .run_async(client.update_object(&space_id, &response.object.id, update_request))
-                .map_err(|e| {
-                    LabeledError::new(format!(
-                        "Failed to update object with markdown content: {}",
-                        e
-                    ))
-                })?;
+        if verbose {
+            eprintln!("\n✅ API Response received");
+            eprintln!("  Object ID: {}", response.object.id);
+            if let Some(props) = &response.properties {
+                eprintln!("  Response properties: {}", serde_json::to_string_pretty(props).unwrap_or_else(|_| "Failed to serialize".to_string()));
+            }
+            if let Some(md) = &response.markdown {
+                eprintln!("  Markdown: {} characters", md.len());
+            }
         }
 
         if verbose {
@@ -243,8 +257,8 @@ impl PluginCommand for ImportMarkdown {
             );
         }
 
-        // Get the type_key from the created object
-        let type_key = response.object.object.clone().unwrap_or(type_id.clone());
+        // Get the type_key from the created object or use the one from type_data
+        let type_key = response.object.object.clone().unwrap_or_else(|| type_data.key.clone());
 
         // Convert to AnytypeValue::Object with full context
         let anytype_value: AnytypeValue = (response.object, space_id, type_id, type_key).into();

@@ -151,6 +151,7 @@ async fn import_markdown(
     let request = CreateObjectRequest {
         type_key: type_key.to_string(),
         name: Some(object_name.clone()),
+        markdown: None,
         properties: Some(properties),
     };
 

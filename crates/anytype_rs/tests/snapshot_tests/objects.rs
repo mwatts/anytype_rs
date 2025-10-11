@@ -32,6 +32,7 @@ fn test_create_object_request_serialization() {
     let request = CreateObjectRequest {
         type_key: "note".to_string(),
         name: Some("New Note".to_string()),
+        markdown: None,
         properties: Some(serde_json::json!({
             "title": "My Note",
             "content": "Note content"
@@ -42,6 +43,7 @@ fn test_create_object_request_serialization() {
     let request_minimal = CreateObjectRequest {
         type_key: "page".to_string(),
         name: None,
+        markdown: None,
         properties: None,
     };
     insta::assert_json_snapshot!("create_object_request_minimal", request_minimal);

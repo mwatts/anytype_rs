@@ -134,6 +134,7 @@ async fn create_object(
     let request = CreateObjectRequest {
         name: Some(name.to_string()),
         type_key: type_key.to_string(),
+        markdown: None,
         properties: None,
     };
 
