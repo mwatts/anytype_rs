@@ -14,7 +14,19 @@
       "Bash(git add:*)",
       "Bash(cargo test:*)",
       "Bash(git log:*)",
-      "Bash(git cherry-pick:*)"
+      "Bash(git cherry-pick:*)",
+      "Bash(./target/release/anytype:*)",
+      "Bash(./target/release/atc:*)",
+      "Bash(ls:*)",
+      "Bash(awk:*)",
+      "Bash(./target/debug/atc:*)",
+      "Bash(./target/debug/nu_plugin_anytype:*)",
+      "WebFetch(domain:developers.anytype.io)",
+      "WebFetch(domain:httpmock.rs)",
+      "Bash(git rm:*)",
+      "Bash(cargo insta review:*)",
+      "Bash(cargo insta:*)",
+      "Bash(git mv:*)"
     ],
     "deny": [],
     "ask": []
