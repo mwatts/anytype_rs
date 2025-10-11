@@ -66,12 +66,34 @@ impl AnytypePlugin {
 
     /// Initialize client from stored JWT token
     pub fn init_client(&self) -> Result<(), ShellError> {
+        self.init_client_with_config(None)
+    }
+
+    /// Initialize client with optional engine interface for config retrieval
+    ///
+    /// Commands can call this method with `Some(engine)` to load configuration from
+    /// Nushell's plugin config. Configuration should be set in Nushell like:
+    ///
+    /// ```nushell
+    /// $env.config.plugins.anytype = {
+    ///     base_url: "http://localhost:31009"
+    ///     timeout_seconds: 60
+    ///     app_name: "nushell-anytype"
+    /// }
+    /// ```
+    ///
+    /// If engine is None or config is not found, defaults from ClientConfig::default() are used.
+    pub fn init_client_with_config(
+        &self,
+        engine: Option<&nu_plugin::EngineInterface>,
+    ) -> Result<(), ShellError> {
         let token = self.load_auth_token()?;
-        let mut client = anytype_rs::AnytypeClient::with_config(anytype_rs::ClientConfig {
-            base_url: self.config.api_endpoint.clone(),
-            ..Default::default()
-        })
-        .map_err(crate::error::convert_anytype_error)?;
+
+        // Build ClientConfig from Nushell plugin config or use defaults
+        let client_config = self.load_client_config(engine);
+
+        let mut client = anytype_rs::AnytypeClient::with_config(client_config)
+            .map_err(crate::error::convert_anytype_error)?;
 
         client.set_api_key(token);
         let client = Arc::new(client);
@@ -82,6 +104,50 @@ impl AnytypePlugin {
         *self.resolver.write().unwrap() = Some(resolver);
 
         Ok(())
+    }
+
+    /// Load ClientConfig from Nushell plugin configuration or use defaults
+    fn load_client_config(&self, engine: Option<&nu_plugin::EngineInterface>) -> anytype_rs::ClientConfig {
+        // Start with defaults
+        let defaults = anytype_rs::ClientConfig::default();
+
+        // Try to get configuration from Nushell if engine interface is provided
+        let config_value = if let Some(eng) = engine {
+            eng.get_plugin_config().ok().flatten()
+        } else {
+            None
+        };
+
+        // Extract configuration values from the record or use defaults
+        let base_url = config_value
+            .as_ref()
+            .and_then(|v| v.as_record().ok())
+            .and_then(|record| record.get("base_url"))
+            .and_then(|v| v.as_str().ok())
+            .map(|s| s.to_string())
+            .unwrap_or_else(|| defaults.base_url.clone());
+
+        let timeout_seconds = config_value
+            .as_ref()
+            .and_then(|v| v.as_record().ok())
+            .and_then(|record| record.get("timeout_seconds"))
+            .and_then(|v| v.as_int().ok())
+            .map(|n| n as u64)
+            .unwrap_or(defaults.timeout_seconds);
+
+        let app_name = config_value
+            .as_ref()
+            .and_then(|v| v.as_record().ok())
+            .and_then(|record| record.get("app_name"))
+            .and_then(|v| v.as_str().ok())
+            .map(|s| s.to_string())
+            .unwrap_or_else(|| defaults.app_name.clone());
+
+        anytype_rs::ClientConfig {
+            base_url,
+            timeout_seconds,
+            app_name,
+        }
     }
 
     /// Load authentication token from existing CLI config

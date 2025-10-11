@@ -267,7 +267,33 @@ anytype search "urgent" --space "Work"
 
 ## Configuration
 
-Create `~/.config/anytype-cli/plugin.toml` to customize behavior:
+### Nushell Plugin Configuration (Recommended)
+
+Configure the plugin using Nushell's native plugin configuration system. Add this to your Nushell config file (`$nu.config-path`):
+
+```nushell
+$env.config.plugins = {
+    anytype: {
+        base_url: "http://localhost:31009"      # Anytype API endpoint (default: http://localhost:31009)
+        timeout_seconds: 60                      # Request timeout in seconds (default: 30)
+        app_name: "nushell-anytype"              # Application name for API (default: anytype_rs)
+    }
+}
+```
+
+**Configuration options:**
+- **`base_url`** (string): URL of the Anytype API endpoint. Default: `http://localhost:31009`
+- **`timeout_seconds`** (integer): HTTP request timeout in seconds. Default: `30`
+- **`app_name`** (string): Application name sent to the API. Default: `anytype_rs`
+
+To apply configuration changes, restart Nushell or reload your config:
+```nushell
+source $nu.config-path
+```
+
+### Legacy TOML Configuration
+
+You can also create `~/.config/anytype-cli/plugin.toml` to customize behavior:
 
 ```toml
 default_space = "Work"                    # Default space for commands
@@ -275,6 +301,8 @@ cache_ttl = 300                           # Cache TTL in seconds (5 min)
 case_insensitive = true                   # Case-insensitive name matching
 api_endpoint = "http://localhost:31009"  # Anytype API endpoint
 ```
+
+**Note:** The Nushell plugin configuration takes precedence for API connection settings (`base_url`, `timeout_seconds`, `app_name`). The TOML configuration is used for plugin-specific settings like `default_space` and `cache_ttl`.
 
 ### Using Default Space
 
